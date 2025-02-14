@@ -293,7 +293,7 @@ const groups = {
   }
   .question-grid, .feedback-grid {
     padding: 1.5rem;
-    background-color: #a0b10c;
+    background-color: #ffffff;
     text-align: left;
   }
   .question-number {
