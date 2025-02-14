@@ -29,7 +29,7 @@
 <style scoped>
   .choice-button {
     display: block;
-    margin: 1rem;
+    margin-left: 20%;
     padding: 0.5rem;
     background-color: lightblue;
     border: none;

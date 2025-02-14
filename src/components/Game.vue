@@ -285,7 +285,7 @@ const groups = {
 <style scoped>
   .main-container {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* question-gridとfeedback-gridを2列に */
+    grid-template-columns: 60% 40%;
     align-items: center; /* 縦方向の中央揃え */
     justify-content: center; /* 横方向の中央揃え */
     width: 100%;
@@ -295,12 +295,15 @@ const groups = {
     padding: 1.5rem;
     background-color: #ffffff;
     text-align: left;
+    margin-top: 10%;
   }
   .question-number {
+    margin-left: 10%;
     font-size: 6rem;
     font-weight: bold;
   }
   .current-question {
+    margin-left: 10%;
     font-size: 9rem;
     font-weight: bold;
     margin-top: 6rem;

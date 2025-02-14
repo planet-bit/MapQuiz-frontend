@@ -86,7 +86,6 @@ const handleCloseLearning = () => {
 .learn-container {
   position:absolute;
   top: 15rem;
-  left:px;
   height:calc(100% - 15rem);
   width: 50%;
   background-color: rgb(255, 255, 255);

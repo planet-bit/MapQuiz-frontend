@@ -1,14 +1,15 @@
 <template>
   <!-- 学習モード時に言語一覧を表示 -->
-  <div v-if="isLearning" class="overlay">
+  <div v-if="isLearning">
     <div class="language-list">
-      <h3>{{ selectedCountry }} の言語一覧</h3>
+      <h3>List of languages in {{ selectedCountry }} 
+        <button @click="closeLearning">CLOSE</button>
+      </h3>
       <ul>
         <li v-for="(pronunciation, index) in languageData[selectedCountry]" :key="index">
           {{ pronunciation }}
         </li>
       </ul>
-      <button @click="closeLearning">CLOSE</button>
     </div>
   </div>
 </template>
@@ -32,82 +33,70 @@
 
   // 国ごとの言語の読み方一覧
   const languageData = {
-    Russia: ["А → A", "Б → B", "В → V", "Г → G", "Д → D", "Е → E", "Ё → Yo", "Ж → Zh", "З → Z"],
-    SouthKorea: ["ハングル"],
+    Russia: [
+      "А → A", "Б → B", "В → V", "Г → G", "Д → D", "Е → E", "Ё → Yo", "Ж → Zh", "З → Z",
+      "И → I", "Й → Y", "К → K", "Л → L", "М → M", "Н → N", "О → O", "П → P", "Р → R", "С → S",
+      "Т → T", "У → U", "Ф → F", "Х → Kh", "Ц → Ts", "Ч → Ch", "Ш → Sh", "Щ → Shch", "Ъ → (Hard sign)",
+      "Ы → Y", "Ь → (Soft sign)", "Э → E", "Ю → Yu", "Я → Ya"
+    ],
+    SouthKorea: [
+      "ㅏ → A", "ㅑ → Ya", "ㅓ → Eo", "ㅕ → Yeo", "ㅗ → O", "ㅛ → Yo", "ㅜ → U", "ㅠ → Yu", "ㅡ → Eu", "ㅣ → I", 
+      "ㅐ → Ae", "ㅒ → Yae", "ㅔ → E", "ㅖ → Ye", "ㅘ → Wa", "ㅙ → Wae", "ㅚ → Oe", "ㅝ → Weo", "ㅞ → We", "ㅟ → Wi", 
+      "ㅢ → Ui", "ㄱ → G/K", "ㅋ → K", "ㄲ → Kk", "ㄴ → N", "ㄷ → D/T", "ㅌ → T", "ㄸ → Tt", "ㄹ → R/L", "ㅁ → M", 
+      "ㅂ → B/P", "ㅍ → P", "ㅃ → Pp", "ㅅ → S", "ㅆ → Ss", "ㅇ → Ng", "ㅈ → J", "ㅉ → Jj", "ㅊ → Ch", "ㅎ → H",
+    ],
+    Bangladesh: [
+      "অ → A", "আ → A", "ই → I", "ঈ → I", "উ → U", "ঊ → U", "ঋ → Ri", "এ → E", "ঐ → Oi", "ও → O",
+      "ঔ → Ou","ক → K", "খ → Kh", "গ → G", "ঘ → Gh", "ঙ → Ng", "চ → Ch", "ছ → Chh", "জ → J",
+      "ঝ → Jh", "ঞ → Ñ","ট → T", "ঠ → Th", "ড → D", "ঢ → Dh", "ণ → N","ত → T", "থ → Th", "দ → D",
+      "ধ → Dh", "ন → N","প → P", "ফ → Ph", "ব → B", "ভ → Bh", "ম → M","য → Y", "র → R", "ল → L",
+      "শ → Sh", "ষ → Sh", "স → S", "হ → H"
+    ]
   };
-  </script>
+</script>
   
-  <style scoped>
-  .overlay {
-  position: fixed;  /* 画面全体に固定 */
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5); /* 透過黒 */
-  z-index: 1000; /* 言語ウィンドウの後ろに配置 */
-}
+<style scoped>
+  /* 言語リストのウィンドウ */
+  .language-list {
+    position: relative;
+    background-color: rgb(255, 255, 255);
+    padding: 10rem;
+    font-size: 7rem;
+    font-weight: bold !important;
+  }
 
-/* 言語リストのウィンドウ */
-.language-list {
-  position: fixed;  /* 画面全体に固定 */
-  top: 10%; /* 画面上部に少し余裕を持たせる */
-  left: 50%; /* 画面の中央へ */
-  transform: translate(-50%, 0); /* 中央寄せ */
-  width: 80vw;
-  height: 80vh;
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  z-index: 1001; /* overlay より前面 */
-}
-
-/* 言語リストのウィンドウ */
-.language-list {
-  position: fixed;  /* 画面全体に固定 */
-  top: 10%; /* 画面上部に少し余裕を持たせる */
-  left: 50%; /* 画面の中央へ */
-  transform: translate(-50%, 0); /* 中央寄せ */
-  width: 80vw;
-  height: 80vh;
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  z-index: 1001; /* overlay より前面 */
-  font-size: 90px;
-}
-
-.language-list ul {
-  padding: 0;
+  .language-list ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); /* 列幅の自動調整 */
+  grid-auto-flow: column; /* 縦方向（列優先）に配置 */
+  grid-template-rows: repeat(11, auto); /* 行数を決める（適宜調整） */
   list-style-type: none;
-}
+  
+ }
 
-/* 言語リストの文字サイズを変更 */
-.language-list ul li {
-  font-size: 90px;  /* 文字サイズを調整 */
-  line-height: 1.5;  /* 行間を少し広く */
-  margin-bottom: 10px;  /* 各項目の下に余白を追加 */
-}
-
-/* 閉じるボタン */
-button {
-  position: fixed;
-  bottom: 100px;
-  right: 100px;
-  padding: 10px 20px;
-  background-color: #007bff;; /* 青色 */
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 75px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-  </style>
+  .language-list ul li {
+    font-size: 5rem; /* 文字サイズを調整 */
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 1rem;
+    text-align: center;
+    background-color: rgb(255, 255, 255);
+  }
+  /* 閉じるボタン */
+  button {
+    margin-left: 5%;
+    margin-bottom:5%;
+    padding: 1rem 2rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-size: 5rem;
+    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
   
