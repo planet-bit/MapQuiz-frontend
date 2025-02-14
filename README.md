@@ -5,7 +5,7 @@
 
 ## 推奨されるIDE（統合開発環境）設定
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) 
 
 ## 必要な環境
 
@@ -35,12 +35,6 @@ npm run dev
 ```
 ブラウザでアプリを表示するには
 開発サーバーが立ち上がった後、ブラウザで http://localhost:5173/ にアクセスしてください。
-
-### 本番環境用にビルド（コンパイルおよび圧縮）
-
-```sh
-npm run build
-```
 
 ## 注意点
 
