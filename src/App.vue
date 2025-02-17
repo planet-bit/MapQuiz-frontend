@@ -2,6 +2,7 @@
   <div class ="title-bar-container">
       <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
     <TitleBar 
+      :selectedLearn="selectedLearn"
       @country-selected="handleCountryChange" 
       @start-game="handleStartGame" 
       @letters-game="handleLettersGame" 
@@ -32,6 +33,7 @@ const selectedCountry = ref(null); //選択中の国
 const gameType = ref(null); //選択中のゲームタイプ
 const isGameStarted = ref(false); //ゲームが始まった時に表示させたいものに使う
 const isLearning = ref(false); // Learnボタンの状態を管理
+const selectedLearn = ref("");
 
 // 国の選択が変更されたときの処理
 const handleCountryChange = (country) => {
@@ -57,12 +59,14 @@ const handleLettersGame = () => {
 const handleLearnLanguage = () => {
   console.log('Learnボタンがクリックされました');
   isLearning.value = true; // 学習モードをONにする
+  selectedLearn.value = "learn"; // ← Learnボタンをアクティブにする
 };
 
 // 学習モードを閉じる処理
 const handleCloseLearning = () => {
   console.log('closeボタンがクリックされました');
   isLearning.value = false; // 学習モードをOFFにする
+  selectedLearn.value = "";
 };
 
 </script>
@@ -88,6 +92,6 @@ const handleCloseLearning = () => {
   top: 15rem;
   height:calc(100% - 15rem);
   width: 50%;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(204, 165, 165);
 }
 </style>

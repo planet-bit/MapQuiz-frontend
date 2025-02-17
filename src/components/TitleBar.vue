@@ -13,15 +13,15 @@
     </div>
 
     <div v-if="selectedCountry" class="start-button">
-      <button @click="startGame">Start</button>
+      <button @click="startGame":class="{ active: selectedGameType === 'start' }">Location</button>
     </div>
 
     <div v-if="selectedCountry" class="letters-button">
-      <button @click="lettersGame">Letters</button>
+      <button @click="lettersGame":class="{ active: selectedGameType === 'letters' }">Letters</button>
     </div>
 
     <div v-if="selectedCountry" class="learn-button">
-      <button @click="learnLanguage">Learn</button>
+      <button @click="learnLanguage":class="{ active: selectedLearn === 'learn' }">Learn</button>
     </div>
 
     <div class="login-link">
@@ -31,7 +31,12 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch} from "vue";
+
+const props = defineProps({
+   selectedLearn: String,
+  });
+  
 
 // ページをリロードするメソッド
 const reloadPage = () => {
@@ -44,21 +49,28 @@ const emit = defineEmits(['country-selected', 'start-game', 'letters-game', 'lea
 const countries = ['Russia', 'SouthKorea','Bangladesh']; // 国リスト
 const selectedCountry = ref(''); //変数を リアクティブ（変更を検知できる状態） にする
 const selectedGameType = ref('');
-const selectedLearn = ref('');
+const selectedLearn = ref(props.selectedLearn);
 
 //親コンポーネントへイベントを送信
 const selectCountry = () => {
+  
   emit('country-selected', selectedCountry.value);
 };
 const startGame = () => {
+  selectedGameType.value = "start";
   emit('start-game');
 };
 const lettersGame = () => {
+  selectedGameType.value = "letters";
   emit('letters-game');
 };
 const learnLanguage = () => {
   emit('learn-language')
 }
+// `selectedLearn` の変更を監視し、リアルタイムで更新
+watch(() => props.selectedLearn, (newVal) => {
+  selectedLearn.value = newVal;
+});
 </script>
 
 <style scoped>
@@ -161,7 +173,14 @@ select:focus {
     text-decoration: underline; /* ホバー時に下線を追加 */
   }
 
-
+  button.active {
+  background-color: #4CAF50; /* 緑色 */
+}
+ /* active状態のときはhoverを無効にする */
+  button.active:hover {
+    transform: none; /* スケーリングを無効にする */
+    box-shadow: none; /* シャドウを無効にする */
+  }
 
 </style>
   

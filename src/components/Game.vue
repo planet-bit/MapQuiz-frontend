@@ -1,26 +1,42 @@
 <template>
   <div class = "main-container">
-  <div class = "question-grid">
-    <p class = "question-number">Question {{ currentQuestionIndex }}</p>
-    <p  class = "current-question">{{ currentQuestion.word }}</p>
-    <ChoiceButtons 
-      :choices="currentChoices" 
-      :selectedChoice="selectedChoice" 
-      :correctAnswer="currentQuestion.answer"
-      :isAnswered="isAnswered"
-      @answer-selected="checkAnswer"
-    />
-  </div>
-  <div class = "feedback-grid">
-    <AnswerFeedback 
-      v-if="selectedChoice"
-      :selectedChoice="selectedChoice"
-      :correctAnswer="currentQuestion.answer"
-      :streakCount="currentQuestionIndex - 1"
-      @next-question="nextQuestion"
-      @retry-question="retryQuestion"
-    />
-  </div>
+
+    <div v-if="!gameStarted" class="mode-selection">
+      <label>
+        <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
+      </label>
+      <button @click="startGame">START</button> 
+    </div>
+
+    <div v-else>
+      <div class = "question-grid">
+        <p class = "question-number">Question {{ currentQuestionIndex }}</p>
+        <p  class = "current-question">{{ currentQuestion.word }}</p>
+        <ChoiceButtons 
+          :choices="currentChoices" 
+          :selectedChoice="selectedChoice" 
+          :correctAnswer="currentQuestion.answer"
+          :isAnswered="isAnswered"
+          @answer-selected="checkAnswer"
+        />
+      </div>
+    </div>
+    <div class="feedback-grid">
+      <div v-if="showAnswerFeedback" >
+        <AnswerFeedback 
+          v-if="selectedChoice"
+          :selectedChoice="selectedChoice"
+          :correctAnswer="currentQuestion.answer"
+          :streakCount="currentQuestionIndex - 1"
+          :challengeMode="challengeMode"
+          @next-question="nextQuestion"
+          @retry-question="retryQuestion"
+          @end-challenge="endChallenge"
+      
+        />
+      </div>
+    </div>
+    <div v-if="gameStarted && challengeMode" class="timer">Time Left: {{ timeLeft }}s</div>
   </div>
 </template>
 
@@ -29,6 +45,7 @@
 import { ref, watch, onMounted } from "vue";
 import ChoiceButtons from "./ChoiceButtons.vue";
 import AnswerFeedback from "./AnswerFeedback.vue";
+
 
 // 親から渡されたプロパティ
 const props = defineProps({
@@ -42,6 +59,10 @@ const selectedChoice = ref(null); // ユーザーが選択した回答
 const correctChoice = ref(null); //正解
 const currentQuestionIndex = ref(1); // 現在の問題番号（1から開始）
 const isAnswered = ref(false); // 答えたかどうか（1回のみ解答可能にする為）
+const gameStarted = ref(false); //ゲーム中かどうか
+const challengeMode = ref(false); //チャレンジモードの状態管理
+const showAnswerFeedback = ref(false);  // AnswerFeedbackを表示するための状態
+
 
 const loadQuestion = (selectedCountry, gameType) => {
   const key = `${selectedCountry}-${gameType}`;
@@ -84,17 +105,31 @@ const setQuestion = () => {
   }
 };
 
-// **ゲーム設定が変更されたら新しい問題をセット**
+// **ゲーム設定が変更されたらチャレンジ選択画面に戻る**
 watch([() => props.selectedCountry, () => props.gameType], () => {
+  gameStarted.value = false; // チャレンジ選択画面に戻る
+  clearInterval(timer); // タイマーを停止
+  timeLeft.value = 10; // タイマーをリセット
   currentQuestionIndex.value = 1; // 1問目にリセット
-  setQuestion();
 });
-onMounted(setQuestion);
+
+onMounted(() => {
+  gameStarted.value = false; // 初回もチャレンジ選択画面にする
+});
 
 // **選択肢をクリックしたときの処理**
 const checkAnswer = (choice) => {
   selectedChoice.value = choice;
-  isAnswered.value = true; // 1回しか回答できないようにする
+  isAnswered.value = true;
+  clearInterval(timer);
+
+  if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === undefined)) {
+    showAnswerFeedback.value = true; // まずフィードバックを表示
+  } else if (challengeMode.value && choice === currentQuestion.value.answer) {
+    nextQuestion();
+  } else {
+    showAnswerFeedback.value = true;
+  }
 };
 
 // **RetryとNextボタンの処理**
@@ -104,13 +139,40 @@ const resetQuestion = () => {
   setQuestion(); // 新しい問題をセット
 };
 const retryQuestion = () => {
-    currentQuestionIndex.value = 1; // 問題番号を1にリセットする
-    resetQuestion(); 
+  currentQuestionIndex.value = 1; // 問題番号を1にリセットする
+  resetQuestion(); 
 };
 
 const nextQuestion = () => {
-    currentQuestionIndex.value++; // 問題番号を増やす
-    resetQuestion(); 
+  currentQuestionIndex.value++;
+  if (challengeMode.value) startTimer();
+  setQuestion();
+};
+
+const startGame = () => {
+  gameStarted.value = true;
+  setQuestion();
+  if (challengeMode.value) startTimer();
+};
+
+const timeLeft = ref(10);
+let timer = null;
+
+const startTimer = () => {
+  timeLeft.value = 10;
+  timer = setInterval(() => {
+    timeLeft.value--;
+    if (timeLeft.value <= 0) {
+      clearInterval(timer);
+      checkAnswer(undefined); // 時間切れで不正解扱いにする
+    }
+  }, 1000);
+};
+
+const endChallenge = () => {
+  gameStarted.value = false;
+  currentQuestionIndex.value = 1;
+  startGame();
 };
 
 const groups = {
@@ -284,12 +346,67 @@ const groups = {
 
 <style scoped>
   .main-container {
+   
     display: grid;
     grid-template-columns: 60% 40%;
-    align-items: center; /* 縦方向の中央揃え */
-    justify-content: center; /* 横方向の中央揃え */
+    align-items: center; 
+    justify-content: center; 
     width: 100%;
-    margin: auto; /* 中央に配置 */
+    margin: auto;
+  }
+  .mode-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background-color: #ffffff;
+    max-width: 100%;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    text-align: left;
+  }
+  .mode-selection input[type="checkbox"] {
+    margin-right: 5rem; 
+  }
+
+  .mode-selection label {
+    font-size: 7rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 60rem
+  }
+
+  .mode-selection button {
+    padding: 1rem 2rem;
+    font-size: 5rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    transform: translate(-50%, 0);
+    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
+  }
+
+  .mode-selection button:hover {
+    background-color: #0056b3;
+  }
+
+  .mode-selection input[type="checkbox"] {
+    width: 5rem;
+    height: 5rem;
+    accent-color: #007bff; 
+    cursor: pointer;
+  }
+
+  .timer {
+    font-size: 5rem;
   }
   .question-grid, .feedback-grid {
     padding: 1.5rem;
