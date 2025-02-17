@@ -1,5 +1,5 @@
 <template>
-    <div v-if="selectedChoice !== null">
+     <div v-if="selectedChoice !== null || timeUp">
       <p v-if="selectedChoice === correctAnswer" class="correct-message">Correct!</p>
       <p v-else class="streak-count">Streak: {{ streakCount }}</p>
 
@@ -20,7 +20,7 @@
       </button>
 
       <button 
-        v-if="challengeMode && selectedChoice !== correctAnswer" 
+        v-if="challengeMode && (selectedChoice !== correctAnswer || timeUp)" 
         class="game-over-button" 
         @click="$emit('end-challenge')"
       >
@@ -31,19 +31,17 @@
 </template>
   
 <script setup>
+  import { computed } from 'vue';
   defineProps({
     selectedChoice: String,
-    timeLeft: Number,
     correctAnswer: String,
     streakCount: Number,
     challengeMode: Boolean
   });
   
   defineEmits(["next-question", "retry-question"]);
-
+  const timeUp = computed(() => props.selectedChoice === "TIME_UP");
   
-
-
 </script>
   
 <style scoped>

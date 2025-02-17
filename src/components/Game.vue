@@ -119,12 +119,12 @@ onMounted(() => {
 
 // **選択肢をクリックしたときの処理**
 const checkAnswer = (choice) => {
-  selectedChoice.value = choice;
+  selectedChoice.value = choice ?? "TIME_UP";  // 時間切れの場合 "TIME_UP" を設定
   isAnswered.value = true;
   clearInterval(timer);
 
-  if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === undefined)) {
-    showAnswerFeedback.value = true; // まずフィードバックを表示
+  if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
+    showAnswerFeedback.value = true; // フィードバック表示
   } else if (challengeMode.value && choice === currentQuestion.value.answer) {
     nextQuestion();
   } else {
@@ -164,7 +164,7 @@ const startTimer = () => {
     timeLeft.value--;
     if (timeLeft.value <= 0) {
       clearInterval(timer);
-      checkAnswer(undefined); // 時間切れで不正解扱いにする
+      checkAnswer("TIME_UP"); // "TIME_UP" として送る
     }
   }, 1000);
 };

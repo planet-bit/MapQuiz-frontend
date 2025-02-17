@@ -92,6 +92,6 @@ const handleCloseLearning = () => {
   top: 15rem;
   height:calc(100% - 15rem);
   width: 50%;
-  background-color: rgb(204, 165, 165);
+  background-color: rgb(255, 255, 255);
 }
 </style>
