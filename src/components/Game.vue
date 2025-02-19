@@ -12,7 +12,9 @@
     <!-- ゲームが開始された後の表示 -->
     <div v-else>
       <div class="question-grid">
-        <p class="question-number">Question {{ currentQuestionIndex }}</p>
+        <div v-if="gameStarted && challengeMode" class="timer">
+          Time Left: {{ timeLeft }}s
+        </div>
         <p class="current-question">{{ currentQuestion.word }}</p>
         <ChoiceButtons 
           :choices="currentChoices" 
@@ -40,9 +42,6 @@
         />
       </div>
     </div>
-
-    <!-- チャレンジモード時のタイマー表示 -->
-    <div v-if="gameStarted && challengeMode" class="timer">Time Left: {{ timeLeft }}s</div>
   </div>
 </template>
 
@@ -425,18 +424,15 @@ const groups = {
   }
 
   .timer {
-    font-size: 5rem;
+    margin-left: 10%;
+    font-size: 6rem;
+    font-weight: bold;
   }
   .question-grid, .feedback-grid {
     padding: 1.5rem;
     background-color: #ffffff;
     text-align: left;
     margin-top: 10%;
-  }
-  .question-number {
-    margin-left: 10%;
-    font-size: 6rem;
-    font-weight: bold;
   }
   .current-question {
     margin-left: 10%;
