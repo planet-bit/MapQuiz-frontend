@@ -4,7 +4,7 @@
     <TitleBar 
       :selectedLearn="selectedLearn"
       @country-selected="handleCountryChange" 
-      @start-game="handleStartGame" 
+      @location-game="handleLocationGame" 
       @letters-game="handleLettersGame" 
       @learn-language="handleLearnLanguage"
     />
@@ -42,7 +42,7 @@ const handleCountryChange = (country) => {
 };
 
 // スタートゲームの処理
-const handleStartGame = () => {
+const handleLocationGame = () => {
   console.log('Startボタンがクリックされました');
   gameType.value = "start";
   isGameStarted.value = true;
