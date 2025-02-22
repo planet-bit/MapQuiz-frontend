@@ -2,7 +2,8 @@
   <div class ="title-bar-container">
       <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
     <TitleBar 
-      :selectedLearn="selectedLearn"
+      :isLearning="isLearning"
+      :gameType="gameType"
       @country-selected="handleCountryChange" 
       @location-game="handleLocationGame" 
       @letters-game="handleLettersGame" 
@@ -14,8 +15,7 @@
     <Game v-if="isGameStarted" :selectedCountry="selectedCountry" :gameType="gameType" />
   </div>
   <div class = "learn-container">
-    <!-- LearnButtonに情報を渡し、Closeボタンの情報を受け取り、関数実行 -->
-    <LearnButton v-if="selectedCountry" 
+    <Learn v-if="selectedCountry" 
     :selectedCountry="selectedCountry"
     :isLearning="isLearning"
     @close-learning="handleCloseLearning" 
@@ -24,49 +24,36 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import TitleBar from "./components/TitleBar.vue";
 import Game from "./components/Game.vue";
-import LearnButton from "./components/LearnButton.vue";
+import Learn from "./components/Learn.vue";
 
 const selectedCountry = ref(null); //選択中の国
 const gameType = ref(null); //選択中のゲームタイプ
 const isGameStarted = ref(false); //ゲームが始まった時に表示させたいものに使う
 const isLearning = ref(false); // Learnボタンの状態を管理
-const selectedLearn = ref("");
 
-// 国の選択が変更されたときの処理
 const handleCountryChange = (country) => {
-  console.log('Countryボタンがクリックされました');
-  selectedCountry.value = country; // `.value` とrefを使うことで値を追跡
+  selectedCountry.value = country;
 };
 
-// スタートゲームの処理
 const handleLocationGame = () => {
-  console.log('Startボタンがクリックされました');
   gameType.value = "start";
   isGameStarted.value = true;
 };
 
-// 文字ゲームの処理
 const handleLettersGame = () => {
-  console.log('Lettersボタンがクリックされました');
   gameType.value = "letters";
   isGameStarted.value = true;
 };
 
-// Learnボタンが押されたときの処理
 const handleLearnLanguage = () => {
-  console.log('Learnボタンがクリックされました');
-  isLearning.value = true; // 学習モードをONにする
-  selectedLearn.value = "learn"; // ← Learnボタンをアクティブにする
+  isLearning.value = !isLearning.value; 
 };
 
-// 学習モードを閉じる処理
 const handleCloseLearning = () => {
-  console.log('closeボタンがクリックされました');
-  isLearning.value = false; // 学習モードをOFFにする
-  selectedLearn.value = "";
+  isLearning.value = false; 
 };
 
 </script>

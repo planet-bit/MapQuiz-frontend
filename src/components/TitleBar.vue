@@ -14,8 +14,8 @@
 
       <div v-if="selectedCountry" class="buttons-container">
         <Buttons
-          :selectedLearn="selectedLearn"
-          :selectedGameType="selectedGameType"
+          :isLearning="isLearning"
+          :gameType="gameType"
           @location-game="MiddleLocationGame"
           @letters-game="MiddleLettersGame"
           @learn-language="MiddleLearnLanguage"
@@ -30,19 +30,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import Buttons from "./Buttons.vue";
 
 const emit = defineEmits(["country-selected", "location-game", "letters-game", "learn-language"]);
 
 const props = defineProps({
-  selectedLearn: String,
-  selectedGameType: String,
+  isLearning: Boolean,
+  gameType: String
 });
 
 const countries = ["Russia", "SouthKorea", "Bangladesh"];
 const selectedCountry = ref("");
-const selectedGameType = ref("");
 
 const reloadPage = () => {
   location.reload();
@@ -53,12 +52,10 @@ const selectCountry = () => {
 };
 
 const MiddleLocationGame = () => {
-  selectedGameType.value = "start";
   emit("location-game");
 };
 
 const MiddleLettersGame = () => {
-  selectedGameType.value = "letters";
   emit("letters-game");
 };
 

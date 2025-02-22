@@ -1,20 +1,19 @@
 <template>
   <div class="buttons-container">
     <button @click="LocationGame" 
-      :class="{ active: selectedGameType === 'start' }">Location</button>
+      :class="{ active: gameType === 'start' }">Location</button>
     <button @click="LettersGame" 
-      :class="{ active: selectedGameType === 'letters' }">Letters</button>
+      :class="{ active: gameType === 'letters' }">Letters</button>
     <button @click="LearnLanguage" 
-      :class="{ active: selectedLearn === 'learn' }">Learn</button>
+      :class="{ active: isLearning }">Learn</button>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
 
 const props = defineProps({
-  selectedLearn: String,
-  selectedGameType: String,
+  isLearning: Boolean,
+  gameType: String
 });
 
 const emit = defineEmits(["location-game", "letters-game", "learn-language"]);
