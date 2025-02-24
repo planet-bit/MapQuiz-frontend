@@ -12,9 +12,11 @@
     <!-- ゲームが開始された後の表示 -->
     <div v-else>
       <div class="question-grid">
-        <div v-if="gameStarted && challengeMode" class="timer">
-          Time Left: {{ timeLeft }}s
-        </div>
+        <Timer
+          :challengeMode="challengeMode" 
+          :startTimer="startTimer"
+          @time-up="handleTimeUp"
+        />
         <p class="current-question">{{ currentQuestion.word }}</p>
         <ChoiceButtons 
           :choices="currentChoices" 
@@ -50,6 +52,7 @@
 import { ref, watch, onMounted } from "vue";
 import ChoiceButtons from "./ChoiceButtons.vue";
 import AnswerFeedback from "./AnswerFeedback.vue";
+import Timer from "./Timer.vue";
 
 // 親コンポーネントから渡されたプロパティ
 const props = defineProps({
@@ -67,6 +70,14 @@ const isAnswered = ref(false); // 答えたかどうか
 const gameStarted = ref(false); // ゲーム開始の状態
 const challengeMode = ref(false); // チャレンジモードの状態
 const showAnswerFeedback = ref(false);  // フィードバック表示用
+const timerActive = ref(false);
+
+const StartChallenge = () => {
+  timerActive.value = false;
+  setTimeout(() => timerActive.value = true, 0);
+};
+
+
 
 // 問題をランダムに取得する関数
 const loadQuestion = (selectedCountry, gameType) => {
@@ -160,10 +171,6 @@ const startGame = () => {
   setQuestion(); // ゲーム開始時に問題をセット
   if (challengeMode.value) startTimer(); // チャレンジモードならタイマーを開始
 };
-
-// タイマーの設定
-const timeLeft = ref(10);
-let timer = null;
 
 const startTimer = () => {
   timeLeft.value = 10; // 10秒に設定
