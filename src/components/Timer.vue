@@ -1,5 +1,5 @@
 <template>
-    <div v-if="challengeMode">
+    <div v-if="challengeMode" class="Timer">
       Time Left: {{ timeLeft }}s
     </div>
   </template>
@@ -9,13 +9,21 @@
   
   const props = defineProps({
     challengeMode: Boolean,
-    startTimer: Boolean, 
+    timerActive: Boolean,
+    triggerStopTimer: Boolean
   });
   
-  const emit = defineEmits("time-up");
+  const emit = defineEmits(["time-up"]);
   
   const timeLeft = ref(10);
   let timer = null;
+
+  watch(() => props.triggerStopTimer, (newVal) => {
+  if (newVal) {
+    clearInterval(timer);
+    timer = null;
+  }
+});
   
   // タイマー開始関数
   const beginTimer = () => {
@@ -31,7 +39,7 @@
   };
   
   // タイマーの監視
-  watch(() => props.startTimer, (newVal) => {
+  watch(() => props.timerActive, (newVal) => {
     if (newVal) beginTimer();
     else if (timer){
       clearInterval(timer);
@@ -46,5 +54,13 @@
       timer = null;
     }
   });
-  </script>
+</script>
+
+<style scoped>
+  .Timer {
+    font-size: 6rem;
+    font-weight: bold;
+  }
+
+</style>
   

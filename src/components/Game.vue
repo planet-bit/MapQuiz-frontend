@@ -14,8 +14,9 @@
       <div class="question-grid">
         <Timer
           :challengeMode="challengeMode" 
-          :startTimer="startTimer"
-          @time-up="handleTimeUp"
+          :timerActive="timerActive"
+          :triggerStopTimer="triggerStopTimer"
+          @time-up="TimeUp"
         />
         <p class="current-question">{{ currentQuestion.word }}</p>
         <ChoiceButtons 
@@ -70,14 +71,23 @@ const isAnswered = ref(false); // 答えたかどうか
 const gameStarted = ref(false); // ゲーム開始の状態
 const challengeMode = ref(false); // チャレンジモードの状態
 const showAnswerFeedback = ref(false);  // フィードバック表示用
-const timerActive = ref(false);
+const timerActive = ref (false);
+const triggerStopTimer = ref(false);
 
-const StartChallenge = () => {
+const StartTimer = () => {
   timerActive.value = false;
-  setTimeout(() => timerActive.value = true, 0);
+  setTimeout(() => timerActive.value = true, 0); // すぐに `false` に戻す
 };
 
+const StopTimer = () => {
+  triggerStopTimer.value = true;
+  setTimeout(() => triggerStopTimer.value = false, 0);
+};
 
+const TimeUp = () => {
+  checkAnswer("TIME_UP");
+  showAnswerFeedback.value = true; 
+};
 
 // 問題をランダムに取得する関数
 const loadQuestion = (selectedCountry, gameType) => {
@@ -124,8 +134,6 @@ const setQuestion = () => {
 // 国やゲームタイプが変更されたらゲーム開始画面に戻す
 watch([() => props.selectedCountry, () => props.gameType], () => {
   gameStarted.value = false; // チャレンジ選択画面に戻る
-  clearInterval(timer); // タイマー停止
-  timeLeft.value = 10; // タイマーをリセット
   currentQuestionIndex.value = 1; // 問題番号をリセット
   selectedChoice.value = ""
 });
@@ -136,8 +144,6 @@ onMounted(() => {
 
 const selectMode = () => {
   gameStarted.value = false; // チャレンジ選択画面に戻る
-  clearInterval(timer); // タイマー停止
-  timeLeft.value = 10; // タイマーをリセット
   currentQuestionIndex.value = 1; // 問題番号をリセット
   selectedChoice.value = ""
 }
@@ -146,8 +152,7 @@ const selectMode = () => {
 const checkAnswer = (choice) => {
   selectedChoice.value = choice ?? "TIME_UP";  // 時間切れの場合 "TIME_UP" として選択
   isAnswered.value = true;
-  clearInterval(timer); // タイマーを止める
-
+  StopTimer();
   // チャレンジモード時の解答チェック
   if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
     showAnswerFeedback.value = true; // フィードバック表示
@@ -161,7 +166,7 @@ const checkAnswer = (choice) => {
 // 次の問題に進む関数
 const nextQuestion = () => {
   currentQuestionIndex.value++; // 問題番号を進める
-  if (challengeMode.value) startTimer(); // チャレンジモードならタイマーを再スタート
+  if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを再スタート
   setQuestion(); // 新しい問題をセット
 };
 
@@ -169,19 +174,9 @@ const nextQuestion = () => {
 const startGame = () => {
   gameStarted.value = true;
   setQuestion(); // ゲーム開始時に問題をセット
-  if (challengeMode.value) startTimer(); // チャレンジモードならタイマーを開始
+  if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを開始
 };
 
-const startTimer = () => {
-  timeLeft.value = 10; // 10秒に設定
-  timer = setInterval(() => {
-    timeLeft.value--; // 秒数を減らす
-    if (timeLeft.value <= 0) {
-      clearInterval(timer); // タイマー停止
-      checkAnswer("TIME_UP"); // 時間切れの処理
-    }
-  }, 1000);
-};
 
 const retryQuestion = () => {
     currentQuestionIndex.value = 1; // 問題番号を1にリセットする
@@ -429,11 +424,8 @@ const groups = {
     accent-color: #007bff; 
     cursor: pointer;
   }
-
-  .timer {
+  .question-grid {
     margin-left: 10%;
-    font-size: 6rem;
-    font-weight: bold;
   }
   .question-grid, .feedback-grid {
     padding: 1.5rem;
@@ -442,7 +434,6 @@ const groups = {
     margin-top: 10%;
   }
   .current-question {
-    margin-left: 10%;
     font-size: 9rem;
     font-weight: bold;
     margin-top: 6rem;
