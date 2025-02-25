@@ -5,7 +5,7 @@
       v-for="choice in choices"
       :key="choice"
       :disabled="isAnswered"
-       @click="$emit('answer-selected', choice)"
+      @click="$emit('answer-selected', choice)"
       :class="{
         'correct': choice === correctAnswer && (isAnswered || selectedChoice === choice),
         'incorrect': selectedChoice === choice && choice !== correctAnswer
