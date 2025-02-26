@@ -1,5 +1,10 @@
 <template>
   <div class="main-container">
+        <QuestionManager ref="questionManager"
+          :selectedCountry="selectedCountry" 
+          :gameType="gameType"
+          @question-updated="updateQuestion"
+        />
 
     <!-- ゲーム開始前のモード選択 -->
     <div v-if="!gameStarted" class="mode-selection">
@@ -7,6 +12,7 @@
         <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
       </label>
       <button @click="startGame">START</button> 
+
     </div>
 
     <!-- ゲームが開始された後の表示 -->
@@ -19,6 +25,7 @@
           @time-up="TimeUp"
         />
         <p class="current-question">{{ currentQuestion.word }}</p>
+
         <ChoiceButtons 
           :choices="currentChoices" 
           :selectedChoice="selectedChoice" 
@@ -54,6 +61,7 @@ import { ref, watch, onMounted } from "vue";
 import ChoiceButtons from "./ChoiceButtons.vue";
 import AnswerFeedback from "./AnswerFeedback.vue";
 import Timer from "./Timer.vue";
+import QuestionManager from "./QuestionManager.vue";
 
 // 親コンポーネントから渡されたプロパティ
 const props = defineProps({
@@ -65,7 +73,6 @@ const props = defineProps({
 const currentQuestion = ref(""); // 現在の問題
 const currentChoices = ref([]); // 現在の選択肢
 const selectedChoice = ref(null); // ユーザーの選択
-const correctChoice = ref(null); // 正解
 const currentQuestionIndex = ref(1); // 問題番号
 const isAnswered = ref(false); // 答えたかどうか
 const gameStarted = ref(false); // ゲーム開始の状態
@@ -73,6 +80,14 @@ const challengeMode = ref(false); // チャレンジモードの状態
 const showAnswerFeedback = ref(false);  // フィードバック表示用
 const timerActive = ref (false);
 const triggerStopTimer = ref(false);
+const questionManager = ref(null); // QuestionManagerのインスタンスを参照する
+
+const updateQuestion = ({ question, choices }) => {
+  console.log("Updated Question:", question);
+  console.log("Updated Choices:", choices);
+  currentQuestion.value = question;
+  currentChoices.value = choices;
+};
 
 const StartTimer = () => {
   timerActive.value = false;
@@ -89,63 +104,26 @@ const TimeUp = () => {
   showAnswerFeedback.value = true; 
 };
 
-// 問題をランダムに取得する関数
-const loadQuestion = (selectedCountry, gameType) => {
-  const key = `${selectedCountry}-${gameType}`; // 国とゲームタイプでキーを作成
-  const questions = groups[key] || []; // 対応する問題リストを取得
-  if (questions.length > 0) {
-    const randomIndex = Math.floor(Math.random() * questions.length); // ランダムに問題を選択
-    return questions[randomIndex];
-  }
-  return "";
-};
-
-// 選択肢を生成する関数
-const generateChoices = (correctAnswer, allQuestions) => {
-  // 正解以外の選択肢をランダムに取得
-  let wrongAnswers = allQuestions
-    .map(q => q.answer)
-    .filter(answer => answer !== correctAnswer);
-
-  // ダミー選択肢をランダムに選んで取得（足りなければそのまま）
-  wrongAnswers = wrongAnswers.sort(() => 0.5 - Math.random()).slice(0, 4);
-
-  // 正解とダミー選択肢を混ぜる
-  const choices = [correctAnswer, ...wrongAnswers].sort(() => 0.5 - Math.random());
-  return choices;
-};
-
-// 新しい問題をセットする関数
-const setQuestion = () => {
-  if (props.selectedCountry && props.gameType) {
-    const question = loadQuestion(props.selectedCountry, props.gameType);
-    currentQuestion.value = question;
-    selectedChoice.value = null; 
-    isAnswered.value = false; // 新しい問題に切り替える時にリセット
-
-    if (question) {
-      const key = `${props.selectedCountry}-${props.gameType}`;
-      const allQuestions = groups[key] || [];
-      currentChoices.value = generateChoices(question.answer, allQuestions);
-    }
-  }
-};
+const GameReset = () => {
+  currentQuestionIndex.value = 1; // 問題番号をリセット
+  selectedChoice.value = null;
+  isAnswered.value = false;
+}
 
 // 国やゲームタイプが変更されたらゲーム開始画面に戻す
 watch([() => props.selectedCountry, () => props.gameType], () => {
   gameStarted.value = false; // チャレンジ選択画面に戻る
-  currentQuestionIndex.value = 1; // 問題番号をリセット
-  selectedChoice.value = ""
+  GameReset();
 });
 
 onMounted(() => {
   gameStarted.value = false; // 初回も選択画面にする
+  console.log("QuestionManager:", questionManager.value);
 });
 
 const selectMode = () => {
   gameStarted.value = false; // チャレンジ選択画面に戻る
-  currentQuestionIndex.value = 1; // 問題番号をリセット
-  selectedChoice.value = ""
+  GameReset();
 }
 
 // 解答を選択したときに呼ばれる関数
@@ -166,207 +144,44 @@ const checkAnswer = (choice) => {
 // 次の問題に進む関数
 const nextQuestion = () => {
   currentQuestionIndex.value++; // 問題番号を進める
+  isAnswered.value = false; // 回答済み状態をリセット
+  selectedChoice.value = null; // 選択をリセット
   if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを再スタート
-  setQuestion(); // 新しい問題をセット
-};
+  if (questionManager.value) {
+    console.log("Calling setQuestion in nextQuestion");
+    questionManager.value.setQuestion();
+  };
+}
 
 // ゲーム開始時の処理
 const startGame = () => {
   gameStarted.value = true;
-  setQuestion(); // ゲーム開始時に問題をセット
   if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを開始
+  console.log("QuestionManager instance:", questionManager.value); // 追加
+  if (questionManager.value) {
+    console.log("Calling setQuestion");
+    questionManager.value.setQuestion();
+  } else {
+    console.log("QuestionManager is null!");
+  } // ゲーム開始時に問題をセット
 };
-
 
 const retryQuestion = () => {
-    currentQuestionIndex.value = 1; // 問題番号を1にリセットする
-    resetQuestion(); 
-};
-
-const resetQuestion = () => {
-  selectedChoice.value = null; // 選択肢をリセット
-  correctChoice.value = null; // 正解をリセット
-  setQuestion(); // 新しい問題をセット
+  GameReset();
+  if (questionManager.value) {
+    questionManager.value.setQuestion(); // 初期問題をセット
+  }
 };
 
 // チャレンジモードを終了する処理
 const endChallenge = () => {
-  gameStarted.value = false;
-  currentQuestionIndex.value = 1; // 問題番号をリセット
+  GameReset();
   startGame(); // ゲーム再スタート
-};
-const groups = {
-  "Russia-start": [
-    {word: "test1", answer: "test1"},
-    {word: "test2", answer: "test2"},
-    {word: "test3", answer: "test3"},
-    {word: "test4", answer: "test4"},
-    {word: "test5", answer: "test5"},
-    {word: "test6", answer: "test6"}
-  ],
-  "Russia-letters": [
-    { "word": "Москва", "answer": "Moscow" },
-    { "word": "Санкт-Петербург", "answer": "Saint Petersburg" },
-    { "word": "Севастополь", "answer": "Sevastopol" },
-    { "word": "Республика Адыгея", "answer": "Adygea Republic" },
-    { "word": "Республика Алтай", "answer": "Altai Republic" },
-    { "word": "Республика Башкортостан", "answer": "Bashkortostan Republic" },
-    { "word": "Республика Бурятия", "answer": "Buryatia Republic" },
-    { "word": "Республика Дагестан", "answer": "Dagestan Republic" },
-    { "word": "Республика Ингушетия", "answer": "Ingushetia Republic" },
-    { "word": "Кабардино-Балкарская Республика", "answer": "Kabardino-Balkaria Republic" },
-    { "word": "Республика Калмыкия", "answer": "Kalmykia Republic" },
-    { "word": "Карачаево-Черкесская Республика", "answer": "Karachay-Cherkess Republic" },
-    { "word": "Республика Карелия", "answer": "Karelia Republic" },
-    { "word": "Республика Коми", "answer": "Komi Republic" },
-    { "word": "Республика Крым", "answer": "Crimea Republic" },
-    { "word": "Республика Марий Эл", "answer": "Mari El Republic" },
-    { "word": "Республика Мордовия", "answer": "Mordovia Republic" },
-    { "word": "Республика Саха (Якутия)", "answer": "Sakha Republic (Yakutia)" },
-    { "word": "Республика Северная Осетия — Алания", "answer": "North Ossetia-Alania Republic" },
-    { "word": "Республика Татарстан", "answer": "Tatarstan Republic" },
-    { "word": "Республика Тыва", "answer": "Tuva Republic" },
-    { "word": "Удмуртская Республика", "answer": "Udmurt Republic" },
-    { "word": "Республика Хакасия", "answer": "Khakassia Republic" },
-    { "word": "Чеченская Республика", "answer": "Chechen Republic" },
-    { "word": "Чувашская Республика", "answer": "Chuvash Republic" },
-    { "word": "Алтайский край", "answer": "Altai Krai" },
-    { "word": "Забайкальский край", "answer": "Zabaykalsky Krai" },
-    { "word": "Камчатский край", "answer": "Kamchatka Krai" },
-    { "word": "Краснодарский край", "answer": "Krasnodar Krai" },
-    { "word": "Красноярский край", "answer": "Krasnoyarsk Krai" },
-    { "word": "Пермский край", "answer": "Perm Krai" },
-    { "word": "Приморский край", "answer": "Primorsky Krai" },
-    { "word": "Ставропольский край", "answer": "Stavropol Krai" },
-    { "word": "Хабаровский край", "answer": "Khabarovsk Krai" },
-    { "word": "Амурская область", "answer": "Amur Oblast" },
-    { "word": "Архангельская область", "answer": "Arkhangelsk Oblast" },
-    { "word": "Астраханская область", "answer": "Astrakhan Oblast" },
-    { "word": "Белгородская область", "answer": "Belgorod Oblast" },
-    { "word": "Брянская область", "answer": "Bryansk Oblast" },
-    { "word": "Владимирская область", "answer": "Vladimir Oblast" },
-    { "word": "Волгоградская область", "answer": "Volgograd Oblast" },
-    { "word": "Вологодская область", "answer": "Vologda Oblast" },
-    { "word": "Воронежская область", "answer": "Voronezh Oblast" },
-    { "word": "Ивановская область", "answer": "Ivanovo Oblast" },
-    { "word": "Иркутская область", "answer": "Irkutsk Oblast" },
-    { "word": "Калининградская область", "answer": "Kaliningrad Oblast" },
-    { "word": "Калужская область", "answer": "Kaluga Oblast" },
-    { "word": "Кемеровская область", "answer": "Kemerovo Oblast" },
-    { "word": "Кировская область", "answer": "Kirov Oblast" },
-    { "word": "Костромская область", "answer": "Kostroma Oblast" },
-    { "word": "Курганская область", "answer": "Kurgan Oblast" },
-    { "word": "Курская область", "answer": "Kursk Oblast" },
-    { "word": "Ленинградская область", "answer": "Leningrad Oblast" },
-    { "word": "Липецкая область", "answer": "Lipetsk Oblast" },
-    { "word": "Магаданская область", "answer": "Magadan Oblast" },
-    { "word": "Московская область", "answer": "Moscow Oblast" },
-    { "word": "Мурманская область", "answer": "Murmansk Oblast" },
-    { "word": "Нижегородская область", "answer": "Nizhny Novgorod Oblast" },
-    { "word": "Новгородская область", "answer": "Novgorod Oblast" },
-    { "word": "Новосибирская область", "answer": "Novosibirsk Oblast" },
-    { "word": "Омская область", "answer": "Omsk Oblast" },
-    { "word": "Оренбургская область", "answer": "Orenburg Oblast" },
-    { "word": "Орловская область", "answer": "Oryol Oblast" },
-    { "word": "Пензенская область", "answer": "Penza Oblast" },
-    { "word": "Псковская область", "answer": "Pskov Oblast" },
-    { "word": "Ростовская область", "answer": "Rostov Oblast" },
-    { "word": "Рязанская область", "answer": "Ryazan Oblast" },
-    { "word": "Самарская область", "answer": "Samara Oblast" },
-    { "word": "Саратовская область", "answer": "Saratov Oblast" },
-    { "word": "Сахалинская область", "answer": "Sakhalin Oblast" },
-    { "word": "Свердловская область", "answer": "Sverdlovsk Oblast" },
-    { "word": "Смоленская область", "answer": "Smolensk Oblast" },
-    { "word": "Тамбовская область", "answer": "Tambov Oblast" },
-    { "word": "Тверская область", "answer": "Tver Oblast" },
-    { "word": "Томская область", "answer": "Tomsk Oblast" },
-    { "word": "Тульская область", "answer": "Tula Oblast" },
-    { "word": "Тюменская область", "answer": "Tyumen Oblast" },
-    { "word": "Ульяновская область", "answer": "Ulyanovsk Oblast" },
-    { "word": "Челябинская область", "answer": "Chelyabinsk Oblast" },
-    { "word": "Ярославская область", "answer": "Yaroslavl Oblast" }
-  ],
-  "SouthKorea-start": [
-    {word: "test1", answer: "test1"},
-    {word: "test2", answer: "test2"},
-    {word: "test3", answer: "test3"},
-    {word: "test4", answer: "test4"},
-    {word: "test5", answer: "test5"},
-    {word: "test6", answer: "test6"}
-  ],
-  "SouthKorea-letters": [
-    { word: "서울", answer: "Seoul" },
-    { word: "부산", answer: "Busan" },
-    { word: "인천", answer: "Incheon" },
-    {word: "대구", answer: "Daegu"},
-    {word: "광주", answer: "Gwangju"},
-    {word: "test6", answer: "test6"}
-  ],
-  "Bangladesh-start": [
-    {word: "test1", answer: "test1"},
-    {word: "test2", answer: "test2"},
-    {word: "test3", answer: "test3"},
-    {word: "test4", answer: "test4"},
-    {word: "test5", answer: "test5"},
-    {word: "test6", answer: "test6"}
-  ],
-  "Bangladesh-letters": [
-    { "word": "ঢাকা", "answer": "Dhaka" },
-    { "word": "চট্টগ্রাম", "answer": "Chattogram" },
-    { "word": "খুলনা", "answer": "Khulna" },
-    { "word": "রাজশাহী", "answer": "Rajshahi" },
-    { "word": "সিলেট", "answer": "Sylhet" },
-    { "word": "বরিশাল", "answer": "Barishal" },
-    { "word": "রংপুর", "answer": "Rangpur" },
-    { "word": "কুমিল্লা", "answer": "Cumilla" },
-    { "word": "নারায়ণগঞ্জ", "answer": "Narayanganj" },
-    { "word": "বগুড়া", "answer": "Bogra" },
-    { "word": "ময়মনসিংহ", "answer": "Mymensingh" },
-    { "word": "গাজীপুর", "answer": "Gazipur" },
-    { "word": "টাঙ্গাইল", "answer": "Tangail" },
-    { "word": "ফরিদপুর", "answer": "Faridpur" },
-    { "word": "কুষ্টিয়া", "answer": "Kushtia" },
-    { "word": "যশোর", "answer": "Jashore" },
-    { "word": "নোয়াখালী", "answer": "Noakhali" },
-    { "word": "চাঁদপুর", "answer": "Chandpur" },
-    { "word": "কক্সবাজার", "answer": "Cox's Bazar" },
-    { "word": "ফেনী", "answer": "Feni" },
-    { "word": "লক্ষ্মীপুর", "answer": "Lakshmipur" },
-    { "word": "দিনাজপুর", "answer": "Dinajpur" },
-    { "word": "ঠাকুরগাঁও", "answer": "Thakurgaon" },
-    { "word": "পাবনা", "answer": "Pabna" },
-    { "word": "শরীয়তপুর", "answer": "Shariatpur" },
-    { "word": "গোপালগঞ্জ", "answer": "Gopalganj" },
-    { "word": "মাদারীপুর", "answer": "Madaripur" },
-    { "word": "সাতক্ষীরা", "answer": "Satkhira" },
-    { "word": "পিরোজপুর", "answer": "Pirojpur" },
-    { "word": "ঝালকাঠি", "answer": "Jhalokathi" },
-    { "word": "ভোলা", "answer": "Bhola" },
-    { "word": "বরগুনা", "answer": "Barguna" },
-    { "word": "নেত্রকোণা", "answer": "Netrokona" },
-    { "word": "সুনামগঞ্জ", "answer": "Sunamganj" },
-    { "word": "মৌলভীবাজার", "answer": "Moulvibazar" },
-    { "word": "হবিগঞ্জ", "answer": "Habiganj" },
-    { "word": "গাইবান্ধা", "answer": "Gaibandha" },
-    { "word": "কুড়িগ্রাম", "answer": "Kurigram" },
-    { "word": "নওগাঁ", "answer": "Naogaon" },
-    { "word": "জয়পুরহাট", "answer": "Joypurhat" },
-    { "word": "নাটোর", "answer": "Natore" },
-    { "word": "চুয়াডাঙ্গা", "answer": "Chuadanga" },
-    { "word": "মেহেরপুর", "answer": "Meherpur" },
-    { "word": "মাগুরা", "answer": "Magura" },
-    { "word": "ঝিনাইদহ", "answer": "Jhenaidah" },
-    { "word": "শেরপুর", "answer": "Sherpur" },
-    { "word": "বাগেরহাট", "answer": "Bagerhat" },
-    { "word": "বান্দরবান", "answer": "Bandarban" },
-    { "word": "খাগড়াছড়ি", "answer": "Khagrachhari" }
-  ],
 };
 </script>
 
 <style scoped>
   .main-container {
-   
     display: grid;
     grid-template-columns: 60% 40%;
     align-items: center; 
