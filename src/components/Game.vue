@@ -1,23 +1,25 @@
 <template>
   <div class="main-container">
-        <QuestionManager ref="questionManager"
-          :selectedCountry="selectedCountry" 
-          :gameType="gameType"
-          @question-updated="updateQuestion"
-        />
+    <!-- 問題をランダムで出題する機能 -->
+    <QuestionManager ref="questionManager"
+      :selectedCountry="selectedCountry" 
+      :gameType="gameType"
+      @question-updated="updateQuestion"
+    />
 
-    <!-- ゲーム開始前のモード選択 -->
+    <!-- ゲーム開始前のモード選択の表示 -->
     <div v-if="!gameStarted" class="mode-selection">
       <label>
         <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
       </label>
       <button @click="startGame">START</button> 
-
     </div>
 
     <!-- ゲームが開始された後の表示 -->
     <div v-else>
       <div class="question-grid">
+
+        <!-- タイマー機能の表示 -->
         <Timer
           :challengeMode="challengeMode" 
           :timerActive="timerActive"
@@ -26,6 +28,7 @@
         />
         <p class="current-question">{{ currentQuestion.word }}</p>
 
+        <!-- 選択肢ボタン表示 -->
         <ChoiceButtons 
           :choices="currentChoices" 
           :selectedChoice="selectedChoice" 
@@ -47,7 +50,6 @@
           :challengeMode="challengeMode"
           @next-question="nextQuestion"
           @retry-question="retryQuestion"
-          @end-challenge="endChallenge"
           @select-mode="selectMode"
         />
       </div>
@@ -57,127 +59,113 @@
 
 <script setup>
 
-import { ref, watch, onMounted } from "vue";
-import ChoiceButtons from "./ChoiceButtons.vue";
-import AnswerFeedback from "./AnswerFeedback.vue";
-import Timer from "./Timer.vue";
-import QuestionManager from "./QuestionManager.vue";
+  import { ref, watch, onMounted } from "vue";
+  import ChoiceButtons from "./ChoiceButtons.vue";
+  import AnswerFeedback from "./AnswerFeedback.vue";
+  import Timer from "./Timer.vue";
+  import QuestionManager from "./QuestionManager.vue";
 
-// 親コンポーネントから渡されたプロパティ
-const props = defineProps({
-  selectedCountry: String,
-  gameType: String
-});
+  // 親コンポーネントから渡されたプロパティ
+  const props = defineProps({
+    selectedCountry: String,
+    gameType: String
+  });
 
-// 問題と選択肢、状態管理用の変数
-const currentQuestion = ref(""); // 現在の問題
-const currentChoices = ref([]); // 現在の選択肢
-const selectedChoice = ref(null); // ユーザーの選択
-const currentQuestionIndex = ref(1); // 問題番号
-const isAnswered = ref(false); // 答えたかどうか
-const gameStarted = ref(false); // ゲーム開始の状態
-const challengeMode = ref(false); // チャレンジモードの状態
-const showAnswerFeedback = ref(false);  // フィードバック表示用
-const timerActive = ref (false);
-const triggerStopTimer = ref(false);
-const questionManager = ref(null); // QuestionManagerのインスタンスを参照する
+  const currentQuestion = ref(""); // 現在の問題
+  const currentChoices = ref([]); // 現在の選択肢
+  const selectedChoice = ref(null); // ユーザーの選択
+  const currentQuestionIndex = ref(1); // 問題番号
+  const isAnswered = ref(false); // 答えたかどうか
+  const gameStarted = ref(false); // ゲーム開始の状態
+  const challengeMode = ref(false); // チャレンジモードの状態
+  const showAnswerFeedback = ref(false);  // フィードバック表示用
+  const timerActive = ref (false);
+  const triggerStopTimer = ref(false);
+  const questionManager = ref(null);
 
-const updateQuestion = ({ question, choices }) => {
-  console.log("Updated Question:", question);
-  console.log("Updated Choices:", choices);
-  currentQuestion.value = question;
-  currentChoices.value = choices;
-};
-
-const StartTimer = () => {
-  timerActive.value = false;
-  setTimeout(() => timerActive.value = true, 0); // すぐに `false` に戻す
-};
-
-const StopTimer = () => {
-  triggerStopTimer.value = true;
-  setTimeout(() => triggerStopTimer.value = false, 0);
-};
-
-const TimeUp = () => {
-  checkAnswer("TIME_UP");
-  showAnswerFeedback.value = true; 
-};
-
-const GameReset = () => {
-  currentQuestionIndex.value = 1; // 問題番号をリセット
-  selectedChoice.value = null;
-  isAnswered.value = false;
-}
-
-// 国やゲームタイプが変更されたらゲーム開始画面に戻す
-watch([() => props.selectedCountry, () => props.gameType], () => {
-  gameStarted.value = false; // チャレンジ選択画面に戻る
-  GameReset();
-});
-
-onMounted(() => {
-  gameStarted.value = false; // 初回も選択画面にする
-  console.log("QuestionManager:", questionManager.value);
-});
-
-const selectMode = () => {
-  gameStarted.value = false; // チャレンジ選択画面に戻る
-  GameReset();
-}
-
-// 解答を選択したときに呼ばれる関数
-const checkAnswer = (choice) => {
-  selectedChoice.value = choice ?? "TIME_UP";  // 時間切れの場合 "TIME_UP" として選択
-  isAnswered.value = true;
-  StopTimer();
-  // チャレンジモード時の解答チェック
-  if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
-    showAnswerFeedback.value = true; // フィードバック表示
-  } else if (challengeMode.value && choice === currentQuestion.value.answer) {
-    nextQuestion(); // 正解の場合次の問題に進む
-  } else {
-    showAnswerFeedback.value = true; // 不正解の場合フィードバックを表示
-  }
-};
-
-// 次の問題に進む関数
-const nextQuestion = () => {
-  currentQuestionIndex.value++; // 問題番号を進める
-  isAnswered.value = false; // 回答済み状態をリセット
-  selectedChoice.value = null; // 選択をリセット
-  if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを再スタート
-  if (questionManager.value) {
-    console.log("Calling setQuestion in nextQuestion");
-    questionManager.value.setQuestion();
+  const updateQuestion = ({ question, choices }) => {
+    currentQuestion.value = question;
+    currentChoices.value = choices;
   };
-}
 
-// ゲーム開始時の処理
-const startGame = () => {
-  gameStarted.value = true;
-  if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを開始
-  console.log("QuestionManager instance:", questionManager.value); // 追加
-  if (questionManager.value) {
-    console.log("Calling setQuestion");
-    questionManager.value.setQuestion();
-  } else {
-    console.log("QuestionManager is null!");
-  } // ゲーム開始時に問題をセット
-};
+  const StartTimer = () => {
+    timerActive.value = false;
+    setTimeout(() => timerActive.value = true, 0); // すぐに `false` に戻す
+  };
 
-const retryQuestion = () => {
-  GameReset();
-  if (questionManager.value) {
-    questionManager.value.setQuestion(); // 初期問題をセット
+  const StopTimer = () => {
+    triggerStopTimer.value = true;
+    setTimeout(() => triggerStopTimer.value = false, 0);
+  };
+
+  const TimeUp = () => {
+    checkAnswer("TIME_UP");
+    showAnswerFeedback.value = true; 
+  };
+  
+  //問題番号、ユーザーの選択、解答の有無をリセット
+  const GameReset = () => {
+    currentQuestionIndex.value = 1;
+    selectedChoice.value = null;
+    isAnswered.value = false;
   }
-};
 
-// チャレンジモードを終了する処理
-const endChallenge = () => {
-  GameReset();
-  startGame(); // ゲーム再スタート
-};
+  // 国やゲームタイプが変更されたらゲーム開始画面に戻す
+  watch([() => props.selectedCountry, () => props.gameType], () => {
+    gameStarted.value = false; 
+    GameReset();
+  });
+
+  onMounted(() => {
+    gameStarted.value = false; // 初回も選択画面にする
+  });
+
+  const selectMode = () => {
+    gameStarted.value = false;
+    GameReset();
+  }
+
+  // 解答を選択したときに呼ばれる関数
+  const checkAnswer = (choice) => {
+    selectedChoice.value = choice ?? "TIME_UP";  // 時間切れの場合 "TIME_UP" として選択
+    isAnswered.value = true;
+    StopTimer();
+    // チャレンジモード時の解答チェック
+    if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
+      showAnswerFeedback.value = true; // フィードバック表示
+    } else if (challengeMode.value && choice === currentQuestion.value.answer) {
+      nextQuestion(); // 正解の場合次の問題に進む
+    } else {
+      showAnswerFeedback.value = true; // 不正解の場合フィードバックを表示
+    }
+  };
+
+  // 次の問題に進む関数
+  const nextQuestion = () => {
+   currentQuestionIndex.value++; // 問題番号を進める
+    isAnswered.value = false; // 回答済み状態をリセット
+    selectedChoice.value = null; // 選択をリセット
+    if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを再スタート
+    if (questionManager.value) {
+      console.log("Calling setQuestion in nextQuestion");
+      questionManager.value.setQuestion();
+    };
+  }
+
+  // ゲーム開始時の処理
+  const startGame = () => {
+    gameStarted.value = true;
+    if (challengeMode.value) StartTimer();
+    if (questionManager.value) {
+      questionManager.value.setQuestion();
+    }
+  };
+
+  const retryQuestion = () => {
+    GameReset();
+    startGame();
+  };
+
 </script>
 
 <style scoped>
@@ -207,7 +195,6 @@ const endChallenge = () => {
   .mode-selection input[type="checkbox"] {
     margin-right: 5rem; 
   }
-
   .mode-selection label {
     font-size: 7rem;
     font-weight: bold;
@@ -216,7 +203,6 @@ const endChallenge = () => {
     gap: 0.5rem;
     min-width: 60rem
   }
-
   .mode-selection button {
     padding: 1rem 2rem;
     font-size: 5rem;
@@ -228,11 +214,9 @@ const endChallenge = () => {
     transform: translate(-50%, 0);
     box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
   }
-
   .mode-selection button:hover {
     background-color: #0056b3;
   }
-
   .mode-selection input[type="checkbox"] {
     width: 5rem;
     height: 5rem;

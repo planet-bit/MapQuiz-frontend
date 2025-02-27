@@ -29,8 +29,8 @@
 
     <div v-if="challengeMode && (selectedChoice !== correctAnswer || timeUp)" class="button-group">
       <button 
-        class="game-over-button" 
-        @click="$emit('end-challenge')"
+        class="retry-button" 
+        @click="$emit('retry-question')"
       >
         RETRY
       </button>
@@ -55,7 +55,7 @@ defineProps({
   challengeMode: Boolean
 });
 
-defineEmits(["next-question", "retry-question", "select-mode", "end-challenge"]);
+defineEmits(["next-question", "retry-question", "select-mode" ]);
 
 const timeUp = computed(() => props.selectedChoice === "TIME_UP");
 
@@ -71,7 +71,6 @@ const timeUp = computed(() => props.selectedChoice === "TIME_UP");
 
 .next-button, 
 .retry-button, 
-.game-over-button,
 .select-mode-button {
   padding: 1rem 2rem;
   background-color: #007bff;
@@ -85,7 +84,6 @@ const timeUp = computed(() => props.selectedChoice === "TIME_UP");
 
 .next-button:hover, 
 .retry-button:hover, 
-.game-over-button:hover, 
 .select-mode-button:hover {
   background-color: #0056b3;
 }

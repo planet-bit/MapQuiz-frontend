@@ -1,9 +1,8 @@
 <template>
 </template>
   
-  <script setup>
-  import { ref } from "vue";
-  
+<script setup>
+
   // 親コンポーネントから国とゲームタイプを受け取る
   const props = defineProps({
     selectedCountry: String,
@@ -12,7 +11,23 @@
   
   // 親コンポーネントへデータを渡すためのemit
   const emit = defineEmits(["question-updated"]);
-  
+
+  // 新しい問題をセットし、親にデータを渡す
+  const setQuestion = () => {
+    if (props.selectedCountry && props.gameType) {
+      const question = loadQuestion(props.selectedCountry, props.gameType);
+      if (question) {
+        const key = `${props.selectedCountry}-${props.gameType}`;
+        const allQuestions = groups[key] || [];
+        const choices = generateChoices(question.answer, allQuestions);
+        emit("question-updated", {
+          question,
+          choices
+        });
+      }
+    }
+  };
+
   // 問題の取得関数
   const loadQuestion = (selectedCountry, gameType) => {
     const key = `${selectedCountry}-${gameType}`;
@@ -35,27 +50,10 @@
     return choices;
   };
   
-  // 新しい問題をセットし、親にデータを渡す
-  const setQuestion = () => {
-    if (props.selectedCountry && props.gameType) {
-      const question = loadQuestion(props.selectedCountry, props.gameType);
-      if (question) {
-        const key = `${props.selectedCountry}-${props.gameType}`;
-        const allQuestions = groups[key] || [];
-        const choices = generateChoices(question.answer, allQuestions);
-
-        emit("question-updated", {
-          question,
-          choices
-        });
-      }
-    }
-  };
-  
-// `defineExpose` で関数を親から呼べるようにする
-defineExpose({
-  setQuestion
-});
+  // `defineExpose` で関数を親から呼べるようにする
+  defineExpose({
+    setQuestion
+  });
 
   const groups = {
     "Russia-start": [
