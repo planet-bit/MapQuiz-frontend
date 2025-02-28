@@ -1,5 +1,4 @@
 <template>
-  <!-- 学習モード時に言語一覧を表示 -->
   <div v-if="isLearning">
     <div class="language-list">
       <h3>List of languages in {{ selectedCountry }} 
@@ -15,7 +14,6 @@
 </template>
   
 <script setup>
-  import { ref, watch } from 'vue';
   
   // 親コンポーネントから受け取る国
   const props = defineProps({

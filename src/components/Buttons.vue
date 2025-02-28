@@ -6,17 +6,25 @@
       :class="{ active: gameType === 'letters' }">Letters</button>
     <button @click="LearnLanguage" 
       :class="{ active: isLearning }">Learn</button>
+    <button @click="ViewMap" 
+      :class="{ active: isViewingMap }">Map</button>
   </div>
 </template>
 
 <script setup>
 
 const props = defineProps({
+  gameType: String,
   isLearning: Boolean,
-  gameType: String
+  isViewingMap: Boolean
 });
 
-const emit = defineEmits(["location-game", "letters-game", "learn-language"]);
+const emit = defineEmits([
+  "location-game", 
+  "letters-game", 
+  "learn-language",
+  "view-map"
+]);
 
 const LocationGame = () => {
   emit("location-game");
@@ -29,6 +37,11 @@ const LettersGame = () => {
 const LearnLanguage = () => {
   emit("learn-language");
 };
+
+const ViewMap = () => {
+  emit("view-map");
+};
+
 </script>
 
 <style scoped>

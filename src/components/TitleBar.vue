@@ -14,11 +14,13 @@
 
       <div v-if="selectedCountry" class="buttons-container">
         <Buttons
-          :isLearning="isLearning"
           :gameType="gameType"
+          :isLearning="isLearning"
+          :isViewingMap="isViewingMap"
           @location-game="MiddleLocationGame"
           @letters-game="MiddleLettersGame"
           @learn-language="MiddleLearnLanguage"
+          @view-map="MiddleViewMap"
         />
       </div>
     </div>
@@ -33,11 +35,18 @@
 import { ref, watch } from "vue";
 import Buttons from "./Buttons.vue";
 
-const emit = defineEmits(["country-selected", "location-game", "letters-game", "learn-language"]);
+const emit = defineEmits([
+  "country-selected", 
+  "location-game", 
+  "letters-game", 
+  "learn-language", 
+  "view-map"
+]);
 
 const props = defineProps({
+  gameType: String,
   isLearning: Boolean,
-  gameType: String
+  isViewingMap: Boolean  
 });
 
 const countries = ["Russia", "SouthKorea", "Bangladesh"];
@@ -62,6 +71,12 @@ const MiddleLettersGame = () => {
 const MiddleLearnLanguage = () => {
   emit("learn-language");
 };
+
+const MiddleViewMap = () => {
+  emit("view-map");
+};
+
+
 </script>
 
 <style scoped>
