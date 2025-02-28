@@ -53,16 +53,23 @@ const initializeMap = () => {
       }
 
       // **新しい地図を作成**
-      map = L.map('map').setView(center.value, zoom.value);
+      map = L.map('map', {
+        center: center.value,
+        zoom: zoom.value,
+        zoomDelta: 0.25, // ここで設定
+        zoomSnap: 0,
+        wheelPxPerZoomLevel: 150 // デフォルトは 60, 大きくするとズームが遅くなる
+      });
+
+      console.log("zoomDelta:", map.options.zoomDelta); // 設定が適用されているか確認
+
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',maxZoom: 20
+        subdomains: 'abcd',
+        maxZoom: 20,
+        minZoom:4
       }).addTo(map);
-
-      var map = L.map('map', {
-        minZoom: 0,
-        maxZoom: 0
-      });
+      
 
 
     }
