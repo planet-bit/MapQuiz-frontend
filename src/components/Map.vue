@@ -1,7 +1,10 @@
 <template>
   <div v-if="isViewingMap">
-    <div id="map" class="map-container"></div>
+
+    <p class= "map-title">List of languages in {{ selectedCountry }} 
     <button @click="closeMap" class="map-close-btn">CLOSE</button>
+    </p>
+    <div id="map" class="map-container"></div>
   </div>
 </template>
   
@@ -33,10 +36,10 @@ watch(() => props.selectedCountry, (newCountry) => {
     zoom.value = 5.5
   } else if (newCountry === "SouthKorea") {
     center.value = [36.5, 127.5]; // 韓国の中心
-    zoom.value = 10
+    zoom.value = 9
   } else if (newCountry === "Bangladesh") {
     center.value = [23.7, 90.4]; // バングラデシュの中心
-    zoom.value = 10
+    zoom.value = 8.5
   }
   if (map) {
     map.setView(center.value, zoom.value);
@@ -63,8 +66,8 @@ const initializeMap = () => {
 
       console.log("zoomDelta:", map.options.zoomDelta); // 設定が適用されているか確認
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 20,
         minZoom:4
@@ -100,6 +103,13 @@ watch(() => props.isViewingMap, (newVal) => {
  
 
 <style>
+  .map-title {
+    position: relative;
+    padding: 10rem;
+    font-size: 6rem;
+    font-weight: bold;
+  }
+
   .leaflet-control-zoom-in,
   .leaflet-control-zoom-out {
     width: 6rem !important ;
@@ -113,8 +123,8 @@ watch(() => props.isViewingMap, (newVal) => {
   }
 
   .map-container {
-    width: 100%;
-    height: 80vh;
+    width: 95%;
+    height: 70vh;
   }
 
   .map-close-btn {

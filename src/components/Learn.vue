@@ -1,9 +1,8 @@
 <template>
   <div v-if="isLearning">
     <div class="language-list">
-      <h3>List of languages in {{ selectedCountry }} 
-        <button @click="closeLearning">CLOSE</button>
-      </h3>
+      List of languages in {{ selectedCountry }} 
+      <button @click="closeLearning">CLOSE</button>
       <ul>
         <li v-for="(pronunciation, index) in languageData[selectedCountry]" :key="index">
           {{ pronunciation }}
@@ -57,10 +56,9 @@
   /* 言語リストのウィンドウ */
   .language-list {
     position: relative;
-    background-color: rgb(255, 255, 255);
     padding: 10rem;
-    font-size: 7rem;
-    font-weight: bold !important;
+    font-size: 6rem;
+    font-weight: bold;
   }
 
   .language-list ul {
