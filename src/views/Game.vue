@@ -60,10 +60,10 @@
 <script setup>
 
   import { ref, watch, onMounted } from "vue";
-  import ChoiceButtons from "./ChoiceButtons.vue";
-  import AnswerFeedback from "./AnswerFeedback.vue";
-  import Timer from "./Timer.vue";
-  import QuestionManager from "./QuestionManager.vue";
+  import ChoiceButtons from "../components/ChoiceButtons.vue";
+  import AnswerFeedback from "../components/AnswerFeedback.vue";
+  import Timer from "../components/Timer.vue";
+  import QuestionManager from "../components/QuestionManager.vue";
 
   // 親コンポーネントから渡されたプロパティ
   const props = defineProps({

@@ -25,14 +25,26 @@
       </div>
     </div>
 
-    <div class="login-link">
-      <a href="/login">Login</a>
+    <!-- ログインボタン -->
+    <div class="login-container">
+      <a v-if="!isLoggedIn" href="#" @click.prevent="toggleLogin">Login</a>
+      
+      <!-- User ボタンとドロップダウン -->
+      <div v-else class="user-menu">
+        <a href="#" @click.prevent="toggleDropdown">User ▼</a>
+
+        <!-- ドロップダウンメニュー -->
+        <div v-if="isDropdownOpen" class="dropdown-menu">
+          <a href="#" @click.prevent="viewHistory">履歴</a>
+          <a href="#" @click.prevent="logout">Sign out</a>
+        </div>
+      </div>
     </div>
-  </div>
+</div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import Buttons from "./Buttons.vue";
 
 const emit = defineEmits([
@@ -40,17 +52,24 @@ const emit = defineEmits([
   "location-game", 
   "letters-game", 
   "learn-language", 
-  "view-map"
+  "view-map",
+  "toggle-login",
+  "logout",
+  "view-history"
 ]);
 
 const props = defineProps({
   gameType: String,
   isLearning: Boolean,
-  isViewingMap: Boolean  
+  isViewingMap: Boolean,
+  isLoggedIn: Boolean,
+  isViewingMap: Boolean,
+  isLoggedIn: Boolean
 });
 
 const countries = ["Russia", "SouthKorea", "Bangladesh"];
 const selectedCountry = ref("");
+const isDropdownOpen = ref(false); // ドロップダウンの表示状態
 
 const reloadPage = () => {
   location.reload();
@@ -76,6 +95,23 @@ const MiddleViewMap = () => {
   emit("view-map");
 };
 
+const toggleLogin = () => {
+  emit("toggle-login");
+};
+
+const logout = () => {
+  isDropdownOpen.value = false;
+  emit("logout"); // 親コンポーネントにログアウト処理を通知
+};
+
+const viewHistory = () => {
+  isDropdownOpen.value = false;
+  emit("view-history"); // 親コンポーネントに履歴表示のイベントを送る
+};
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
 
 </script>
 
@@ -125,18 +161,42 @@ const MiddleViewMap = () => {
   gap: 10rem;
 }
 
-.login-link {
-  margin-left: auto;
+
+
+.login-container a ,
+.user-menu a {
+  color: #000000; /* 黒色に設定 */
 }
 
-.login-link a {
-  color: #000000; 
-  text-decoration: none;
+.login-container {
+  position: relative;
   font-size: 6rem;
-  font-weight: bold;
 }
 
-.login-link a:hover {
-  text-decoration: underline;
+.user-menu {
+  position: relative;
+  display: inline-block;
 }
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-size: 4rem;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 8px 12px;
+  color: black;
+  text-decoration: none;
+}
+
 </style>

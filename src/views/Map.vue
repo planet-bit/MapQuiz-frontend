@@ -1,7 +1,7 @@
 <template>
   <div v-if="isViewingMap">
 
-    <p class= "map-title">List of languages in {{ selectedCountry }} 
+    <p class= "map-title">Map of {{ selectedCountry }} 
     <button @click="closeMap" class="map-close-btn">CLOSE</button>
     </p>
     <div id="map" class="map-container"></div>
@@ -66,12 +66,12 @@ const initializeMap = () => {
 
       console.log("zoomDelta:", map.options.zoomDelta); // 設定が適用されているか確認
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 20,
-        minZoom:4
-      }).addTo(map);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap &copy; CARTO',
+  subdomains: 'abcd',
+  maxZoom: 20
+}).addTo(map);
+
       
 
 

@@ -5,11 +5,14 @@
       :gameType="gameType"
       :isLearning="isLearning"
       :isViewingMap="isViewingMap"
+      :isLoggedIn="isLoggedIn" 
       @country-selected="handleCountryChange" 
       @location-game="handleLocationGame" 
       @letters-game="handleLettersGame" 
       @learn-language="handleLearnLanguage"
       @view-map="handleViewMap"
+      @toggle-login="toggleLogin"
+      @logout="logout"
     />
   </div> 
   <div class = "game-container">
@@ -32,16 +35,17 @@
 
 <script setup>
 import { ref } from "vue";
-import TitleBar from "./components/TitleBar.vue";
-import Game from "./components/Game.vue";
-import Learn from "./components/Learn.vue";
-import Map from "./components/Map.vue";
+import TitleBar from "./views/TitleBar.vue";
+import Game from "./views/Game.vue";
+import Learn from "./views/Learn.vue";
+import Map from "./views/Map.vue";
 
 const selectedCountry = ref(null); //選択中の国
 const gameType = ref(null); //選択中のゲームタイプ
 const isGameStarted = ref(false); //ゲームが始まった時に表示させたいものに使う
 const isLearning = ref(false); // Learnボタンの状態を管理
 const isViewingMap = ref(false); // Mapボタンの状態を管理
+const isLoggedIn = ref(false); //ログイン状態を管理
 
 const handleCountryChange = (country) => {
   selectedCountry.value = country;
@@ -77,6 +81,14 @@ const handleViewMap = () => {
 
 const handleCloseMap = () => {
   isViewingMap.value = false;
+};
+
+const toggleLogin = () => {
+  isLoggedIn.value = !isLoggedIn.value;
+};
+
+const logout = () => {
+  isLoggedIn.value = false;
 };
 
 </script>
