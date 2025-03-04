@@ -13,8 +13,10 @@
       @view-map="handleViewMap"
       @toggle-login="toggleLogin"
       @logout="logout"
-    />
+    >
+    </TitleBar>
   </div> 
+
   <div class = "game-container">
     <!-- Gameに情報を渡す -->
     <Game v-if="isGameStarted" :selectedCountry="selectedCountry" :gameType="gameType" />

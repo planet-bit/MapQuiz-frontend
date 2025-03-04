@@ -12,17 +12,13 @@
         </select>
       </div>
 
-      <div v-if="selectedCountry" class="buttons-container">
-        <Buttons
-          :gameType="gameType"
-          :isLearning="isLearning"
-          :isViewingMap="isViewingMap"
-          @location-game="MiddleLocationGame"
-          @letters-game="MiddleLettersGame"
-          @learn-language="MiddleLearnLanguage"
-          @view-map="MiddleViewMap"
-        />
+      <div v-if="selectedCountry"  class="buttons-container">
+        <MyButtons text="Location" :isActive="gameType === 'start'" @click-action="LocationGame"/>
+        <MyButtons text="Letters" :isActive="gameType === 'letters'" @click-action="LettersGame" />
+        <MyButtons text="Learn" :isActive="isLearning" @click-action="LearnLanguage" />
+        <MyButtons text="Map" :isActive="isViewingMap" @click-action="ViewMap" />
       </div>
+      
     </div>
 
     <!-- ログインボタン -->
@@ -45,7 +41,7 @@
 
 <script setup>
 import { ref } from "vue";
-import Buttons from "./Buttons.vue";
+import MyButtons from "../components/MyButtons.vue";
 
 const emit = defineEmits([
   "country-selected", 
@@ -79,19 +75,19 @@ const selectCountry = () => {
   emit("country-selected", selectedCountry.value);
 };
 
-const MiddleLocationGame = () => {
+const LocationGame = () => {
   emit("location-game");
 };
 
-const MiddleLettersGame = () => {
+const LettersGame = () => {
   emit("letters-game");
 };
 
-const MiddleLearnLanguage = () => {
+const LearnLanguage = () => {
   emit("learn-language");
 };
 
-const MiddleViewMap = () => {
+const ViewMap = () => {
   emit("view-map");
 };
 

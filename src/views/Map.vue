@@ -114,17 +114,17 @@ watch(() => props.isViewingMap, (newVal) => {
   .leaflet-control-zoom-out {
     width: 6rem !important ;
     height: 6rem !important ;
-    font-size: 6rem !important ; /* 文字サイズを大きく */
-    line-height: 6rem !important ; /* ボタン内の文字を中央に配置 */
+    font-size: 6rem !important ;
+    line-height: 6rem !important ;
   }
 
   .leaflet-container {
-    font-size: 3rem ;
+    font-size: 2rem ;
   }
 
   .map-container {
     width: 95%;
-    height: 70vh;
+    height: 65vh;
   }
 
   .map-close-btn {
