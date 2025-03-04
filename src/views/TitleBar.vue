@@ -12,12 +12,7 @@
         </select>
       </div>
 
-      <div v-if="selectedCountry"  class="buttons-container">
-        <MyButtons text="Location" :isActive="gameType === 'start'" @click-action="LocationGame"/>
-        <MyButtons text="Letters" :isActive="gameType === 'letters'" @click-action="LettersGame" />
-        <MyButtons text="Learn" :isActive="isLearning" @click-action="LearnLanguage" />
-        <MyButtons text="Map" :isActive="isViewingMap" @click-action="ViewMap" />
-      </div>
+      <slot></slot>>
       
     </div>
 
@@ -41,7 +36,6 @@
 
 <script setup>
 import { ref } from "vue";
-import MyButtons from "../components/MyButtons.vue";
 
 const emit = defineEmits([
   "country-selected", 
@@ -73,22 +67,6 @@ const reloadPage = () => {
 
 const selectCountry = () => {
   emit("country-selected", selectedCountry.value);
-};
-
-const LocationGame = () => {
-  emit("location-game");
-};
-
-const LettersGame = () => {
-  emit("letters-game");
-};
-
-const LearnLanguage = () => {
-  emit("learn-language");
-};
-
-const ViewMap = () => {
-  emit("view-map");
 };
 
 const toggleLogin = () => {

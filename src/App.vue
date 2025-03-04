@@ -14,6 +14,14 @@
       @toggle-login="toggleLogin"
       @logout="logout"
     >
+      <div v-if="selectedCountry"  class="buttons-container">
+        <MyButtons text="Location" :isActive="gameType === 'start'" @click-action="handleLocationGame"/>
+        <MyButtons text="Letters" :isActive="gameType === 'letters'" @click-action="handleLettersGame" />
+        <MyButtons text="Learn" :isActive="isLearning" @click-action="handleLearnLanguage" />
+        <MyButtons text="Map" :isActive="isViewingMap" @click-action="handleViewMap" />
+      </div>
+
+    
     </TitleBar>
   </div> 
 
@@ -41,6 +49,7 @@ import TitleBar from "./views/TitleBar.vue";
 import Game from "./views/Game.vue";
 import Learn from "./views/Learn.vue";
 import Map from "./views/Map.vue";
+import MyButtons from "./components/MyButtons.vue";
 
 const selectedCountry = ref(null); //選択中の国
 const gameType = ref(null); //選択中のゲームタイプ
