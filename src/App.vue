@@ -2,15 +2,8 @@
   <div class ="title-bar-container">
       <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
     <TitleBar 
-      :gameType="gameType"
-      :isLearning="isLearning"
-      :isViewingMap="isViewingMap"
       :isLoggedIn="isLoggedIn" 
       @country-selected="handleCountryChange" 
-      @location-game="handleLocationGame" 
-      @letters-game="handleLettersGame" 
-      @learn-language="handleLearnLanguage"
-      @view-map="handleViewMap"
       @toggle-login="toggleLogin"
       @logout="logout"
     >
