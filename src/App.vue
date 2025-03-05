@@ -14,7 +14,6 @@
         <MyButtons text="Map" :isActive="isViewingMap" @click-action="handleViewMap" />
       </div>
 
-    
     </TitleBar>
   </div> 
 

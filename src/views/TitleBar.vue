@@ -12,7 +12,7 @@
         </select>
       </div>
 
-      <slot></slot>>
+      <slot></slot>
       
     </div>
 
@@ -35,14 +35,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
 
 const emit = defineEmits([
   "country-selected", 
-  "location-game", 
-  "letters-game", 
-  "learn-language", 
-  "view-map",
   "toggle-login",
   "logout",
   "view-history"
@@ -53,20 +50,41 @@ const props = defineProps({
   isLearning: Boolean,
   isViewingMap: Boolean,
   isLoggedIn: Boolean,
-  isViewingMap: Boolean,
-  isLoggedIn: Boolean
 });
 
-const countries = ["Russia", "SouthKorea", "Bangladesh"];
+const countries = ref([]);
 const selectedCountry = ref("");
 const isDropdownOpen = ref(false); // ドロップダウンの表示状態
 
-const reloadPage = () => {
-  location.reload();
+const fetchCountries = async () => {
+  try {
+    const response = await axios.get("http://localhost:3000/api/countries");
+    countries.value = response.data.map(item => item.country_name);
+  } catch (error) {
+    console.error("Error fetching countries:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+    } else {
+      console.error("Error message:", error.message);
+    }
+  }
 };
 
+// コンポーネントがマウントされた時にデータを取得
+onMounted(() => {
+  fetchCountries();
+});
+
+// 選択された国を処理する関数
 const selectCountry = () => {
-  emit("country-selected", selectedCountry.value);
+  const countryWithoutSpaces = selectedCountry.value.replace(/\s+/g, ''); // スペースを取り除く
+  emit("country-selected", countryWithoutSpaces);  // スペースを取り除いた国名を親コンポーネントに渡す
+};
+
+
+const reloadPage = () => {
+  location.reload();
 };
 
 const toggleLogin = () => {

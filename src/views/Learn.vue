@@ -4,8 +4,8 @@
       List of languages in {{ selectedCountry }} 
       <button @click="closeLearning">CLOSE</button>
       <ul>
-        <li v-for="(pronunciation, index) in languageData[selectedCountry]" :key="index">
-          {{ pronunciation }}
+        <li v-for="(pronunciation, index) in languageList" :key="index">
+          {{ pronunciation.letters }}
         </li>
       </ul>
     </div>
@@ -13,6 +13,7 @@
 </template>
   
 <script setup>
+  import { ref, watch } from 'vue';
   
   // 親コンポーネントから受け取る国
   const props = defineProps({
@@ -27,29 +28,26 @@
   const closeLearning = () => {
     emit('close-learning');
   };
+  
+  const languageList = ref([]);
 
-  // 国ごとの言語の読み方一覧
-  const languageData = {
-    Russia: [
-      "А → A", "Б → B", "В → V", "Г → G", "Д → D", "Е → E", "Ё → Yo", "Ж → Zh", "З → Z",
-      "И → I", "Й → Y", "К → K", "Л → L", "М → M", "Н → N", "О → O", "П → P", "Р → R", "С → S",
-      "Т → T", "У → U", "Ф → F", "Х → Kh", "Ц → Ts", "Ч → Ch", "Ш → Sh", "Щ → Shch",
-      "Ы → Y", "Э → E", "Ю → Yu", "Я → Ya", "Ъ → (Hard sign)", "Ь → (Soft sign)"
-    ],
-    SouthKorea: [
-      "ㅏ → A", "ㅑ → Ya", "ㅓ → Eo", "ㅕ → Yeo", "ㅗ → O", "ㅛ → Yo", "ㅜ → U", "ㅠ → Yu", "ㅡ → Eu", "ㅣ → I", 
-      "ㅐ → Ae", "ㅒ → Yae", "ㅔ → E", "ㅖ → Ye", "ㅘ → Wa", "ㅙ → Wae", "ㅚ → Oe", "ㅝ → Weo", "ㅞ → We", "ㅟ → Wi", 
-      "ㅢ → Ui", "ㄱ → G/K", "ㅋ → K", "ㄲ → Kk", "ㄴ → N", "ㄷ → D/T", "ㅌ → T", "ㄸ → Tt", "ㄹ → R/L", "ㅁ → M", 
-      "ㅂ → B/P", "ㅍ → P", "ㅃ → Pp", "ㅅ → S", "ㅆ → Ss", "ㅇ → Ng", "ㅈ → J", "ㅉ → Jj", "ㅊ → Ch", "ㅎ → H",
-    ],
-    Bangladesh: [
-      "অ → A", "আ → A", "ই → I", "ঈ → I", "উ → U", "ঊ → U", "ঋ → Ri", "এ → E", "ঐ → Oi", "ও → O",
-      "ঔ → Ou","ক → K", "খ → Kh", "গ → G", "ঘ → Gh", "ঙ → Ng", "চ → Ch", "ছ → Chh", "জ → J",
-      "ঝ → Jh", "ঞ → Ñ","ট → T", "ঠ → Th", "ড → D", "ঢ → Dh", "ণ → N","ত → T", "থ → Th", "দ → D",
-      "ধ → Dh", "ন → N","প → P", "ফ → Ph", "ব → B", "ভ → Bh", "ম → M","য → Y", "র → R", "ল → L",
-      "শ → Sh", "ষ → Sh", "স → S", "হ → H"
-    ]
-  };
+  // 国ごとのデータを API から取得する関数
+const fetchLanguageData = async () => {
+  if (!props.selectedCountry) return;
+  try {
+    const response = await fetch(`http://localhost:3000/api/letters/${props.selectedCountry}`);
+    if (!response.ok) throw new Error('データ取得に失敗しました');
+    
+    const data = await response.json();
+    languageList.value = data;
+  } catch (error) {
+    console.error('APIエラー:', error);
+  }
+};
+
+// selectedCountry が変わったらデータを取得
+watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
+ 
 </script>
   
 <style scoped>

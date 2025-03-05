@@ -3,13 +3,9 @@
     <p v-if="selectedChoice === correctAnswer" class="correct-message">Correct!</p>
     <p v-else class="streak-count">Streak: {{ streakCount }}</p>
 
-    <button 
-      v-if="selectedChoice === correctAnswer" 
-      class="next-button" 
-      @click="$emit('next-question')"
-    >
-      NEXT
-    </button>
+    <div v-if="selectedChoice === correctAnswer">
+      <GameButtons text="NEXT" @click="$emit('next-question')"/>
+    </div>
 
     <div v-if="!challengeMode && selectedChoice !== correctAnswer" class="button-group">
       <button 
@@ -47,6 +43,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import GameButtons from './GameButtons.vue';
 
 defineProps({
   selectedChoice: String,
@@ -69,7 +66,6 @@ const timeUp = computed(() => props.selectedChoice === "TIME_UP");
   text-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
-.next-button, 
 .retry-button, 
 .select-mode-button {
   padding: 1rem 2rem;
@@ -82,7 +78,6 @@ const timeUp = computed(() => props.selectedChoice === "TIME_UP");
   box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
-.next-button:hover, 
 .retry-button:hover, 
 .select-mode-button:hover {
   background-color: #0056b3;
