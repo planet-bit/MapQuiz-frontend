@@ -1,8 +1,8 @@
 <template>
   <div v-if="isLearning">
     <div class="language-list">
-      List of languages in {{ selectedCountry }} 
-      <button @click="closeLearning">CLOSE</button>
+      List of languages in {{ selectedCountry }}
+      <GameButtons class="learn-close-button" text="CLOSE" @click="$emit('close-learning')"/>
       <ul>
         <li v-for="(pronunciation, index) in languageList" :key="index">
           {{ pronunciation.letters }}
@@ -14,6 +14,7 @@
   
 <script setup>
   import { ref, watch } from 'vue';
+  import GameButtons from '@/components/GameButtons.vue';
   
   // 親コンポーネントから受け取る国
   const props = defineProps({
@@ -51,7 +52,7 @@ watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
 </script>
   
 <style scoped>
-  /* 言語リストのウィンドウ */
+
   .language-list {
     position: relative;
     padding: 10rem;
@@ -65,7 +66,7 @@ watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
   grid-auto-flow: column; /* 縦方向（列優先）に配置 */
   grid-template-rows: repeat(11, auto); /* 行数を決める（適宜調整） */
   list-style-type: none;
-  
+  margin:5rem;
  }
 
   .language-list ul li {
@@ -76,21 +77,10 @@ watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
     text-align: center;
     background-color: rgb(255, 255, 255);
   }
-  /* 閉じるボタン */
-  button {
-    margin-left: 5%;
-    margin-bottom:5%;
-    padding: 1rem 2rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 2rem;
-    cursor: pointer;
-    font-size: 5rem;
-    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
+  
+  .learn-close-button {
+    margin-left: 5rem;
   }
-  button:hover {
-    background-color: #0056b3;
-  }
+ 
 </style>
   

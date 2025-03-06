@@ -82,7 +82,6 @@ const selectCountry = () => {
   emit("country-selected", countryWithoutSpaces);  // スペースを取り除いた国名を親コンポーネントに渡す
 };
 
-
 const reloadPage = () => {
   location.reload();
 };
@@ -133,7 +132,7 @@ const toggleDropdown = () => {
 }
 
 .dropdown select {
-  font-size: 6rem;
+  font-size: 5.5rem;
   font-weight: bold;
   padding: 1rem;
   background: none;

@@ -56,7 +56,7 @@
   });
 
   const groups = {
-    "Russia-start": [
+    "Russia-location": [
       {word: "test1", answer: "test1"},
       {word: "test2", answer: "test2"},
       {word: "test3", answer: "test3"},
@@ -64,7 +64,7 @@
       {word: "test5", answer: "test5"},
       {word: "test6", answer: "test6"}
     ],
-    "Russia-letters": [
+    "Russia-letter": [
       { "word": "Москва", "answer": "Moscow" },
       { "word": "Санкт-Петербург", "answer": "Saint Petersburg" },
       { "word": "Севастополь", "answer": "Sevastopol" },
@@ -146,7 +146,7 @@
       { "word": "Челябинская область", "answer": "Chelyabinsk Oblast" },
       { "word": "Ярославская область", "answer": "Yaroslavl Oblast" }
       ],
-    "SouthKorea-start": [
+    "SouthKorea-location": [
       {word: "test1", answer: "test1"},
       {word: "test2", answer: "test2"},
       {word: "test3", answer: "test3"},
@@ -154,7 +154,7 @@
       {word: "test5", answer: "test5"},
       {word: "test6", answer: "test6"}
     ],
-    "SouthKorea-letters": [
+    "SouthKorea-letter": [
       { word: "서울", answer: "Seoul" },
       { word: "부산", answer: "Busan" },
       { word: "인천", answer: "Incheon" },
@@ -162,7 +162,7 @@
       {word: "광주", answer: "Gwangju"},
       {word: "test6", answer: "test6"}
     ],
-    "Bangladesh-start": [
+    "Bangladesh-location": [
       {word: "test1", answer: "test1"},
       {word: "test2", answer: "test2"},
       {word: "test3", answer: "test3"},
@@ -170,7 +170,7 @@
       {word: "test5", answer: "test5"},
       {word: "test6", answer: "test6"}
     ],
-    "Bangladesh-letters": [
+    "Bangladesh-letter": [
       { "word": "ঢাকা", "answer": "Dhaka" },
       { "word": "চট্টগ্রাম", "answer": "Chattogram" },
       { "word": "খুলনা", "answer": "Khulna" },

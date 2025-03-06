@@ -1,22 +1,26 @@
 <template>
-    <button @click="$emit('click-action')" :class="{ active: isActive }">
+
+    <button @click="emit('click-action')" :class="{ active: isActive }">
       {{ text }}
     </button>
-  </template>
+    
+</template>
   
-  <script>
-  export default {
-    props: {
-      text: String,
-      isActive: Boolean
-    }
-  };
-  </script>
+<script setup>
+
+  defineProps({
+    text: String,
+    isActive: Boolean
+    });
+
+  const emit = defineEmits(["click-action"]);
+
+</script>
   
   
   <style scoped>
   button {
-    font-size: 5rem;
+    font-size: 4.5rem;
     font-weight: bold;
     background-color: #ffffff00;
     color: #000000;
@@ -24,7 +28,7 @@
     border-radius: 1rem;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    margin-left: 10rem;
+    margin: 5rem;
   }
 
   button:hover {

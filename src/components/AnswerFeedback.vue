@@ -8,35 +8,13 @@
     </div>
 
     <div v-if="!challengeMode && selectedChoice !== correctAnswer" class="button-group">
-      <button 
-        class="retry-button" 
-        @click="$emit('retry-question')"
-      >
-        RETRY
-      </button>
-
-      <button 
-        class="select-mode-button" 
-        @click="$emit('select-mode')"
-      >
-        SELECT MODE
-      </button>
+      <GameButtons text="RETRY" @click="$emit('retry-question')"/>
+      <GameButtons text="SELECT MODE" @click="$emit('select-mode')"/>
     </div>
 
     <div v-if="challengeMode && (selectedChoice !== correctAnswer || timeUp)" class="button-group">
-      <button 
-        class="retry-button" 
-        @click="$emit('retry-question')"
-      >
-        RETRY
-      </button>
-
-      <button 
-        class="select-mode-button" 
-        @click="$emit('select-mode')"
-      >
-        SELECT MODE
-      </button>
+      <GameButtons text="RETRY" @click="$emit('retry-question')"/>
+      <GameButtons text="SELECT MODE" @click="$emit('select-mode')"/>
     </div>
   </div>
 </template>
@@ -64,23 +42,6 @@ const timeUp = computed(() => props.selectedChoice === "TIME_UP");
   font-weight: bold;
   color: #25b6af;
   text-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
-}
-
-.retry-button, 
-.select-mode-button {
-  padding: 1rem 2rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 2rem;
-  cursor: pointer;
-  font-size: 5rem;
-  box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
-}
-
-.retry-button:hover, 
-.select-mode-button:hover {
-  background-color: #0056b3;
 }
 
 /* ボタンを縦に並べる */

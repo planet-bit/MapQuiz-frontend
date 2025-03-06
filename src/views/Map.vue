@@ -1,15 +1,16 @@
 <template>
   <div v-if="isViewingMap">
 
-    <p class= "map-title">Map of {{ selectedCountry }} 
-    <button @click="closeMap" class="map-close-btn">CLOSE</button>
-    </p>
+    <div class= "map-title">Map of {{ selectedCountry }}
+      <GameButtons class="map-close-button" text="CLOSE" @click="$emit('close-map')"/>
+    </div>
     <div id="map" class="map-container"></div>
   </div>
 </template>
   
 <script setup>
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import GameButtons from '@/components/GameButtons.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -127,20 +128,8 @@ watch(() => props.isViewingMap, (newVal) => {
     height: 65vh;
   }
 
-  .map-close-btn {
-    margin-left: 5%;
-    margin-bottom:5%;
-    padding: 1rem 2rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 2rem;
-    cursor: pointer;
-    font-size: 5rem;
-    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
-  }
-  .map-close-btn:hover {
-    background-color: #0056b3;
+  .map-close-button {
+    margin-left: 5rem;
   }
 </style>
   

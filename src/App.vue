@@ -8,8 +8,9 @@
       @logout="logout"
     >
       <div v-if="selectedCountry"  class="buttons-container">
-        <MyButtons text="Location" :isActive="gameType === 'start'" @click-action="handleLocationGame"/>
-        <MyButtons text="Letters" :isActive="gameType === 'letters'" @click-action="handleLettersGame" />
+        <RadioButtons v-model="gameType" label="Location" value="location" />
+        <RadioButtons v-model="gameType" label="Letter" value="letter" />
+        <div class="separator"></div>
         <MyButtons text="Learn" :isActive="isLearning" @click-action="handleLearnLanguage" />
         <MyButtons text="Map" :isActive="isViewingMap" @click-action="handleViewMap" />
       </div>
@@ -36,32 +37,23 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import TitleBar from "./views/TitleBar.vue";
-import Game from "./views/Game.vue";
-import Learn from "./views/Learn.vue";
-import Map from "./views/Map.vue";
-import MyButtons from "./components/MyButtons.vue";
+import { ref, computed } from "vue";
+import TitleBar from "@/views/TitleBar.vue";
+import Game from "@/views/Game.vue";
+import Learn from "@/views/Learn.vue";
+import Map from "@/views/Map.vue";
+import MyButtons from "@/components/MyButtons.vue";
+import RadioButtons from "@/components/RadioButtons.vue";
 
 const selectedCountry = ref(null); //選択中の国
 const gameType = ref(null); //選択中のゲームタイプ
-const isGameStarted = ref(false); //ゲームが始まった時に表示させたいものに使う
+const isGameStarted = computed(() => !!gameType.value); // gameType が選択されたら true になる
 const isLearning = ref(false); // Learnボタンの状態を管理
 const isViewingMap = ref(false); // Mapボタンの状態を管理
 const isLoggedIn = ref(false); //ログイン状態を管理
 
 const handleCountryChange = (country) => {
   selectedCountry.value = country;
-};
-
-const handleLocationGame = () => {
-  gameType.value = "start";
-  isGameStarted.value = true;
-};
-
-const handleLettersGame = () => {
-  gameType.value = "letters";
-  isGameStarted.value = true;
 };
 
 const handleLearnLanguage = () => {
@@ -104,6 +96,23 @@ const logout = () => {
   height: 15rem;
   width: 100%; 
 }
+.buttons-container{
+  display: flex;
+  flex-wrap: nowrap;      /* 要素が折り返さない */
+  align-items: center;    /* 垂直方向の中央揃え */
+  overflow-x: auto;
+}
+.separator {
+  display: inline-block;
+  width: 1rem;
+  height: 7.5rem;
+  background-color: #00000085;
+  vertical-align: middle;
+  margin: 0 10rem;
+  border-radius: 0.5rem;
+}
+
+
 .game-container {
   position: absolute;
   top: 15rem;
