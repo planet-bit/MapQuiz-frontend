@@ -11,8 +11,8 @@
         <RadioButtons v-model="gameType" label="Location" value="location" />
         <RadioButtons v-model="gameType" label="Letter" value="letter" />
         <div class="separator"></div>
-        <MyButtons text="Learn" :isActive="isLearning" @click-action="handleLearnLanguage" />
-        <MyButtons text="Map" :isActive="isViewingMap" @click-action="handleViewMap" />
+        <MyButtons text="Learn" :isActive="isLearning" @click-action="toggleButton('Learn')" />
+        <MyButtons text="Map" :isActive="isViewingMap" @click-action="toggleButton('Map')" />
       </div>
 
     </TitleBar>
@@ -56,22 +56,22 @@ const handleCountryChange = (country) => {
   selectedCountry.value = country;
 };
 
-const handleLearnLanguage = () => {
-  isLearning.value = !isLearning.value;
-  if (isLearning.value === true) {
-    isViewingMap.value = false;
+const toggleButton = (button) => {
+    if (button === 'Learn') {
+      isLearning.value = !isLearning.value;
+      if (isLearning.value) {
+        isViewingMap.value = false;
+      }
+    } else if (button === 'Map') {
+      isViewingMap.value = !isViewingMap.value;
+      if (isViewingMap.value) {
+        isLearning.value = false;
+      }
+    }
   };
-};
 
 const handleCloseLearning = () => {
   isLearning.value = false; 
-};
-
-const handleViewMap = () => {
-  isViewingMap.value = !isViewingMap.value;
-  if (isViewingMap.value === true) {
-    isLearning.value = false;
-  };
 };
 
 const handleCloseMap = () => {
@@ -93,7 +93,7 @@ const logout = () => {
   position: absolute;
   top: 0;
   left: 0px;
-  height: 15rem;
+  height: 240px;
   width: 100%; 
 }
 .buttons-container{
@@ -104,27 +104,25 @@ const logout = () => {
 }
 .separator {
   display: inline-block;
-  width: 1rem;
-  height: 7.5rem;
+  width: 12px;
+  height: 110px;
   background-color: #00000085;
   vertical-align: middle;
-  margin: 0 10rem;
-  border-radius: 0.5rem;
+  margin: 0 160px;
+  border-radius: 6px;
 }
-
-
 .game-container {
   position: absolute;
-  top: 15rem;
+  top: 240px;
   left: 0;
-  height:calc(100% - 15rem);
+  height:calc(100% - 240px);
   width: 50%;
   background-color: rgb(255, 255, 255);
 }
 .learn-container {
   position:absolute;
-  top: 15rem;
-  height:calc(100% - 15rem);
+  top: 240px;
+  height:calc(100% - 240px);
   width: 50%;
   background-color: rgb(255, 255, 255);
 }
