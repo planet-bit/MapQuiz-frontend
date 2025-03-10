@@ -112,14 +112,14 @@ const toggleDropdown = () => {
   background: #68d47a;
   color: #000000; 
   width: 100%; 
-  height: 15rem; 
+  height: 240px; 
   padding: 0 10rem;
 }
 
 .left-container {
   display: flex;
   align-items: center;
-  gap: 10rem;
+  gap: 160px;
 }
 
 .title {
@@ -132,7 +132,7 @@ const toggleDropdown = () => {
 .dropdown select {
   font-size: 5.5rem;
   font-weight: bold;
-  padding: 1rem;
+  padding: 16px;
   background: none;
   border: none;
   border-bottom: 6px solid #000000;
@@ -147,7 +147,7 @@ const toggleDropdown = () => {
 
 .buttons-container {
   display: flex;
-  gap: 10rem;
+  gap: 160px;
 }
 
 

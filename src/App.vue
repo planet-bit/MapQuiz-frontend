@@ -11,8 +11,8 @@
         <RadioButtons v-model="gameType" label="Location" value="location" />
         <RadioButtons v-model="gameType" label="Letter" value="letter" />
         <div class="separator"></div>
-        <MyButtons text="Learn" :isActive="isLearning" @click-action="toggleButton('Learn')" />
-        <MyButtons text="Map" :isActive="isViewingMap" @click-action="toggleButton('Map')" />
+        <ToggleButtons text="Learn" :isActive="isLearning" @click-action="toggleButton('Learn')" />
+        <ToggleButtons text="Map" :isActive="isViewingMap" @click-action="toggleButton('Map')" />
         <div class="separator"></div>
       </div>
 
@@ -43,7 +43,7 @@ import TitleBar from "@/views/TitleBar.vue";
 import Game from "@/views/Game.vue";
 import Learn from "@/views/Learn.vue";
 import Map from "@/views/Map.vue";
-import MyButtons from "@/components/MyButtons.vue";
+import ToggleButtons from "@/components/ToggleButtons.vue";
 import RadioButtons from "@/components/RadioButtons.vue";
 
 const selectedCountry = ref(null); //選択中の国
