@@ -13,6 +13,7 @@
         <div class="separator"></div>
         <MyButtons text="Learn" :isActive="isLearning" @click-action="toggleButton('Learn')" />
         <MyButtons text="Map" :isActive="isViewingMap" @click-action="toggleButton('Map')" />
+        <div class="separator"></div>
       </div>
 
     </TitleBar>

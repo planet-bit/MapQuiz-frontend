@@ -1,17 +1,23 @@
-# mapquiz-vue
+# MapQuiz-frontend
 
 このアプリは、言語と地名の学習を目的としたクイズアプリです。
+
+## 概要
+MapQuiz-frontendはVue.jsを使用しており、MapQuiz-backendと連携してクイズ機能を提供します。
 
 
 ## 推奨されるIDE（統合開発環境）設定
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) （Veturは無効にしてください）
 
-## 必要な環境
+### 必要なツール
+- Node.js (推奨バージョン: xx.xx.x)
+- npm
 
-Node.js（バージョン22.13.1以上）
-
-npm（バージョン10.9.2以上）
+### 主な依存ライブラリ
+- Vue (^3.5.13) - フロントエンドフレームワーク
+- Axios (^1.8.1) - HTTPクライアント
+- Leaflet (^1.9.4) - 地図ライブラリ
 
 ## セットアップ手順
 
@@ -41,8 +47,6 @@ npm run dev
 npm run build
 ```
 
-## 注意点
+## バックエンドの起動
 
-まだVue.jsのみで動作している状態です。
-
-バックエンド、データベース（MySQL）は後々連携予定です。
+フロントエンドと連携するバックエンドアプリケーションのセットアップについては、MapQuiz-frontend READMEを参照してください。

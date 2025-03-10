@@ -24,11 +24,6 @@
   
   // 親コンポーネントにイベントを送るための関数 を定義する
   const emit = defineEmits(['close-learning']);
-
-   // 親に学習モードを終了するイベントを送る関数
-  const closeLearning = () => {
-    emit('close-learning');
-  };
   
   const languageList = ref([]);
 

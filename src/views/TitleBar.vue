@@ -61,15 +61,13 @@ const fetchCountries = async () => {
     const response = await axios.get("http://localhost:3000/api/countries");
     countries.value = response.data.map(item => item.country_name);
   } catch (error) {
-    console.error("Error fetching countries:", error);
-    if (error.response) {
-      console.error("Response data:", error.response.data);
-      console.error("Response status:", error.response.status);
-    } else {
-      console.error("Error message:", error.message);
-    }
+    const errorMessage = error.response ? 
+      `Error: ${error.response.status} - ${error.response.data}` : 
+      `Error message: ${error.message}`;
+    console.error(errorMessage);
   }
 };
+
 
 // コンポーネントがマウントされた時にデータを取得
 onMounted(() => {
