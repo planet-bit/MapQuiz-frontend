@@ -20,10 +20,6 @@ const props = defineProps({
 });
 const emit = defineEmits(['close-map']);
 
-const closeMap = () => {
-  emit('close-map');
-};
-
 // 地図の中心とズーム
 const center = ref([45, 75]); // 初期値はロシア
 const zoom = ref(5); // ズームレベル
@@ -70,7 +66,8 @@ const initializeMap = () => {
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; OpenStreetMap &copy; CARTO',
   subdomains: 'abcd',
-  maxZoom: 20
+  maxZoom: 20,
+  minZoom: 4
 }).addTo(map);
 
       

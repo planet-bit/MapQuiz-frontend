@@ -16,27 +16,18 @@
       
     </div>
 
-    <!-- ログインボタン -->
     <div class="login-container">
-      <a v-if="!isLoggedIn" href="#" @click.prevent="toggleLogin">Login</a>
-      
-      <!-- User ボタンとドロップダウン -->
-      <div v-else class="user-menu">
-        <a href="#" @click.prevent="toggleDropdown">User ▼</a>
-
-        <!-- ドロップダウンメニュー -->
-        <div v-if="isDropdownOpen" class="dropdown-menu">
-          <a href="#" @click.prevent="viewHistory">履歴</a>
-          <a href="#" @click.prevent="logout">Sign out</a>
-        </div>
-      </div>
+      <LoginDropdown />
     </div>
+
 </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import LoginDropdown from '../components/LoginDropdown.vue';
+
 
 const emit = defineEmits([
   "country-selected", 
@@ -54,7 +45,6 @@ const props = defineProps({
 
 const countries = ref([]);
 const selectedCountry = ref("");
-const isDropdownOpen = ref(false); // ドロップダウンの表示状態
 
 const fetchCountries = async () => {
   try {
@@ -76,30 +66,11 @@ onMounted(() => {
 
 // 選択された国を処理する関数
 const selectCountry = () => {
-  const countryWithoutSpaces = selectedCountry.value.replace(/\s+/g, ''); // スペースを取り除く
-  emit("country-selected", countryWithoutSpaces);  // スペースを取り除いた国名を親コンポーネントに渡す
+  emit("country-selected", selectedCountry.value);
 };
 
 const reloadPage = () => {
   location.reload();
-};
-
-const toggleLogin = () => {
-  emit("toggle-login");
-};
-
-const logout = () => {
-  isDropdownOpen.value = false;
-  emit("logout"); // 親コンポーネントにログアウト処理を通知
-};
-
-const viewHistory = () => {
-  isDropdownOpen.value = false;
-  emit("view-history"); // 親コンポーネントに履歴表示のイベントを送る
-};
-
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
 };
 
 </script>
@@ -150,42 +121,10 @@ const toggleDropdown = () => {
   gap: 160px;
 }
 
-
-
-.login-container a ,
-.user-menu a {
-  color: #000000; /* 黒色に設定 */
-}
-
 .login-container {
   position: relative;
-  font-size: 6rem;
 }
 
-.user-menu {
-  position: relative;
-  display: inline-block;
-}
 
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  font-size: 4rem;
-}
-
-.dropdown-menu a {
-  display: block;
-  padding: 8px 12px;
-  color: black;
-  text-decoration: none;
-}
 
 </style>
