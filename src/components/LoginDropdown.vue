@@ -159,7 +159,7 @@ const viewHistory = () => {
   top: 100%;
   right: 0;
   width: 2000px;
-  height: 1500px;;
+  height: 1000px;;
   background: rgb(245, 245, 245);
   border: 2px solid #bebdbd;
   box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.2);

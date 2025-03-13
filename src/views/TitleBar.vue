@@ -12,52 +12,53 @@
         </select>
       </div>
 
-      <slot></slot>
-      
+      <slot></slot> 
+
     </div>
 
     <div class="login-container">
       <LoginDropdown />
     </div>
-
-</div>
+    
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
-import LoginDropdown from '../components/LoginDropdown.vue';
+  import { ref, onMounted } from "vue";
+  import axios from "axios";
+  import LoginDropdown from '@/components/LoginDropdown.vue';
 
 
-const emit = defineEmits([
-  "country-selected", 
-  "toggle-login",
-  "logout",
-  "view-history"
-]);
+  const emit = defineEmits([
+    "country-selected", 
+    "toggle-login",
+    "logout",
+    "view-history"
+  ]);
 
-const props = defineProps({
-  gameType: String,
-  isLearning: Boolean,
-  isViewingMap: Boolean,
-  isLoggedIn: Boolean,
-});
+  const props = defineProps({
+    gameType: String,
+    isLearning: Boolean,
+    isViewingMap: Boolean,
+    isLoggedIn: Boolean,
+  });
 
-const countries = ref([]);
-const selectedCountry = ref("");
+  const countries = ref([]);
+  const selectedCountry = ref("");
 
-const fetchCountries = async () => {
-  try {
-    const response = await axios.get("http://localhost:3000/api/countries");
-    countries.value = response.data.map(item => item.country_name);
-  } catch (error) {
-    const errorMessage = error.response ? 
-      `Error: ${error.response.status} - ${error.response.data}` : 
-      `Error message: ${error.message}`;
-    console.error(errorMessage);
-  }
-};
-
+  // fetchCountries関数を非同期で定義し、APIから国名データを取得する処理を行う
+  const fetchCountries = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/countries");
+      countries.value = response.data.map(item => item.country_name);
+    } catch (error) {
+      // エラーハンドリング。エラーがaxiosのレスポンスに関連している場合とそうでない場合を分けて処理
+      const errorMessage = error.response ? 
+        `Error: ${error.response.status} - ${error.response.data}` : 
+        `Error message: ${error.message}`;
+      console.error(errorMessage);
+    }
+  };
 
 // コンポーネントがマウントされた時にデータを取得
 onMounted(() => {
@@ -124,7 +125,4 @@ const reloadPage = () => {
 .login-container {
   position: relative;
 }
-
-
-
 </style>

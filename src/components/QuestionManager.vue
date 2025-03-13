@@ -14,11 +14,14 @@
   const emit = defineEmits(["question-updated"]);
   const questions = ref([]);
   
-  // API から問題データを取得
+  // APIから問題データを取得する非同期関数
   const fetchQuestions = async () => {
     if (!props.selectedCountry) return;
     try {
+      // APIにリクエストを送信。`encodeURIComponent`で選択された国をURLエンコード
       const response = await fetch(`http://localhost:3000/api/questions?country=${encodeURIComponent(props.selectedCountry)}`);
+
+      // responseをJSON形式に変換し、questionsに格納
       const data = await response.json();
       questions.value = data;
     } catch (error) {
@@ -33,7 +36,8 @@
       fetchQuestions();
     }
   });
-    // 初回マウント時にも問題を取得
+
+  // 初回マウント時にも問題を取得
   onMounted(() => {
     if (props.selectedCountry && props.gameType) {
       fetchQuestions();
@@ -57,7 +61,7 @@
     let wrongAnswers = allQuestions
       .map(q => q.answer)
       .filter(answer => answer !== correctAnswer);
-    wrongAnswers = wrongAnswers.sort(() => 0.5 - Math.random()).slice(0, 4);
+    wrongAnswers = wrongAnswers.sort(() => 0.5 - Math.random()).slice(0, 7);
     const choices = [correctAnswer, ...wrongAnswers].sort(() => 0.5 - Math.random());
     return choices;
   };
@@ -65,7 +69,6 @@
   // コンポーネント外で呼び出せるように
   defineExpose({
     setQuestion,
-    fetchQuestions
   });
 
 </script>

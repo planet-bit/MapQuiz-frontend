@@ -28,33 +28,33 @@
   const languageList = ref([]);
 
   // 国ごとのデータを API から取得する関数
-const fetchLanguageData = async () => {
-  if (!props.selectedCountry) return;
-  try {
-    const response = await fetch(`http://localhost:3000/api/letters/${props.selectedCountry}`);
-    if (!response.ok) throw new Error('データ取得に失敗しました');
-    
-    const data = await response.json();
-    languageList.value = data;
-  } catch (error) {
-    console.error('APIエラー:', error);
-  }
-};
+  const fetchLanguageData = async () => {
 
-// selectedCountry が変わったらデータを取得
-watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
- 
+    if (!props.selectedCountry) return;
+    try {
+      const response = await fetch(`http://localhost:3000/api/letters/${props.selectedCountry}`);
+      if (!response.ok) throw new Error('データ取得に失敗しました');
+    
+      // responseをJSON形式に変換し、languageListに格納
+      const data = await response.json();
+      languageList.value = data;
+    } catch (error) {
+      console.error('APIエラー:', error);
+    }
+  };
+
+  // selectedCountry が変わったらデータを取得
+  watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
+
 </script>
   
 <style scoped>
-
   .language-list {
     position: relative;
     padding: 10rem;
     font-size: 6rem;
     font-weight: bold;
   }
-
   .language-list ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); /* 列幅の自動調整 */
@@ -63,7 +63,6 @@ watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
   list-style-type: none;
   margin:5rem;
  }
-
   .language-list ul li {
     font-size: 5rem; /* 文字サイズを調整 */
     font-weight: bold;
@@ -72,10 +71,8 @@ watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
     text-align: center;
     background-color: rgb(255, 255, 255);
   }
-  
   .learn-close-button {
     margin-left: 5rem;
   }
- 
 </style>
   
