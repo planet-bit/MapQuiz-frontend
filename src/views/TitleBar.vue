@@ -6,10 +6,13 @@
       <div class="dropdown">
         <select v-model="selectedCountry" @change="selectCountry">
           <option value="" disabled hidden>Country</option>
-          <option v-for="country in countries" :key="country" :value="country">
-            {{ country }}
+          <option v-for="country in countries" 
+            :key="country.code" 
+            :value="country.name">
+            {{ country.name }}
           </option>
         </select>
+ 
       </div>
 
       <slot></slot> 
@@ -48,27 +51,37 @@
 
   // fetchCountries関数を非同期で定義し、APIから国名データを取得する処理を行う
   const fetchCountries = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/countries");
-      countries.value = response.data.map(item => item.country_name);
-    } catch (error) {
-      // エラーハンドリング。エラーがaxiosのレスポンスに関連している場合とそうでない場合を分けて処理
-      const errorMessage = error.response ? 
-        `Error: ${error.response.status} - ${error.response.data}` : 
-        `Error message: ${error.message}`;
-      console.error(errorMessage);
-    }
-  };
+  try {
+    const response = await axios.get("http://localhost:3000/api/countries");
+    countries.value = response.data.map(item => ({
+      code: item.country_code, 
+      name: item.country_name  
+    }));
+  } catch (error) {
+    const errorMessage = error.response ? 
+      `Error: ${error.response.status} - ${error.response.data}` : 
+      `Error message: ${error.message}`;
+    console.error(errorMessage);
+  }
+};
+
 
 // コンポーネントがマウントされた時にデータを取得
 onMounted(() => {
   fetchCountries();
 });
 
-// 選択された国を処理する関数
 const selectCountry = () => {
-  emit("country-selected", selectedCountry.value);
+  const selected = countries.value.find(c => c.name === selectedCountry.value);
+  if (selected) {
+    emit("country-selected", {
+      code: selected.code,  
+      name: selected.name   
+    });
+  }
 };
+
+
 
 const reloadPage = () => {
   location.reload();

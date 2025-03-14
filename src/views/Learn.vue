@@ -1,7 +1,7 @@
 <template>
   <div v-if="isLearning">
     <div class="language-list">
-      List of languages in {{ selectedCountry }}
+      List of languages in {{ selectedCountry.name }}
       <GameButtons class="learn-close-button" text="CLOSE" @click="$emit('close-learning')"/>
       <ul>
         <li v-for="(pronunciation, index) in languageList" :key="index">
@@ -18,11 +18,11 @@
   
   // 親コンポーネントから受け取る国
   const props = defineProps({
-    selectedCountry: String,
+    selectedCountry: Object,
     isLearning: Boolean
   });
   
-  // 親コンポーネントにイベントを送るための関数 を定義する
+  // 親コンポーネントにイベントを送るための関数
   const emit = defineEmits(['close-learning']);
   
   const languageList = ref([]);
@@ -30,9 +30,10 @@
   // 国ごとのデータを API から取得する関数
   const fetchLanguageData = async () => {
 
-    if (!props.selectedCountry) return;
+    if (!props.selectedCountry.code) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/letters/${props.selectedCountry}`);
+      // country_code を使ってAPIからデータを取得
+      const response = await fetch(`http://localhost:3000/api/letters/${props.selectedCountry.code}`);
       if (!response.ok) throw new Error('データ取得に失敗しました');
     
       // responseをJSON形式に変換し、languageListに格納
@@ -44,9 +45,10 @@
   };
 
   // selectedCountry が変わったらデータを取得
-  watch(() => props.selectedCountry, fetchLanguageData, { immediate: true });
+  watch(() => props.selectedCountry.code, fetchLanguageData, { immediate: true });
 
 </script>
+
   
 <style scoped>
   .language-list {

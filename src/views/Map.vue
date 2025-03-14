@@ -1,7 +1,7 @@
 <template>
   <div v-if="isViewingMap">
 
-    <div class= "map-title">Map of {{ selectedCountry }}
+    <div class= "map-title">Map of {{ selectedCountry.name }}
       <GameButtons class="map-close-button" text="CLOSE" @click="$emit('close-map')"/>
     </div>
     <div id="map" class="map-container"></div>
@@ -15,7 +15,7 @@
   import 'leaflet/dist/leaflet.css';
 
   const props = defineProps({
-    selectedCountry: String,
+    selectedCountry: Object,
     isViewingMap: Boolean
   });
   const emit = defineEmits(['close-map']);
@@ -26,14 +26,14 @@
   let map = null; // Leaflet の地図インスタンスを保持
 
   // 選択された国が変更されたら座標を更新する
-  watch(() => props.selectedCountry, (newCountry) => {
-    if (newCountry === "Russia") {
+  watch(() => props.selectedCountry.code, (newCountry) => {
+    if (newCountry === "ru") {
       center.value = [60, 60]; // ロシアの中心
       zoom.value = 5.5
-    } else if (newCountry === "SouthKorea") {
+    } else if (newCountry === "kr") {
       center.value = [36.5, 127.5]; // 韓国の中心
       zoom.value = 9
-    } else if (newCountry === "Bangladesh") {
+    } else if (newCountry === "bd") {
       center.value = [23.7, 90.4]; // バングラデシュの中心
       zoom.value = 8.5
     }

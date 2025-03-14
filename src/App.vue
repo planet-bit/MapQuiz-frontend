@@ -3,11 +3,11 @@
       <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
     <TitleBar 
       :isLoggedIn="isLoggedIn" 
-      @country-selected="handleCountryChange" 
+      @country-selected="handleCountrySelected" 
       @toggle-login="toggleLogin"
       @logout="logout"
     >
-      <div v-if="selectedCountry"  class="buttons-container">
+      <div v-if="selectedCountry.code"  class="buttons-container">
         <RadioButtons v-model="gameType" label="Location" value="location" />
         <RadioButtons v-model="gameType" label="Letter" value="letter" />
         <div class="separator"></div>
@@ -46,17 +46,16 @@ import Map from "@/views/Map.vue";
 import ToggleButtons from "@/components/ToggleButtons.vue";
 import RadioButtons from "@/components/RadioButtons.vue";
 
-const selectedCountry = ref(null); //選択中の国
+const selectedCountry = ref({ code: "", name: "" });
 const gameType = ref(null); //選択中のゲームタイプ
 const isGameStarted = computed(() => !!gameType.value); // gameType が選択されたら true になる
 const isLearning = ref(false); // Learnボタンの状態を管理
 const isViewingMap = ref(false); // Mapボタンの状態を管理
 const isLoggedIn = ref(false); //ログイン状態を管理
 
-const handleCountryChange = (country) => {
-  selectedCountry.value = country;
+const handleCountrySelected = (country) => {
+    selectedCountry.value = country;
 };
-
 const toggleButton = (button) => {
     if (button === 'Learn') {
       isLearning.value = !isLearning.value;

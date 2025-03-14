@@ -67,7 +67,7 @@
 
   // 親コンポーネントから渡されたプロパティ
   const props = defineProps({
-    selectedCountry: String,
+    selectedCountry: Object,
     gameType: String
   });
 
