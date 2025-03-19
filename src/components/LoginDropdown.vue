@@ -84,13 +84,14 @@ const login = async () => {
     // クッキーにトークンを保存（`Secure` と `HttpOnly` は開発環境では外してもよい）
     document.cookie = `token=${data.token}; path=/;`;
     token.value = data.token;
+    location.reload();  // ログイン後にページをリロード
   } else {
     alert("ログイン失敗");
   }
-
-  isDropdownOpen.value = false;
 };
 
+  
+  
 // 新規登録フォームを表示
 const showRegisterForm = () => {
   isRegistering.value = true; // 新規登録フォームを表示
@@ -119,6 +120,7 @@ const register = async () => {
         token.value = data.token;
       }
       isRegistering.value = false;
+      location.reload();  // ログイン後にページをリロード
     } else {
       alert(data.error || "登録に失敗しました。");
     }
@@ -126,14 +128,13 @@ const register = async () => {
     console.error("登録エラー:", error);
     alert("サーバーエラーが発生しました。");
   }
-
-  isDropdownOpen.value = false;
 };
 
 // ログアウト処理
 const logout = () => {
   document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"; // Cookie削除
   token.value = null;
+  location.reload();
 };
 
 // 履歴表示

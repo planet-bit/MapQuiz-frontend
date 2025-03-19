@@ -36,7 +36,8 @@
     "country-selected", 
     "toggle-login",
     "logout",
-    "view-history"
+    "view-history",
+    "user-logged-in"
   ]);
 
   const props = defineProps({
@@ -48,6 +49,8 @@
 
   const countries = ref([]);
   const selectedCountry = ref("");
+  const token = ref(null);
+  const userId = ref(null);
 
   // fetchCountries関数を非同期で定義し、APIから国名データを取得する処理を行う
   const fetchCountries = async () => {
@@ -65,11 +68,41 @@
   }
 };
 
+// クッキーからトークンを取得する関数
+function getTokenFromCookie() {
+  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+  console.log("クッキーから取得したトークン!: ", match ? match[1] : null);  
+  return match ? match[1] : null;
+}
+
+const fetchUserInfo = async () => {
+  const cookieToken = getTokenFromCookie();  // クッキーからトークンを取得
+  if (cookieToken) {
+    token.value = cookieToken;
+  }
+
+  if (token.value) {
+    try {
+      const response = await axios.get("http://localhost:3000/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token.value}`  // Authorizationヘッダーにトークンを設定
+        }
+      });
+      userId.value = response.data.user.id;  // ユーザーIDを取得
+      emit("user-logged-in", userId.value);  // 親コンポーネントに渡す
+    } catch (error) {
+      console.error("ユーザー情報の取得に失敗しました", error);
+    }
+  } else {
+    console.log("トークンがありません");
+  }
+};
 
 // コンポーネントがマウントされた時にデータを取得
 onMounted(() => {
   fetchCountries();
 });
+onMounted(fetchUserInfo);
 
 const selectCountry = () => {
   const selected = countries.value.find(c => c.name === selectedCountry.value);

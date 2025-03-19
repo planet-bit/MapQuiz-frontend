@@ -51,6 +51,7 @@
           @next-question="nextQuestion"
           @retry-question="retryQuestion"
           @select-mode="selectMode"
+          @streak-finalized="sendStreakData"
         />
       </div>
     </div>
@@ -60,15 +61,16 @@
 <script setup>
 
   import { ref, watch, onMounted } from "vue";
-  import ChoiceButtons from "../components/ChoiceButtons.vue";
-  import AnswerFeedback from "../components/AnswerFeedback.vue";
-  import Timer from "../components/Timer.vue";
-  import QuestionManager from "../components/QuestionManager.vue";
+  import ChoiceButtons from "@/components/ChoiceButtons.vue";
+  import AnswerFeedback from "@/components/AnswerFeedback.vue";
+  import Timer from "@/components/Timer.vue";
+  import QuestionManager from "@/components/QuestionManager.vue";
 
   // 親コンポーネントから渡されたプロパティ
   const props = defineProps({
     selectedCountry: Object,
-    gameType: String
+    gameType: String,
+    userId: Number
   });
 
   const currentQuestion = ref(""); // 現在の問題
@@ -82,6 +84,53 @@
   const timerActive = ref (false);
   const triggerStopTimer = ref(false);
   const questionManager = ref(null);
+  
+
+// `streak-finalized` イベントを受け取って、APIに送信
+const sendStreakData = async () => {
+
+  console.log("props.userId:", props.userId);
+  const streak = currentQuestionIndex.value - 1;
+  // 動的にデータを更新
+  const data = {
+    "user_id": props.userId, // ログインしたユーザーのIDを使う
+    "game_type": props.gameType, // ゲームタイプ（選択に基づく）
+    "country_code": props.selectedCountry.code, // 国コード（選択に基づく）
+    "streak": streak,// 確定した連続記録
+    "correct_answers": streak, // 正解数（連続記録と同じ）
+  };
+
+  try {
+    const response = await updateStreak(data);
+    console.log("更新成功:", response);
+  } catch (error) {
+    console.error("更新エラー:", error);
+  }
+};
+
+const updateStreak = async (data) => {
+  try {
+    console.log("送信データ:", data); // 送信前に確認
+    const response = await fetch("http://localhost:3000/api/streaks/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    console.log("レスポンスステータス:", response.status); // HTTPステータスを確認
+
+    if (!response.ok) {
+      const errorMessage = await response.text(); // サーバーのエラーメッセージを取得
+      throw new Error(`サーバーエラー: ${response.status} - ${errorMessage}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("updateStreak エラー:", error);
+    throw error; // ここでエラーをそのままスロー
+  }
+};
+
 
   const updateQuestion = ({ question, choices }) => {
     currentQuestion.value = question;

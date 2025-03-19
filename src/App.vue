@@ -3,6 +3,7 @@
       <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
     <TitleBar 
       :isLoggedIn="isLoggedIn" 
+      @user-logged-in="handleUserLogin"
       @country-selected="handleCountrySelected" 
       @toggle-login="toggleLogin"
       @logout="logout"
@@ -21,7 +22,7 @@
 
   <div class = "game-container">
     <!-- Gameに情報を渡す -->
-    <Game v-if="isGameStarted" :selectedCountry="selectedCountry" :gameType="gameType" />
+    <Game v-if="isGameStarted" :selectedCountry="selectedCountry" :gameType="gameType" :userId="userId" />
   </div>
   <div class = "learn-container">
     <Learn 
@@ -52,6 +53,10 @@ const isGameStarted = computed(() => !!gameType.value); // gameType が選択さ
 const isLearning = ref(false); // Learnボタンの状態を管理
 const isViewingMap = ref(false); // Mapボタンの状態を管理
 const isLoggedIn = ref(false); //ログイン状態を管理
+const userId = ref(null);
+const handleUserLogin = (id) => {
+  userId.value = id; // ユーザーIDを保存
+};
 
 const handleCountrySelected = (country) => {
     selectedCountry.value = country;
