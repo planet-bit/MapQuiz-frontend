@@ -2,7 +2,7 @@
   <div v-if="isViewingMap">
 
     <div class= "map-title">Map of {{ selectedCountry.name }}
-      <GameButtons class="map-close-button" text="CLOSE" @click="$emit('close-map')"/>
+      <NavigationButtons class="map-close-button" text="CLOSE" @click="$emit('close-map')"/>
     </div>
     <div id="map" class="map-container"></div>
   </div>
@@ -10,7 +10,7 @@
   
 <script setup>
   import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
-  import GameButtons from '@/components/GameButtons.vue';
+  import NavigationButtons from '@/components/NavigationButtons.vue';
   import L from 'leaflet';
   import 'leaflet/dist/leaflet.css';
 

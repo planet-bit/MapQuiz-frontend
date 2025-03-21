@@ -32,13 +32,13 @@
     border: none;
     border-radius: 1rem;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.3s, box-shadow 0.3s;
     margin: 5rem;
   }
   
   button:hover {
     transform: scale(1.1);
-    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.2);
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
   }
   
   @keyframes fadeIn {
@@ -49,6 +49,7 @@
   button.active {
     background-color: #4CAF50;
     color: rgb(0, 0, 0);
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
   }
   
   button.active:hover {

@@ -33,7 +33,7 @@
 
   button:hover {
     transform: scale(1.1);
-    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.2);
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.2);
   }
 
   @keyframes fadeIn {
@@ -43,6 +43,7 @@
 
   button.active {
     background-color: #4CAF50;
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
   }
 
   button.active:hover {

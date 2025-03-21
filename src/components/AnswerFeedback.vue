@@ -4,24 +4,24 @@
     <p v-else class="streak-count">Streak: {{ streakCount }}</p>
 
     <div v-if="selectedChoice === correctAnswer">
-      <GameButtons text="NEXT" @click="$emit('next-question')"/>
+      <NavigationButtons text="NEXT" @click="$emit('next-question')"/>
     </div>
 
     <div v-if="!challengeMode && selectedChoice !== correctAnswer" class="button-group">
-      <GameButtons text="RETRY" @click="$emit('retry-question')"/>
-      <GameButtons text="SELECT MODE" @click="$emit('select-mode')"/>
+      <NavigationButtons text="RETRY" @click="$emit('retry-question')"/>
+      <NavigationButtons text="SELECT MODE" @click="$emit('select-mode')"/>
     </div>
 
     <div v-if="challengeMode && (selectedChoice !== correctAnswer || timeUp)" class="button-group">
-      <GameButtons text="RETRY" @click="$emit('retry-question')"/>
-      <GameButtons text="SELECT MODE" @click="$emit('select-mode')"/>
+      <NavigationButtons text="RETRY" @click="$emit('retry-question')"/>
+      <NavigationButtons text="SELECT MODE" @click="$emit('select-mode')"/>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, watch, defineProps, defineEmits } from 'vue';
-import GameButtons from './GameButtons.vue';
+import NavigationButtons from './NavigationButtons.vue';
 
 const props = defineProps({
   selectedChoice: String,

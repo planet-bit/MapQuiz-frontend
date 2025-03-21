@@ -12,15 +12,17 @@
             {{ country.name }}
           </option>
         </select>
- 
       </div>
-
       <slot></slot> 
-
     </div>
 
-    <div class="login-container">
+    <div v-if = "!token" class="login-container">
       <LoginDropdown />
+    </div>
+    <div v-else class="user-container">
+      <UserDropdown 
+      :userId="userId"
+      @signout="signout" />
     </div>
     
   </div>
@@ -30,7 +32,7 @@
   import { ref, onMounted } from "vue";
   import axios from "axios";
   import LoginDropdown from '@/components/LoginDropdown.vue';
-
+  import UserDropdown from '@/components/UserDropdown.vue';
 
   const emit = defineEmits([
     "country-selected", 
@@ -70,8 +72,7 @@
 
 // クッキーからトークンを取得する関数
 function getTokenFromCookie() {
-  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
-  console.log("クッキーから取得したトークン!: ", match ? match[1] : null);  
+  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);  
   return match ? match[1] : null;
 }
 
@@ -113,8 +114,12 @@ const selectCountry = () => {
     });
   }
 };
-
-
+  
+const signout = () => {
+  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"; // Cookie削除
+  token.value = null; // ローカルの `token` を変更
+  location.reload();
+};
 
 const reloadPage = () => {
   location.reload();

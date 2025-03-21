@@ -2,7 +2,7 @@
   <div v-if="isLearning">
     <div class="language-list">
       List of languages in {{ selectedCountry.name }}
-      <GameButtons class="learn-close-button" text="CLOSE" @click="$emit('close-learning')"/>
+      <NavigationButtons class="learn-close-button" text="CLOSE" @click="$emit('close-learning')"/>
       <ul>
         <li v-for="(pronunciation, index) in languageList" :key="index">
           {{ pronunciation.letters }}
@@ -14,7 +14,7 @@
   
 <script setup>
   import { ref, watch } from 'vue';
-  import GameButtons from '@/components/GameButtons.vue';
+  import NavigationButtons from '@/components/NavigationButtons.vue';
   
   // 親コンポーネントから受け取る国
   const props = defineProps({

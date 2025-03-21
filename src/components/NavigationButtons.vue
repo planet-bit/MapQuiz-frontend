@@ -25,6 +25,7 @@
     cursor: pointer;
     font-size: 5rem;
     box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
   }
 
   button:hover {

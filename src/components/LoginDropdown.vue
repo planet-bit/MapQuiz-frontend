@@ -1,13 +1,7 @@
 <template>
   <div>
-    <a v-if="!token" href="#" @click.prevent="toggleDropdown" class="login-dropdown-link">Log in</a>
-
-    <div v-else class="user-menu">
-      <a href="#" @click.prevent="toggleDropdown" class="user-dropdown-link">User ▼</a>
-      <div v-if="isDropdownOpen" class="dropdown-menu">
-        <a href="#" @click.prevent="viewHistory">履歴</a>
-        <a href="#" @click.prevent="logout">Sign out</a>
-      </div>
+    <a href="#" @click.prevent="toggleDropdown" class="login-dropdown-link">Log in</a>
+    
     </div>
 
     <div v-if="isDropdownOpen && !token" class="dropdown-menu">
@@ -30,7 +24,7 @@
         </div>
       </form>
     </div>
-  </div>
+  
 </template>
 
 <script setup>
@@ -89,8 +83,6 @@ const login = async () => {
     alert("ログイン失敗");
   }
 };
-
-  
   
 // 新規登録フォームを表示
 const showRegisterForm = () => {
@@ -130,29 +122,15 @@ const register = async () => {
   }
 };
 
-// ログアウト処理
-const logout = () => {
-  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"; // Cookie削除
-  token.value = null;
-  location.reload();
-};
-
-// 履歴表示
-const viewHistory = () => {
-  alert('履歴を表示');
-};
 </script>
 
-
-
 <style scoped>
-.login-dropdown-link,
-.user-dropdown-link {
-  color: rgb(0, 0, 0); 
-  font-size: 6rem; 
-  font-weight: bold;
-  text-decoration: none; 
-}
+  .login-dropdown-link {
+    color: rgb(0, 0, 0); 
+    font-size: 6rem; 
+    font-weight: bold;
+    text-decoration: none; 
+  }
 
 .dropdown-menu {
   position: absolute;
@@ -195,4 +173,5 @@ const viewHistory = () => {
   text-decoration: underline;
   font-size: 4rem; /* サイズ変更したい場合 */
 }
+
 </style>
