@@ -72,9 +72,9 @@ const initializeMap = () => {
     map = L.map('map-study', {
       center: center.value,
       zoom: zoom.value,
-      zoomDelta: 0.25,
+      zoomDelta: 0.10,
       zoomSnap: 0,
-      wheelPxPerZoomLevel: 150
+      wheelPxPerZoomLevel: 200
     });
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
@@ -121,8 +121,7 @@ const updateMapLayers = (countryCode) => {
             const label = L.divIcon({
               className: 'custom-label',
               html: `<div class="label">${name}</div>`,
-              iconSize: [100, 50],
-              iconAnchor: [50, 25]
+             
             });
 
             const marker = L.marker(layer.getBounds().getCenter(), { icon: label }).addTo(map);
