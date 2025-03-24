@@ -32,11 +32,11 @@
         :isLearning="isLearning"
         @close-learning="handleCloseLearning" 
       />
-      <Map
+      <StudyMap
         :selectedCountry="selectedCountry"
-        :isViewingMap="isViewingMap"
+        :isViewingStudyMap="isViewingStudyMap"
         @close-map="handleCloseMap">
-      </Map> 
+      </StudyMap> 
     </div>
   </template>
   
@@ -45,7 +45,7 @@
   import TitleBar from "@/views/TitleBar.vue";
   import Game from "@/views/Game.vue";
   import Learn from "@/views/Learn.vue";
-  import Map from "@/views/Map.vue";
+  import StudyMap from "@/components/StudyMap.vue";
   import ToggleButtons from "@/components/ToggleButtons.vue";
   import RadioButtons from "@/components/RadioButtons.vue";
   
@@ -53,7 +53,7 @@
   const gameType = ref(null); //選択中のゲームタイプ
   const isGameStarted = computed(() => !!gameType.value); // gameType が選択されたら true になる
   const isLearning = ref(false); // Learnボタンの状態を管理
-  const isViewingMap = ref(false); // Mapボタンの状態を管理
+  const isViewingStudyMap = ref(false); // Mapボタンの状態を管理
   const isLoggedIn = ref(false); //ログイン状態を管理
   const userId = ref(null);
   const handleUserLogin = (id) => {
@@ -67,11 +67,11 @@
       if (button === 'Learn') {
         isLearning.value = !isLearning.value;
         if (isLearning.value) {
-          isViewingMap.value = false;
+          isViewingStudyMap.value = false;
         }
       } else if (button === 'Map') {
-        isViewingMap.value = !isViewingMap.value;
-        if (isViewingMap.value) {
+        isViewingStudyMap.value = !isViewingStudyMap.value;
+        if (isViewingStudyMap.value) {
           isLearning.value = false;
         }
       }
@@ -82,7 +82,7 @@
   };
   
   const handleCloseMap = () => {
-    isViewingMap.value = false;
+    isViewingStudyMap.value = false;
   };
   
   const toggleLogin = () => {

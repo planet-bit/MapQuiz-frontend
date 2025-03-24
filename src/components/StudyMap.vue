@@ -1,0 +1,218 @@
+<template>
+  <div v-if="isViewingStudyMap">
+    <div class="map-title">
+      Map of {{ selectedCountry.name }}
+      <NavigationButtons class="map-close-button" text="CLOSE" @click="$emit('close-map')" />
+    </div>
+    <div id="map-study" class="map-container"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref, watch, onMounted, nextTick } from 'vue';
+import NavigationButtons from '@/components/NavigationButtons.vue';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const props = defineProps({
+  selectedCountry: Object,
+  isViewingStudyMap: Boolean
+});
+const emit = defineEmits(['close-map']);
+
+const center = ref(); // 初期値: ロシア
+const zoom = ref(5);
+let map = null;
+let geoJsonLayer = null;
+
+const countryData = {
+  ru: { center: [60, 60], zoom: 5.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson' },
+  kr: { center: [36.5, 127.5], zoom: 9.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson' },
+  bd: { center: [23.7, 90.4], zoom: 8.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/bangladesh.geojson' }
+};
+
+watch(() => props.selectedCountry.code, (newCountry) => {
+ 
+ 
+  if (newCountry === "ru") {
+    initializeMap();
+    center.value = [60, 60]; // ロシアの中心
+    zoom.value = 5.5;
+  } else if (newCountry === "kr") {
+    initializeMap();
+    center.value = [36.5, 127.5]; // 韓国の中心
+    zoom.value = 9.5;
+  } else if (newCountry === "bd") {
+    initializeMap();
+    center.value = [23.7, 90.4]; // バングラデシュの中心
+    zoom.value = 8.5;
+  }
+
+  if (map) {
+    // 地図の中心とズームを更新
+    map.setView(center.value, zoom.value);
+    updateMapLayers(newCountry);
+  }
+
+  // **ラベルのサイズ更新**
+  nextTick(() => {
+    updateLabelSize();
+  });
+});
+
+const initializeMap = () => {
+  nextTick(() => {
+    const mapElement = document.getElementById('map-study');
+    if (!mapElement) return;
+
+    if (map) {
+      map.remove();
+    }
+
+    map = L.map('map-study', {
+      center: center.value,
+      zoom: zoom.value,
+      zoomDelta: 0.25,
+      zoomSnap: 0,
+      wheelPxPerZoomLevel: 150
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CartoDB',
+      subdomains: 'abcd',
+      maxZoom: 10,
+      minZoom: 5
+    }).addTo(map);
+
+    updateMapLayers(props.selectedCountry.code);
+  });
+};
+
+const updateMapLayers = (countryCode) => {
+  if (!countryData[countryCode]) return;
+
+  if (geoJsonLayer) {
+    map.removeLayer(geoJsonLayer);
+  }
+
+  fetch(countryData[countryCode].geoJsonUrl)
+    .then(response => response.json())
+    .then(data => {
+      geoJsonLayer = L.geoJSON(data, {
+        style: () => ({
+          fillColor: '#E0E5EC',
+          weight: 2,
+          opacity: 0.8,
+          color: '#555',
+          fillOpacity: 0.6
+        }),
+        onEachFeature: (feature, layer) => {
+          let name = '';
+
+          // 韓国の場合はハングル名、ロシアの場合は英語名を表示
+          if (countryCode === 'kr' && feature.properties && feature.properties.CTP_KOR_NM) {
+            name = feature.properties.CTP_KOR_NM;  // 韓国の場合はハングル名を取得
+          } else if (countryCode === 'ru' && feature.properties && feature.properties.name) {
+            name = feature.properties.name;  // ロシアの場合は英語名を取得
+          }
+
+          // 地名が存在する場合にラベルを表示
+          if (name) {
+            const label = L.divIcon({
+              className: 'custom-label',
+              html: `<div class="label">${name}</div>`,
+              iconSize: [100, 50],
+              iconAnchor: [50, 25]
+            });
+
+            const marker = L.marker(layer.getBounds().getCenter(), { icon: label }).addTo(map);
+
+            // 地域とラベルのホバーイベントを追加
+            const highlightStyle = {
+              fillColor: '#AFEEEE',
+              weight: 4,
+              color: '#008B8B',
+              fillOpacity: 0.85
+            };
+
+            const resetStyle = {
+              fillColor: '#E0E5EC',
+              weight: 2,
+              color: '#555',
+              fillOpacity: 0.6
+            };
+
+            layer.on('mouseover', () => {
+              layer.setStyle(highlightStyle);
+              marker._icon.style.color = '#FF1493';
+            });
+
+            marker.on('mouseover', () => {
+              layer.setStyle(highlightStyle);
+              marker._icon.style.color = '#FF1493';
+            });
+
+            layer.on('mouseout', () => {
+              layer.setStyle(resetStyle);
+              marker._icon.style.color = '';
+            });
+
+            marker.on('mouseout', () => {
+              layer.setStyle(resetStyle);
+              marker._icon.style.color = '';
+            });
+          }
+        }
+      }).addTo(map);
+    });
+};
+
+
+
+onMounted(() => {
+  initializeMap();
+});
+
+watch(() => props.isViewingStudyMap, (newVal) => {
+  if (newVal) {
+    initializeMap();
+  }
+});
+</script>
+
+
+
+<style>
+  .map-title {
+    position: relative;
+    padding: 10rem;
+    font-size: 6rem;
+    font-weight: bold;
+  }
+
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out {
+    width: 6rem !important ;
+    height: 6rem !important ;
+    font-size: 6rem !important ;
+    line-height: 6rem !important ;
+  }
+
+  .leaflet-container {
+    font-size: 2rem ;
+  }
+
+  .map-container {
+    width: 95%;
+    height: 65vh;
+  }
+
+  .map-close-button {
+    margin-left: 5rem;
+  }
+  .label {
+    font-size: 3.5rem
+  }
+  
+</style>
+  
