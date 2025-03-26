@@ -28,20 +28,14 @@ git clone https://github.com/planet-bit/MapQuiz-frontend
 cd MapQuiz-frontend
 ```
 
-### 2.必要なパッケージをインストールします。
-
-```sh
-npm install
-```
-
-### 3.開発環境を起動します。
+### 2.開発環境を起動します。
 
 ```sh
 npm run dev
 ```
 ローカル環境では、通常 http://localhost:5173 でアプリにアクセスできます。
 
-### 4.本番環境用にビルド（コンパイルおよび圧縮）
+### 3.本番環境用にビルド（コンパイルおよび圧縮）
 
 ```sh
 npm run build
