@@ -5,14 +5,19 @@
 ## 概要
 MapQuiz-frontendはVue.jsを使用しており、MapQuiz-backendと連携してクイズ機能を提供します。
 
+フロントエンドと連携するバックエンドアプリケーションのセットアップについては、
+
+MapQuiz-env README https://github.com/planet-bit/MapQuiz-env を参照してください。
 
 ## 推奨されるIDE（統合開発環境）設定
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) （Veturは無効にしてください）
 
 ### 必要なツール
-- Node.js (推奨バージョン: xx.xx.x)
+- Node.js (推奨バージョン: v22.13.1)
 - npm
+- Docker
+- Docker Compose
 
 ### 主な依存ライブラリ
 - Vue (^3.5.13) - フロントエンドフレームワーク
@@ -21,26 +26,49 @@ MapQuiz-frontendはVue.jsを使用しており、MapQuiz-backendと連携して�
 
 ## セットアップ手順
 
-### 1.リポジトリをクローンします。
+### インストール手順
 
-```sh
-git clone https://github.com/planet-bit/MapQuiz-frontend
-cd MapQuiz-frontend
-```
+1. 必要なリポジトリをクローン
 
-### 2.開発環境を起動します。
+   ```sh
+   git clone https://github.com/planet-bit/MapQuiz-frontend.git
+   git clone https://github.com/planet-bit/MapQuiz-backend.git
+   git clone https://github.com/planet-bit/MapQuiz-env.git
+   ```
 
-```sh
-npm run dev
-```
-ローカル環境では、通常 http://localhost:5173 でアプリにアクセスできます。
+2. 環境変数ファイルの設定
 
-### 3.本番環境用にビルド（コンパイルおよび圧縮）
+   env.sampleにはサンプルのバックエンドの接続設定、
+   .env.db.sampleにはサンプルのデータベースの接続設定が格納されています。
+   
+   まず .env.sample を /MapQuiz-backend/.env にコピー、
+   次に .env.db.sample を /MapQuiz-env/.env.db にコピーします。
 
-```sh
-npm run build
-```
 
-## バックエンドの起動
+   ```sh
+   cd MapQuiz-env
+   cp .env.sample ../MapQuiz-backend/.env
+   cp .env.db.sample .env.db
+   ```
 
-フロントエンドと連携するバックエンドアプリケーションのセットアップについては、MapQuiz-frontend READMEを参照してください。
+3. Dockerコンテナの起動
+
+   Docker Composeを使用して、すべてのコンテナ（バックエンド、フロントエンド、データベース）を立ち上げます。
+
+   ```sh
+   docker-compose up
+   ```
+
+   これにより、以下のコンテナが起動します：
+
+   - mapquiz-node-container（フロントエンド、バックエンド）
+   - mapquiz-mysql-container（データベース）
+
+4. バックエンドアプリの確認
+
+   コンテナが起動した後、Node.jsのバックエンドアプリケーションが実行されます。
+   
+   
+   バックエンドへは、http://localhost:3000 を開いて、APIが動作していることを確認してください。
+
+   フロントエンドへは http://localhost:5173 でアプリにアクセスできます。
