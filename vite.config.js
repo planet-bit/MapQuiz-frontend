@@ -17,6 +17,9 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',  // 全てのIPアドレスからアクセス可能に設定
-    port: 5173         // ポートを指定（デフォルトのまま）
+    port: 5173,
+    watch: {
+      usePolling: true,  // ファイル監視のためにPollingを使う
+    }, 
   }
 })

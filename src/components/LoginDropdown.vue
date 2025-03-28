@@ -8,6 +8,7 @@
       <!-- ログインフォーム -->
       <form @submit.prevent="login" v-if="!isRegistering">
         <div>Log in to your account</div>
+        <CloseButtons class="user-deopdown-close-button" @click-action="isDropdownOpen = false" />
         <input type="email" v-model="email" placeholder="Email" required autocomplete="username">
         <input type="password" v-model="password" placeholder="Password" required autocomplete="current-password">
         <button type="submit">Login</button>
@@ -29,6 +30,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import CloseButtons from '@/components/CloseButtons.vue';
 
 const isDropdownOpen = ref(false);
 const email = ref('');
@@ -172,6 +174,12 @@ const register = async () => {
   color: rgb(0, 0, 0);
   text-decoration: underline;
   font-size: 4rem; /* サイズ変更したい場合 */
+}
+
+.user-deopdown-close-button{
+  position: absolute;
+  top: 5%;
+  right:0%;
 }
 
 </style>

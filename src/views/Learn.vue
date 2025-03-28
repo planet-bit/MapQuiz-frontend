@@ -1,8 +1,10 @@
 <template>
   <div v-if="isLearning">
     <div class="language-list">
-      List of languages in {{ selectedCountry.name }}
-      <NavigationButtons class="learn-close-button" text="CLOSE" @click="$emit('close-learning')"/>
+      <div class="language-title" >
+        List of languages in {{ selectedCountry.name }}
+        <CloseButtons class="learn-close-button" @click="$emit('close-learning')" />
+      </div>
       <ul>
         <li v-for="(pronunciation, index) in languageList" :key="index">
           {{ pronunciation.letters }}
@@ -14,7 +16,7 @@
   
 <script setup>
   import { ref, watch } from 'vue';
-  import NavigationButtons from '@/components/NavigationButtons.vue';
+  import CloseButtons from '@/components/CloseButtons.vue';
   
   // 親コンポーネントから受け取る国
   const props = defineProps({
@@ -51,10 +53,10 @@
 
   
 <style scoped>
-  .language-list {
-    position: relative;
+  .language-title {
     padding: 10rem;
     font-size: 6rem;
+    display: flex;
     font-weight: bold;
   }
   .language-list ul {
@@ -74,7 +76,7 @@
     background-color: rgb(255, 255, 255);
   }
   .learn-close-button {
-    margin-left: 5rem;
+    margin-left: 150px;
   }
 </style>
   

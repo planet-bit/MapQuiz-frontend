@@ -132,7 +132,7 @@ const reloadPage = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #68d47a;
+  background: #a8faa8;
   color: #000000; 
   width: 100%; 
   height: 240px; 

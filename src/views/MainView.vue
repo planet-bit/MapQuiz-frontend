@@ -14,7 +14,7 @@
           <RadioButtons v-model="gameType" label="Letter" value="letter" />
           <div class="separator"></div>
           <ToggleButtons text="Learn" :isActive="isLearning" @click-action="toggleButton('Learn')" />
-          <ToggleButtons text="Map" :isActive="isViewingMap" @click-action="toggleButton('Map')" />
+          <ToggleButtons text="Map" :isActive="isViewingStudyMap" @click-action="toggleButton('Map')" />
           <div class="separator"></div>
         </div>
   

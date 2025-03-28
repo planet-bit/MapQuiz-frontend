@@ -1,16 +1,16 @@
 <template>
   <div v-if="isViewingStudyMap">
-    <div class="map-title">
+    <h1 class="map-title">
       Map of {{ selectedCountry.name }}
-      <NavigationButtons class="map-close-button" text="CLOSE" @click="$emit('close-map')" />
-    </div>
+      <CloseButtons class="map-close-button" @click="$emit('close-map')" />
+    </h1>
     <div id="map-study" class="map-container"></div>
   </div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue';
-import NavigationButtons from '@/components/NavigationButtons.vue';
+import CloseButtons from '@/components/CloseButtons.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -183,10 +183,10 @@ watch(() => props.isViewingStudyMap, (newVal) => {
 
 <style>
   .map-title {
-    position: relative;
     padding: 10rem;
     font-size: 6rem;
     font-weight: bold;
+    display: flex;
   }
 
   .leaflet-control-zoom-in,
@@ -207,7 +207,7 @@ watch(() => props.isViewingStudyMap, (newVal) => {
   }
 
   .map-close-button {
-    margin-left: 5rem;
+    margin-left: 150px;
   }
   .label {
     font-size: 3.5rem

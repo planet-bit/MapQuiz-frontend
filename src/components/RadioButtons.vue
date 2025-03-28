@@ -47,7 +47,7 @@
   }
   
   button.active {
-    background-color: #4CAF50;
+    background-color:  #3fd341;
     color: rgb(0, 0, 0);
     box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
   }
