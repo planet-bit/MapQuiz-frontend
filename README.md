@@ -38,17 +38,13 @@ MapQuiz-env README https://github.com/planet-bit/MapQuiz-env を参照してく�
 
 2. 環境変数ファイルの設定
 
-   env.sampleにはサンプルのバックエンドの接続設定、
-   .env.db.sampleにはサンプルのデータベースの接続設定が格納されています。
+   /MapQuiz-env/env.sampleにはサンプルのバックエンドの接続設定があります。
    
-   まず .env.sample を /MapQuiz-backend/.env にコピー、
-   次に .env.db.sample を /MapQuiz-env/.env.db にコピーします。
-
+　 /MapQuiz-env/.env.sample を /MapQuiz-backend/.env にコピーします。
 
    ```sh
    cd MapQuiz-env
    cp .env.sample ../MapQuiz-backend/.env
-   cp .env.db.sample .env.db
    ```
 
 3. Dockerコンテナの起動
@@ -61,7 +57,7 @@ MapQuiz-env README https://github.com/planet-bit/MapQuiz-env を参照してく�
 
    これにより、以下のコンテナが起動します：
 
-   - mapquiz-node-container（フロントエンド、バックエンド）
+   - mapquiz-app-container（フロントエンド、バックエンド）
    - mapquiz-mysql-container（データベース）
 
 4. バックエンドアプリの確認
