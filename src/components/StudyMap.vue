@@ -53,11 +53,6 @@ watch(() => props.selectedCountry.code, (newCountry) => {
     map.setView(center.value, zoom.value);
     updateMapLayers(newCountry);
   }
-
-  // **ラベルのサイズ更新**
-  nextTick(() => {
-    updateLabelSize();
-  });
 });
 
 const initializeMap = () => {
@@ -88,82 +83,89 @@ const initializeMap = () => {
   });
 };
 
-const updateMapLayers = (countryCode) => {
-  if (!countryData[countryCode]) return;
+const updateMapLayers = async (countryCode) => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/regions/${countryCode}`);
+    const data = await response.json();
 
-  if (geoJsonLayer) {
-    map.removeLayer(geoJsonLayer);
-  }
+    // geoJsonLayer がすでに存在する場合は削除
+    if (geoJsonLayer) {
+      map.removeLayer(geoJsonLayer);
+    }
 
-  fetch(countryData[countryCode].geoJsonUrl)
-    .then(response => response.json())
-    .then(data => {
-      geoJsonLayer = L.geoJSON(data, {
-        style: () => ({
-          fillColor: '#E0E5EC',
-          weight: 2,
-          opacity: 0.8,
-          color: '#555',
-          fillOpacity: 0.6
-        }),
-        onEachFeature: (feature, layer) => {
-          let name = '';
+    // GeoJSON データの取得
+    const geoJsonResponse = await fetch(countryData[countryCode].geoJsonUrl);
+    const geoJsonData = await geoJsonResponse.json();
 
-          // 韓国の場合はハングル名、ロシアの場合は英語名を表示
-          if (countryCode === 'kr' && feature.properties && feature.properties.CTP_KOR_NM) {
-            name = feature.properties.CTP_KOR_NM;  // 韓国の場合はハングル名を取得
-          } else if (countryCode === 'ru' && feature.properties && feature.properties.name) {
-            name = feature.properties.name;  // ロシアの場合は英語名を取得
-          }
+    // GeoJSON レイヤーの作成
+    geoJsonLayer = L.geoJSON(geoJsonData, {
+      style: () => ({
+        fillColor: '#E0E5EC',
+        weight: 2,
+        opacity: 0.8,
+        color: '#555',
+        fillOpacity: 0.6
+      }),
+      onEachFeature: (feature, layer) => {
+        let name = '';
 
-          // 地名が存在する場合にラベルを表示
-          if (name) {
-            const label = L.divIcon({
-              className: 'custom-label',
-              html: `<div class="label">${name}</div>`,
-             
-            });
-
-            const marker = L.marker(layer.getBounds().getCenter(), { icon: label }).addTo(map);
-
-            // 地域とラベルのホバーイベントを追加
-            const highlightStyle = {
-              fillColor: '#AFEEEE',
-              weight: 4,
-              color: '#008B8B',
-              fillOpacity: 0.85
-            };
-
-            const resetStyle = {
-              fillColor: '#E0E5EC',
-              weight: 2,
-              color: '#555',
-              fillOpacity: 0.6
-            };
-
-            layer.on('mouseover', () => {
-              layer.setStyle(highlightStyle);
-              marker._icon.style.color = '#FF1493';
-            });
-
-            marker.on('mouseover', () => {
-              layer.setStyle(highlightStyle);
-              marker._icon.style.color = '#FF1493';
-            });
-
-            layer.on('mouseout', () => {
-              layer.setStyle(resetStyle);
-              marker._icon.style.color = '';
-            });
-
-            marker.on('mouseout', () => {
-              layer.setStyle(resetStyle);
-              marker._icon.style.color = '';
-            });
-          }
+        // 国コードに応じて名前を設定
+        if (countryCode === 'kr' && feature.properties && feature.properties.CTP_KOR_NM) {
+          name = feature.properties.CTP_KOR_NM;  // 韓国名
+        } else if (countryCode === 'ru' && feature.properties && feature.properties.name) {
+          name = feature.properties.name;  // ロシア名
         }
-      }).addTo(map);
-    });
+
+        // 名前が存在する場合、ラベルを作成
+        if (name) {
+          const label = L.divIcon({
+            className: 'custom-label',
+            html: `<div class="label">${name}</div>`
+          });
+
+          const marker = L.marker(layer.getBounds().getCenter(), { icon: label }).addTo(map);
+
+          // ハイライト用のスタイル
+          const highlightStyle = {
+            fillColor: '#AFEEEE',
+            weight: 4,
+            color: '#008B8B',
+            fillOpacity: 0.85
+          };
+
+          const resetStyle = {
+            fillColor: '#E0E5EC',
+            weight: 2,
+            color: '#555',
+            fillOpacity: 0.6
+          };
+
+          // 地域とラベルのホバーイベント
+          layer.on('mouseover', () => {
+            layer.setStyle(highlightStyle);
+            marker._icon.style.color = '#FF1493';
+          });
+
+          marker.on('mouseover', () => {
+            layer.setStyle(highlightStyle);
+            marker._icon.style.color = '#FF1493';
+          });
+
+          layer.on('mouseout', () => {
+            layer.setStyle(resetStyle);
+            marker._icon.style.color = '';
+          });
+
+          marker.on('mouseout', () => {
+            layer.setStyle(resetStyle);
+            marker._icon.style.color = '';
+          });
+        }
+      }
+    }).addTo(map);
+  } catch (error) {
+    console.error('Error updating map layers:', error);
+  }
 };
 
 

@@ -13,18 +13,30 @@
           <RadioButtons v-model="gameType" label="Location" value="location" />
           <RadioButtons v-model="gameType" label="Letter" value="letter" />
           <div class="separator"></div>
-          <ToggleButtons text="Learn" :isActive="isLearning" @click-action="toggleButton('Learn')" />
-          <ToggleButtons text="Map" :isActive="isViewingStudyMap" @click-action="toggleButton('Map')" />
+          <ToggleButtons text="Learn" 
+            :isActive="isLearning" 
+            @click-action="toggleButton('Learn')" 
+          />
+          <ToggleButtons text="Map" 
+            :isActive="isViewingStudyMap" 
+            @click-action="toggleButton('Map')" 
+          />
           <div class="separator"></div>
         </div>
   
       </TitleBar>
     </div> 
-    
     <div class = "game-container">
-      <router-view></router-view>
-      <!-- Gameに情報を渡す -->
-      <Game v-if="isGameStarted" :selectedCountry="selectedCountry" :gameType="gameType" :userId="userId" />
+      <GameLocation v-if="gameType === 'location' && isGameStarted" 
+        :selectedCountry="selectedCountry" 
+        :gameType="gameType" 
+        :userId="userId" 
+      />    
+      <GameLetter v-if="gameType === 'letter' && isGameStarted" 
+        :selectedCountry="selectedCountry" 
+        :gameType="gameType" 
+        :userId="userId" 
+      />
     </div>
     <div class = "learn-container">
       <Learn 
@@ -43,7 +55,8 @@
   <script setup>
   import { ref, computed } from "vue";
   import TitleBar from "@/views/TitleBar.vue";
-  import Game from "@/views/Game.vue";
+  import GameLetter from "@/views/GameLetter.vue";
+  import GameLocation from "@/views/GameLocation.vue";
   import Learn from "@/views/Learn.vue";
   import StudyMap from "@/components/StudyMap.vue";
   import ToggleButtons from "@/components/ToggleButtons.vue";
