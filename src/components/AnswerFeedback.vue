@@ -62,6 +62,6 @@ watch([() => props.selectedChoice, () => timeUp.value], () => {
   flex-direction: column;
   align-items: flex-start;
   gap: 5rem; /* ボタン同士の間隔 */
-  margin-top: 3rem;
+  margin: 3rem;
 }
 </style>

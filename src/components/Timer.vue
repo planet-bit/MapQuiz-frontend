@@ -58,7 +58,7 @@
 
 <style scoped>
   .Timer {
-    font-size: 6rem;
+    font-size: 7rem;
     font-weight: bold;
   }
 

@@ -17,32 +17,34 @@
   
       <!-- ゲームが開始された後の表示 -->
       <div v-else>
-        <div class="question-grid">
-  
           <!-- タイマー機能の表示 -->
+          
+          <p class="current-question">{{ currentQuestion.word }}</p>
+        <div class="game-container">
+          
+
           <Timer
             :challengeMode="challengeMode" 
             :timerActive="timerActive"
             :triggerStopTimer="triggerStopTimer"
             @time-up="TimeUp"
           />
-          <p class="current-question">{{ currentQuestion.word }}</p>
-  
-          <!-- ここにchoiceRegionsをいれる -->
-          <ChoiceRegions 
-            :choices="currentChoices" 
+          <ChoiceRegions class="choice-regions"
             :selectedChoice="selectedChoice" 
             :correctAnswer="currentQuestion.answer"
             :isAnswered="isAnswered"
+            :selectedCountry="selectedCountry"
+            :gameStarted="gameStarted"
             @answer-selected="checkAnswer"
           />
-        </div>
-      </div>
-  
-      <!-- 解答後のフィードバック表示 -->
-      <div class="feedback-grid">
-        <div v-if="showAnswerFeedback">
-          <AnswerFeedback 
+       
+
+        
+          
+
+
+        <div v-if="showAnswerFeedback" >
+          <AnswerFeedback class="answer-feedback"
             v-if="selectedChoice"
             :selectedChoice="selectedChoice"
             :correctAnswer="currentQuestion.answer"
@@ -51,8 +53,9 @@
             @next-question="nextQuestion"
             @retry-question="retryQuestion"
             @select-mode="selectMode"
-            @streak-finalized="sendStreakData"
+          
           />
+        </div>
         </div>
       </div>
     </div>
@@ -85,7 +88,7 @@
     const triggerStopTimer = ref(false);
     const questionManager = ref(null);
     
-  
+  /*  @streak-finalized="sendStreakData"
   // `streak-finalized` イベントを受け取って、APIに送信
   const sendStreakData = async () => {
   
@@ -108,7 +111,7 @@
     }
   };
   
-  const updateStreak = async (data) => {
+ const updateStreak = async (data) => {
     try {
       console.log("送信データ:", data); // 送信前に確認
       const response = await fetch("http://localhost:3000/api/streaks/update", {
@@ -130,7 +133,7 @@
       throw error; // ここでエラーをそのままスロー
     }
   };
-  
+  */
   
     const updateQuestion = ({ question, choices }) => {
       currentQuestion.value = question;
@@ -176,19 +179,31 @@
   
     // 解答を選択したときに呼ばれる関数
     const checkAnswer = (choice) => {
-      selectedChoice.value = choice ?? "TIME_UP";  // 時間切れの場合 "TIME_UP" として選択
-      isAnswered.value = true;
-      StopTimer();
-      // チャレンジモード時の解答チェック
-      if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
-        showAnswerFeedback.value = true; // フィードバック表示
-      } else if (challengeMode.value && choice === currentQuestion.value.answer) {
-        nextQuestion(); // 正解の場合次の問題に進む
-      } else {
-        showAnswerFeedback.value = true; // 不正解の場合フィードバックを表示
-      }
-    };
-  
+  selectedChoice.value = choice ?? "TIME_UP";  // 時間切れの場合 "TIME_UP" として選択
+  isAnswered.value = true;
+  console.log("選択された解答:", choice);
+
+  StopTimer();
+  console.log("タイマー停止後");
+
+  // チャレンジモード時の解答チェック
+  if (challengeMode.value) {
+    console.log("チャレンジモード:", challengeMode.value);
+    if (choice !== currentQuestion.value.answer || choice === "TIME_UP") {
+      console.log("不正解または時間切れ");
+      showAnswerFeedback.value = true; // フィードバック表示
+    } else if (choice === currentQuestion.value.answer) {
+      console.log("正解");
+      nextQuestion(); // 正解の場合次の問題に進む
+    }
+  } else {
+    console.log("通常モード");
+    showAnswerFeedback.value = true; // 不正解の場合フィードバックを表示
+    console.log("showAnswerFeedback.value:", showAnswerFeedback.value);
+
+  }
+};
+
     // 次の問題に進む関数
     const nextQuestion = () => {
      currentQuestionIndex.value++; // 問題番号を進める
@@ -219,12 +234,10 @@
   
   <style scoped>
     .main-container {
-      display: grid;
-      grid-template-columns: 60% 40%;
       align-items: center; 
       justify-content: center; 
       width: 100%;
-      margin: auto;
+      margin: 5%;
     }
     .mode-selection {
       display: flex;
@@ -272,19 +285,29 @@
       accent-color: #007bff; 
       cursor: pointer;
     }
-    .question-grid {
-      margin-left: 10%;
-    }
-    .question-grid, .feedback-grid {
-      padding: 1.5rem;
-      background-color: #ffffff;
-      text-align: left;
-      margin-top: 10%;
-    }
     .current-question {
       font-size: 9rem;
       font-weight: bold;
       margin-top: 6rem;
       margin-bottom: 6rem;
     }
+
+    .game-container{
+      position: relative;
+    }
+    .answer-feedback {
+  position: absolute; /* 位置を指定 */
+  top: 10%;
+  left: 5%;
+  z-index: 10; /* より高い値を設定して手前に表示 */
+  background-color: rgba(255, 255, 255, 0.600); /* 背景色を白に設定 */
+  border-radius: 40px; /* 角を丸くする（値は調整可能） */
+  padding: 40px; /* 内側の余白を調整 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 影をつけて立体感を出す */
+}
+
+.choice-regions {
+  position: relative; /* 位置を指定 */
+  z-index: 1; /* 低い値を設定して後ろに表示 */
+}
   </style>

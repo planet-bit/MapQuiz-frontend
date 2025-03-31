@@ -36,7 +36,7 @@ watch(() => props.selectedCountry.code, (newCountry) => {
  
   if (newCountry === "ru") {
     initializeMap();
-    center.value = [60, 60]; // ロシアの中心
+    center.value = [60, 80]; // ロシアの中心
     zoom.value = 5.5;
   } else if (newCountry === "kr") {
     initializeMap();
@@ -85,9 +85,6 @@ const initializeMap = () => {
 
 const updateMapLayers = async (countryCode) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/regions/${countryCode}`);
-    const data = await response.json();
-
     // geoJsonLayer がすでに存在する場合は削除
     if (geoJsonLayer) {
       map.removeLayer(geoJsonLayer);

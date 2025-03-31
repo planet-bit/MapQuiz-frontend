@@ -1,3 +1,6 @@
+
+
+
 <template>
   <div class="main-container">
     <!-- 問題をランダムで出題する機能 -->
