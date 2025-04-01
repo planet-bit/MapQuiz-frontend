@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, nextTick } from "vue";
+  import { ref, onMounted, watch } from "vue";
   import L from "leaflet";
 
   const props = defineProps({
@@ -29,7 +29,6 @@
     kr: { center: [36, 127.5], zoom: 9, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson' },
     bd: { center: [23.7, 90.4], zoom: 8.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/bangladesh.geojson' }
   };
-
   // 地図の初期化
   const initializeMap = () => { 
     if (map) {
@@ -126,6 +125,38 @@
       console.error('Error updating map layers:', error);
     }
   };
+
+  watch(
+  () => props.selectedChoice,
+  (newValue) => {
+    if (newValue === "TIME_UP" && geoJsonLayer) {
+      geoJsonLayer.eachLayer((layer) => {
+        // クリック無効化
+        layer.off("click");
+
+        // 正解の地域を特定
+        if (
+          layer.feature.properties.name_latin?.toLowerCase().trim() === props.correctAnswer.toLowerCase().trim() ||
+          layer.feature.properties.name?.toLowerCase().trim() === props.correctAnswer.toLowerCase().trim()
+        ) {
+          // スタイルを正解の色に固定
+          layer.setStyle({
+            fillColor: "lightgreen",
+            weight: 4,
+            color: "#008B8B",
+            fillOpacity: 0.85,
+          });
+
+          // 既存の hover イベントをすべて削除する
+          layer.off("mouseover");
+          layer.off("mouseout");
+        }
+      });
+    }
+  }
+);
+
+
 
   // 初回マウント時に地図を初期化し、選択された国の設定に基づいて地図を描画
   onMounted(() => {

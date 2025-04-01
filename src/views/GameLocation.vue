@@ -1,5 +1,5 @@
 <template>
-    <div class="main-container">
+  <div class="main-container">
       <!-- 問題をランダムで出題する機能 -->
       <QuestionManager ref="questionManager"
         :selectedCountry="selectedCountry" 
@@ -16,48 +16,46 @@
       </div>
   
       <!-- ゲームが開始された後の表示 -->
-      <div v-else>
-          <!-- タイマー機能の表示 -->
-          
-          <p class="current-question">{{ currentQuestion.word }}</p>
-        <div class="game-container">
-          
+    <div v-else>
+      <!-- タイマー機能の表示 -->    
+      <p class="current-question">{{ currentQuestion.word }}</p>
+      <div class="game-container">
 
-          <Timer
-            :challengeMode="challengeMode" 
-            :timerActive="timerActive"
-            :triggerStopTimer="triggerStopTimer"
-            @time-up="TimeUp"
-          />
-          <ChoiceRegions class="choice-regions"
-            :selectedChoice="selectedChoice"
-            :correctAnswer="currentQuestion.answer"
-            :isAnswered="isAnswered"
-            :selectedCountry="selectedCountry"
-            :gameStarted="gameStarted"
-            :key="mapKey"
-            @answer-selected="checkAnswer"
-          />
+        <Timer
+          :challengeMode="challengeMode" 
+          :timerActive="timerActive"
+          :triggerStopTimer="triggerStopTimer"
+          @time-up="TimeUp"
+        />
 
+        <ChoiceRegions class="choice-regions"
+          :selectedChoice="selectedChoice"
+          :correctAnswer="currentQuestion.answer"
+          :isAnswered="isAnswered"
+          :selectedCountry="selectedCountry"
+          :gameStarted="gameStarted"
+          :key="mapKey"
+          @answer-selected="checkAnswer"
+        />
         <div v-if="showAnswerFeedback" >
           <AnswerFeedback class="answer-feedback"
             v-if="selectedChoice"
-            :selectedChoice="selectedChoice"
-            :correctAnswer="currentQuestion.answer"
-            :streakCount="currentQuestionIndex - 1"
-            :challengeMode="challengeMode"
-            @next-question="nextQuestion"
-            @retry-question="retryQuestion"
-            @select-mode="selectMode"
-          
+              :selectedChoice="selectedChoice"
+              :correctAnswer="currentQuestion.answer"
+              :streakCount="currentQuestionIndex - 1"
+              :challengeMode="challengeMode"
+              @next-question="nextQuestion"
+              @retry-question="retryQuestion"
+              @select-mode="selectMode"
+              @streak-finalized="sendStreakData"
           />
-        </div>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
-  <script setup>
+<script setup>
   
     import { ref, watch, onMounted } from "vue";
     import ChoiceRegions from "@/components/ChoiceRegions.vue";
@@ -85,28 +83,29 @@
     const questionManager = ref(null);
     
     console.log(currentQuestion)
-  /*  @streak-finalized="sendStreakData"
-  // `streak-finalized` イベントを受け取って、APIに送信
-  const sendStreakData = async () => {
-  
-    console.log("props.userId:", props.userId);
-    const streak = currentQuestionIndex.value - 1;
-    // 動的にデータを更新
-    const data = {
-      "user_id": props.userId, // ログインしたユーザーのIDを使う
-      "game_type": props.gameType, // ゲームタイプ（選択に基づく）
-      "country_code": props.selectedCountry.code, // 国コード（選択に基づく）
-      "streak": streak,// 確定した連続記録
-      "correct_answers": streak, // 正解数（連続記録と同じ）
+   
+     // `streak-finalized` イベントを受け取って、APIに送信
+    const sendStreakData = async () => {
+      if (!props.userId) return; // ログインしていなければ処理を中断
+      console.log("props.userId:", props.userId);
+      const streak = currentQuestionIndex.value - 1;
+      // 動的にデータを更新
+      const data = {
+        "user_id": props.userId, // ログインしたユーザーのIDを使う
+        "game_type": props.gameType, // ゲームタイプ（選択に基づく）
+        "country_code": props.selectedCountry.code, // 国コード（選択に基づく）
+        "streak": streak, // 確定した連続記録
+        "correct_answers": streak, // 正解数（連続記録と同じ）
+      };
+
+      try {
+        const response = await updateStreak(data);
+        console.log("更新成功:", response);
+      } catch (error) {
+        console.error("更新エラー:", error);
+      }
     };
-  
-    try {
-      const response = await updateStreak(data);
-      console.log("更新成功:", response);
-    } catch (error) {
-      console.error("更新エラー:", error);
-    }
-  };
+
   
  const updateStreak = async (data) => {
     try {
@@ -130,7 +129,6 @@
       throw error; // ここでエラーをそのままスロー
     }
   };
-  */
   
     const updateQuestion = ({ question, choices }) => {
       currentQuestion.value = question;

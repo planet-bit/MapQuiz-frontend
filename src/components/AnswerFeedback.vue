@@ -41,7 +41,6 @@ watch([() => props.selectedChoice, () => timeUp.value], () => {
   console.log("watchが動作しました");
   if (props.challengeMode && props.selectedChoice !== null && 
       (props.selectedChoice !== props.correctAnswer || timeUp.value)) {
-    console.log("Streak finalized event emitted");
     emit("streak-finalized");
   }
 }, { immediate: true });
