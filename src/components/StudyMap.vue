@@ -27,7 +27,7 @@ let geoJsonLayer = null;
 
 const countryData = {
   ru: { center: [60, 60], zoom: 5.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson' },
-  kr: { center: [36.5, 127.5], zoom: 9.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson' },
+  kr: { center: [36, 127.5], zoom: 9, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson' },
   bd: { center: [23.7, 90.4], zoom: 8.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/bangladesh.geojson' }
 };
 
@@ -40,8 +40,8 @@ watch(() => props.selectedCountry.code, (newCountry) => {
     zoom.value = 5.5;
   } else if (newCountry === "kr") {
     initializeMap();
-    center.value = [36.5, 127.5]; // 韓国の中心
-    zoom.value = 9.5;
+    center.value = [36, 127.5]; // 韓国の中心
+    zoom.value = 9;
   } else if (newCountry === "bd") {
     initializeMap();
     center.value = [23.7, 90.4]; // バングラデシュの中心
@@ -202,7 +202,7 @@ watch(() => props.isViewingStudyMap, (newVal) => {
 
   .map-container {
     width: 95%;
-    height: 65vh;
+    height: 70vh;
   }
 
   .map-close-button {

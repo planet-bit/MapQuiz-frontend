@@ -30,18 +30,14 @@
             @time-up="TimeUp"
           />
           <ChoiceRegions class="choice-regions"
-            :selectedChoice="selectedChoice" 
+            :selectedChoice="selectedChoice"
             :correctAnswer="currentQuestion.answer"
             :isAnswered="isAnswered"
             :selectedCountry="selectedCountry"
             :gameStarted="gameStarted"
+            :key="mapKey"
             @answer-selected="checkAnswer"
           />
-       
-
-        
-          
-
 
         <div v-if="showAnswerFeedback" >
           <AnswerFeedback class="answer-feedback"
@@ -88,6 +84,7 @@
     const triggerStopTimer = ref(false);
     const questionManager = ref(null);
     
+    console.log(currentQuestion)
   /*  @streak-finalized="sendStreakData"
   // `streak-finalized` イベントを受け取って、APIに送信
   const sendStreakData = async () => {
@@ -203,19 +200,21 @@
 
   }
 };
-
+    const mapKey = ref(0); // 地図のキーを管理するリアクティブ変数
     // 次の問題に進む関数
     const nextQuestion = () => {
      currentQuestionIndex.value++; // 問題番号を進める
       isAnswered.value = false; // 回答済み状態をリセット
       selectedChoice.value = null; // 選択をリセット
+      mapKey.value++; // `key` の値を変えることで強制的に `ChoiceRegions` を再作成
       if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを再スタート
       if (questionManager.value) {
         console.log("Calling setQuestion in nextQuestion");
         questionManager.value.setQuestion();
       };
     }
-  
+
+   
     // ゲーム開始時の処理
     const startGame = () => {
       gameStarted.value = true;
@@ -223,6 +222,7 @@
       if (questionManager.value) {
         questionManager.value.setQuestion();
       }
+      mapKey.value++; // `key` の値を変えることで強制的に `ChoiceRegions` を再作成
     };
   
     const retryQuestion = () => {

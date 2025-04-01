@@ -50,7 +50,7 @@
     background-color: lightgreen;
   }
   .incorrect {
-    background-color: lightcoral;
+    background-color: #f08080;
   }
   /* 解答後のボタンにホバーしても色が変わらないように */
   .choice-button.correct:hover {
