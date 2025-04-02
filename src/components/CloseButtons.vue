@@ -4,18 +4,17 @@
   
   <script setup>
   
-    // props を定義
-    defineProps({
+    const props = defineProps({
       text: String,
     });
   
-    // イベントを定義
     const emit = defineEmits(["click-action"]);
+
   </script>
   
   <style scoped>
 button {
-    background-color: #ffffff;
+  background-color: #ffffff;
   color: rgb(128, 128, 128);
   border: none;
   border-radius: 50%; 

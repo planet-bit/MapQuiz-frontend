@@ -6,13 +6,12 @@
 
 <script setup>
 
-  // props を定義
-  defineProps({
-    text: String,
+  const props = defineProps({
+    text: String
   });
 
-  // イベントを定義
   const emit = defineEmits(["click-action"]);
+  
 </script>
 
 <style scoped>

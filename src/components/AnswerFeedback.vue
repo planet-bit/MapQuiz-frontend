@@ -20,32 +20,28 @@
 </template>
 
 <script setup>
-import { computed, watch, defineProps, defineEmits } from 'vue';
-import NavigationButtons from './NavigationButtons.vue';
+  import { computed, watch, defineProps, defineEmits } from 'vue';
+  import NavigationButtons from './NavigationButtons.vue';
 
-const props = defineProps({
-  selectedChoice: String,
-  correctAnswer: String,
-  streakCount: Number,
-  challengeMode: Boolean
-});
+  const props = defineProps({
+    selectedChoice: String,
+    correctAnswer: String,
+    streakCount: Number,
+    challengeMode: Boolean
+  });
 
-const emit = defineEmits(["next-question", "retry-question", "select-mode", "streak-finalized"]);
+  const emit = defineEmits(["next-question", "retry-question", "select-mode", "streak-finalized"]);
 
-const timeUp = computed(() => props.selectedChoice === "TIME_UP");
+  const timeUp = computed(() => props.selectedChoice === "TIME_UP");
 
-console.log("初期 selectedChoice:", props.selectedChoice);
-
-// watch を使って selectedChoice や timeUp の変化を監視
-watch([() => props.selectedChoice, () => timeUp.value], () => {
-  console.log("watchが動作しました");
-  if (props.challengeMode && props.selectedChoice !== null && 
+  // watch を使って selectedChoice や timeUp の変化を監視
+  watch([() => props.selectedChoice, () => timeUp.value], () => {
+    if (props.challengeMode && props.selectedChoice !== null && 
       (props.selectedChoice !== props.correctAnswer || timeUp.value)) {
-    emit("streak-finalized");
-  }
-}, { immediate: true });
+      emit("streak-finalized");
+    }
+  }, { immediate: true });
 </script>
-
 
 <style scoped>
 .correct-message, .streak-count {

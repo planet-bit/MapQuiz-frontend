@@ -16,7 +16,7 @@
 </template>
   
 <script setup>
-  defineProps({
+  const props = defineProps({
     choices: Array,
     selectedChoice: String,
     correctAnswer: String,
@@ -24,6 +24,7 @@
   });
 
   defineEmits(["answer-selected"]);
+  
 </script>
 
 <style scoped>

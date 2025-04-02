@@ -8,17 +8,16 @@
   
 <script setup>
 
-  defineProps({
-    text: String,
-    isActive: Boolean
-    });
+ const props = defineProps({
+  text: String,
+  isActive: Boolean
+  });
 
   const emit = defineEmits(["click-action"]);
 
 </script>
   
-  
-  <style scoped>
+<style scoped>
   button {
     font-size: 4.5rem;
     font-weight: bold;
