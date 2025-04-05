@@ -1,19 +1,28 @@
 <template>
   <div class="main-container">
       <!-- 問題をランダムで出題する機能 -->
-      <QuestionManager ref="questionManager"
-        :selectedCountry="selectedCountry" 
-        :gameType="gameType"
-        @question-updated="updateQuestion"
-      />
+    <QuestionManager ref="questionManager"
+      :selectedCountry="selectedCountry" 
+      :gameType="gameType"
+      @question-updated="updateQuestion"
+    />
   
-      <!-- ゲーム開始前のモード選択の表示 -->
-      <div v-if="!gameStarted" class="mode-selection">
-        <label>
-          <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
-        </label>
-        <button @click="startGame">START</button> 
+    <!-- ゲーム開始前のモード選択の表示 -->
+    <div v-if="!gameStarted">
+      <!-- bd（バングラデシュ）のとき -->
+      <div v-if="selectedCountry.code === 'bd'" class="mode-message">
+        Preparing...
       </div>
+
+      <!-- bd以外のとき -->
+      <div v-else class="mode-selection">
+      <label>
+        <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
+      </label>
+      <button @click="startGame">START</button> 
+    </div>
+  </div>
+
   
       <!-- ゲームが開始された後の表示 -->
     <div v-else>
@@ -307,5 +316,9 @@
 .choice-regions {
   position: relative; /* 位置を指定 */
   z-index: 1; /* 低い値を設定して後ろに表示 */
+}
+
+.mode-message{
+  font-size: 6rem;
 }
   </style>

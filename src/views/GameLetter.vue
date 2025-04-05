@@ -11,11 +11,19 @@
     />
 
     <!-- ゲーム開始前のモード選択の表示 -->
-    <div v-if="!gameStarted" class="mode-selection">
-      <label>
-        <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
-      </label>
-      <button @click="startGame">START</button> 
+    <div v-if="!gameStarted">
+      <!-- bd（バングラデシュ）のとき -->
+      <div v-if="selectedCountry.code === 'bd'" class="mode-message">
+        Preparing...
+      </div>
+
+      <!-- bd以外のとき -->
+      <div v-else class="mode-selection">
+        <label>
+          <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
+        </label>
+        <button @click="startGame">START</button> 
+      </div>
     </div>
 
     <!-- ゲームが開始された後の表示 -->
@@ -289,5 +297,9 @@ const updateStreak = async (data) => {
     font-weight: bold;
     margin-top: 6rem;
     margin-bottom: 6rem;
+  }
+  .mode-message{
+    margin: 8.3%;
+    font-size: 6rem;
   }
 </style>

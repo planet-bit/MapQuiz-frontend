@@ -4,7 +4,14 @@
       Map of {{ selectedCountry.name }}
       <CloseButtons class="map-close-button" @click="$emit('close-map')" />
     </h1>
-    <div id="map-study" class="map-container"></div>
+
+    <!-- 準備中メッセージ -->
+    <div v-if="selectedCountry.code === 'bd'" class="map-message">
+      Preparing...
+    </div>
+
+    <!-- 地図表示 -->
+    <div v-else id="map-study" class="map-container"></div>
   </div>
 </template>
 
@@ -28,7 +35,7 @@ let geoJsonLayer = null;
 const countryData = {
   ru: { center: [60, 60], zoom: 5.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson' },
   kr: { center: [36, 127.5], zoom: 9, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson' },
-  bd: { center: [23.7, 90.4], zoom: 8.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/bangladesh.geojson' }
+  bd: { center: [23.7, 90.4], zoom: 8.5, geoJsonUrl: '' }
 };
 
 watch(() => props.selectedCountry.code, (newCountry) => {
@@ -56,6 +63,9 @@ watch(() => props.selectedCountry.code, (newCountry) => {
 });
 
 const initializeMap = () => {
+
+  if (props.selectedCountry.code === 'bd') return; // バングラデシュなら何もしない
+
   nextTick(() => {
     const mapElement = document.getElementById('map-study');
     if (!mapElement) return;
@@ -212,5 +222,8 @@ watch(() => props.isViewingStudyMap, (newVal) => {
     font-size: 3.5rem
   }
   
+  .map-message {
+    font-size: 5rem
+  }
 </style>
   
