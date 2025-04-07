@@ -12,15 +12,18 @@
         <div v-if="selectedCountry.code"  class="buttons-container">
           <RadioButtons v-model="gameType" label="Location" value="location" />
           <RadioButtons v-model="gameType" label="Letter" value="letter" />
+
           <div class="separator"></div>
-          <ToggleButtons text="Learn" 
-            :isActive="isLearning" 
-            @click-action="toggleButton('Learn')" 
-          />
+
           <ToggleButtons text="Map" 
             :isActive="isViewingStudyMap" 
             @click-action="toggleButton('Map')" 
           />
+          <ToggleButtons text="Learn" 
+            :isActive="isLearning" 
+            @click-action="toggleButton('Learn')" 
+          />
+          
           <div class="separator"></div>
         </div>
   
@@ -28,11 +31,13 @@
     </div> 
     <div class = "game-container">
       <GameLocation v-if="gameType === 'location' && isGameStarted" 
+        v-model:challengeMode="challengeMode"
         :selectedCountry="selectedCountry" 
         :gameType="gameType" 
         :userId="userId" 
       />    
       <GameLetter v-if="gameType === 'letter' && isGameStarted" 
+        v-model:challengeMode="challengeMode"
         :selectedCountry="selectedCountry" 
         :gameType="gameType" 
         :userId="userId" 
@@ -40,11 +45,13 @@
     </div>
     <div class = "learn-container">
       <Learn 
+        :challengeMode="challengeMode"
         :selectedCountry="selectedCountry"
         :isLearning="isLearning"
         @close-learning="handleCloseLearning" 
       />
       <StudyMap
+        :challengeMode="challengeMode"
         :selectedCountry="selectedCountry"
         :isViewingStudyMap="isViewingStudyMap"
         @close-map="handleCloseMap">
@@ -64,6 +71,7 @@
   
   const selectedCountry = ref({ code: "", name: "" });
   const gameType = ref(null); //選択中のゲームタイプ
+  const challengeMode = ref(false)
   const isGameStarted = computed(() => !!gameType.value); // gameType が選択されたら true になる
   const isLearning = ref(false); // Learnボタンの状態を管理
   const isViewingStudyMap = ref(false); // Mapボタンの状態を管理
@@ -76,19 +84,28 @@
   const handleCountrySelected = (country) => {
       selectedCountry.value = country;
   };
+
   const toggleButton = (button) => {
-      if (button === 'Learn') {
-        isLearning.value = !isLearning.value;
-        if (isLearning.value) {
-          isViewingStudyMap.value = false;
-        }
-      } else if (button === 'Map') {
-        isViewingStudyMap.value = !isViewingStudyMap.value;
-        if (isViewingStudyMap.value) {
-          isLearning.value = false;
-        }
-      }
-    };
+  if (challengeMode.value) {
+    return; // challengeModeがtrueの場合はボタンを押せないようにする
+  }
+
+  if (button === 'Learn') {
+    isLearning.value = !isLearning.value;
+    if (isLearning.value) {
+      isViewingStudyMap.value = false;
+    } else {
+      isLearning.value = false; // LearnボタンをオフにしたときにisLearningをfalseにする
+    }
+  } else if (button === 'Map') {
+    isViewingStudyMap.value = !isViewingStudyMap.value;
+    if (isViewingStudyMap.value) {
+      isLearning.value = false;
+    } else {
+      isViewingStudyMap.value = false; // MapボタンをオフにしたときにisViewingStudyMapをfalseにする
+    }
+  }
+};
   
   const handleCloseLearning = () => {
     isLearning.value = false; 

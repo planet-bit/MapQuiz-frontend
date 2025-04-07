@@ -1,6 +1,3 @@
-
-
-
 <template>
   <div class="main-container">
     <!-- 問題をランダムで出題する機能 -->
@@ -20,7 +17,8 @@
       <!-- bd以外のとき -->
       <div v-else class="mode-selection">
         <label>
-          <input type="checkbox" v-model="challengeMode" /> Challenge Mode <br> (10s limit)
+          <input type="checkbox" v-model="localChallengeMode" /> 
+          Challenge Mode <br> (10s limit, No hint)
         </label>
         <button @click="startGame">START</button> 
       </div>
@@ -32,7 +30,7 @@
 
         <!-- タイマー機能の表示 -->
         <Timer
-          :challengeMode="challengeMode" 
+          :challengeMode="props.challengeMode" 
           :timerActive="timerActive"
           :triggerStopTimer="triggerStopTimer"
           @time-up="TimeUp"
@@ -58,7 +56,7 @@
           :selectedChoice="selectedChoice"
           :correctAnswer="currentQuestion.answer"
           :streakCount="currentQuestionIndex - 1"
-          :challengeMode="challengeMode"
+          :challengeMode="props.challengeMode"
           @next-question="nextQuestion"
           @retry-question="retryQuestion"
           @select-mode="selectMode"
@@ -79,10 +77,12 @@
 
   // 親コンポーネントから渡されたプロパティ
   const props = defineProps({
+    challengeMode: Boolean,
     selectedCountry: Object,
     gameType: String,
     userId: Number
   });
+  const emit = defineEmits(["update:challengeMode"]);
 
   const currentQuestion = ref(""); // 現在の問題
   const currentChoices = ref([]); // 現在の選択肢
@@ -90,17 +90,15 @@
   const currentQuestionIndex = ref(1); // 問題番号
   const isAnswered = ref(false); // 答えたかどうか
   const gameStarted = ref(false); // ゲーム開始の状態
-  const challengeMode = ref(false); // チャレンジモードの状態
   const showAnswerFeedback = ref(false);  // フィードバック表示用
   const timerActive = ref (false);
   const triggerStopTimer = ref(false);
   const questionManager = ref(null);
-  
+  const localChallengeMode = ref(props.challengeMode);
 
 // `streak-finalized` イベントを受け取って、APIに送信
 const sendStreakData = async () => {
-
-  console.log("props.userId:", props.userId);
+  if (!props.userId) return;
   const streak = currentQuestionIndex.value - 1;
   // 動的にデータを更新
   const data = {
@@ -191,9 +189,9 @@ const updateStreak = async (data) => {
     isAnswered.value = true;
     StopTimer();
     // チャレンジモード時の解答チェック
-    if (challengeMode.value && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
+    if (props.challengeMode && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
       showAnswerFeedback.value = true; // フィードバック表示
-    } else if (challengeMode.value && choice === currentQuestion.value.answer) {
+    } else if (props.challengeMode && choice === currentQuestion.value.answer) {
       nextQuestion(); // 正解の場合次の問題に進む
     } else {
       showAnswerFeedback.value = true; // 不正解の場合フィードバックを表示
@@ -205,7 +203,7 @@ const updateStreak = async (data) => {
    currentQuestionIndex.value++; // 問題番号を進める
     isAnswered.value = false; // 回答済み状態をリセット
     selectedChoice.value = null; // 選択をリセット
-    if (challengeMode.value) StartTimer(); // チャレンジモードならタイマーを再スタート
+    if (props.challengeMode) StartTimer(); // チャレンジモードならタイマーを再スタート
     if (questionManager.value) {
       console.log("Calling setQuestion in nextQuestion");
       questionManager.value.setQuestion();
@@ -215,7 +213,7 @@ const updateStreak = async (data) => {
   // ゲーム開始時の処理
   const startGame = () => {
     gameStarted.value = true;
-    if (challengeMode.value) StartTimer();
+    if (props.challengeMode) StartTimer();
     if (questionManager.value) {
       questionManager.value.setQuestion();
     }
@@ -226,6 +224,9 @@ const updateStreak = async (data) => {
     startGame();
   };
 
+  watch(localChallengeMode, (newVal) => {
+  emit("update:challengeMode", newVal);
+});
 </script>
 
 <style scoped>

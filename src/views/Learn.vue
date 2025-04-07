@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLearning">
+  <div v-if="isLearning&&!challengeMode">
     <div class="language-list">
       <div class="language-title" >
         List of languages in {{ selectedCountry.name }}
@@ -20,6 +20,7 @@
   
   // 親コンポーネントから受け取る国
   const props = defineProps({
+    challengeMode: Boolean,
     selectedCountry: Object,
     isLearning: Boolean
   });

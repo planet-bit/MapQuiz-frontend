@@ -1,9 +1,9 @@
 <template>
-  <div v-if="isViewingStudyMap">
+  <div v-if="isViewingStudyMap&&!challengeMode">
     <h1 class="map-title">
       Map of {{ selectedCountry.name }}
       <CloseButtons class="map-close-button" @click="$emit('close-map')" />
-    </h1>
+    </h1> 
 
     <!-- 準備中メッセージ -->
     <div v-if="selectedCountry.code === 'bd'" class="map-message">
@@ -11,7 +11,9 @@
     </div>
 
     <!-- 地図表示 -->
-    <div v-else id="map-study" class="map-container"></div>
+    <div v-else id="map-study" class="map-container">
+      <button class="change-language-button" @click="toggleLanguage">Change Language</button>
+    </div>
   </div>
 </template>
 
@@ -22,15 +24,24 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const props = defineProps({
+  challengeMode: Boolean,
   selectedCountry: Object,
   isViewingStudyMap: Boolean
 });
 const emit = defineEmits(['close-map']);
 
+const isEnglish = ref(false);
+
 const center = ref(); // 初期値: ロシア
 const zoom = ref(5);
 let map = null;
 let geoJsonLayer = null;
+
+// 言語を切り替える関数
+const toggleLanguage = () => {
+  isEnglish.value = !isEnglish.value;
+  updateMapLayers(props.selectedCountry.code); // 言語切り替え後、地図のラベルを更新
+};
 
 const countryData = {
   ru: { center: [60, 60], zoom: 5.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson' },
@@ -40,7 +51,8 @@ const countryData = {
 
 watch(() => props.selectedCountry.code, (newCountry) => {
  
- 
+  isEnglish.value = false;
+
   if (newCountry === "ru") {
     initializeMap();
     center.value = [60, 80]; // ロシアの中心
@@ -99,6 +111,14 @@ const updateMapLayers = async (countryCode) => {
     if (geoJsonLayer) {
       map.removeLayer(geoJsonLayer);
     }
+    if (map._layers) {
+      Object.keys(map._layers).forEach((layerId) => {
+        const layer = map._layers[layerId];
+        if (layer instanceof L.Marker && layer.options.icon instanceof L.DivIcon) {
+          map.removeLayer(layer);
+        }
+      });
+    }
 
     // GeoJSON データの取得
     const geoJsonResponse = await fetch(countryData[countryCode].geoJsonUrl);
@@ -116,12 +136,25 @@ const updateMapLayers = async (countryCode) => {
       onEachFeature: (feature, layer) => {
         let name = '';
 
-        // 国コードに応じて名前を設定
-        if (countryCode === 'kr' && feature.properties && feature.properties.CTP_KOR_NM) {
-          name = feature.properties.CTP_KOR_NM;  // 韓国名
-        } else if (countryCode === 'ru' && feature.properties && feature.properties.name) {
-          name = feature.properties.name;  // ロシア名
+        if (feature.properties) {
+          if (isEnglish.value) {
+            if (countryCode === 'kr' && feature.properties && feature.properties.name) {
+            name = feature.properties.name; 
+          } else if (countryCode === 'ru' && feature.properties && feature.properties.name_latin) {
+            name = feature.properties.name_latin; 
+          }
+        }else {
+          if (countryCode === 'kr' && feature.properties && feature.properties.CTP_KOR_NM) {
+            name = feature.properties.CTP_KOR_NM; 
+          } else if (countryCode === 'ru' && feature.properties && feature.properties.name) {
+            name = feature.properties.name; 
+          }
         }
+
+      }
+
+
+        
 
         // 名前が存在する場合、ラベルを作成
         if (name) {
@@ -197,15 +230,27 @@ watch(() => props.isViewingStudyMap, (newVal) => {
     font-weight: bold;
     display: flex;
   }
-
-  .leaflet-control-zoom-in,
-  .leaflet-control-zoom-out {
-    width: 6rem !important ;
-    height: 6rem !important ;
-    font-size: 6rem !important ;
-    line-height: 6rem !important ;
+  .change-language-button {
+    z-index: 1000;
+    position: fixed; /* 画面上で固定 */
+    font-size: 5rem; 
+    padding: 30px; 
+    background-color: #859786; 
+    color: white; 
+    border: none; 
+    border-radius: 50px; 
+    cursor: pointer; 
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2); 
+    transition: background-color 0.3s, transform 0.2s; 
   }
 
+  .change-language-button:hover {
+    background-color: #45a049;
+  }
+
+  .change-language-button:active {
+    transform: translateY(0); /* クリック時に元に戻る */
+  }
   .leaflet-container {
     font-size: 2rem ;
   }
@@ -213,6 +258,7 @@ watch(() => props.isViewingStudyMap, (newVal) => {
   .map-container {
     width: 95%;
     height: 70vh;
+    z-index: 0;
   }
 
   .map-close-button {
