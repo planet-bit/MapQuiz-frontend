@@ -56,7 +56,10 @@
           :selectedChoice="selectedChoice"
           :correctAnswer="currentQuestion.answer"
           :streakCount="currentQuestionIndex - 1"
+          :regionId=currentQuestion.region_id
           :challengeMode="props.challengeMode"
+          :gameType="props.gameType"
+          :userId="props.userId"
           @next-question="nextQuestion"
           @retry-question="retryQuestion"
           @select-mode="selectMode"

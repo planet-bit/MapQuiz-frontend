@@ -4,7 +4,7 @@
     <QuestionManager
       ref="questionManager"
       :selectedCountry="selectedCountry"
-      :gameType="gameType"
+      :gameType="props.gameType"
       @question-updated="updateQuestion"
     />
 
@@ -57,8 +57,11 @@
             v-if="selectedChoice"
             :selectedChoice="selectedChoice"
             :correctAnswer="currentQuestion.answer"
+            :regionId=currentQuestion.region_id
             :streakCount="currentQuestionIndex - 1"
             :challengeMode="props.challengeMode"
+            :gameType="props.gameType"
+            :userId="props.userId"
             @next-question="nextQuestion"
             @retry-question="retryQuestion"
             @select-mode="selectMode"
@@ -88,7 +91,7 @@ const emit = defineEmits(["update:challengeMode"]);
 
 /* ------------------------- リアクティブな状態 ------------------------- */
 const currentQuestion = ref("");         // 現在の問題
-const currentChoices = ref([]);         // 選択肢（今後利用する可能性あり）
+const currentChoices = ref([]);         // 選択肢
 const selectedChoice = ref(null);       // ユーザーの選択
 const currentQuestionIndex = ref(1);    // 現在の問題番号
 const isAnswered = ref(false);          // 回答済みか

@@ -51,6 +51,7 @@
     const question = questions.value[randomIndex];
     const choices = generateChoices(question.answer, questions.value);
     emit("question-updated", {
+      regionId: question.region_id,
       question,
       choices
     });
