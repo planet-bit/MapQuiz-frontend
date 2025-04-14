@@ -25,9 +25,24 @@
   
   // 国ごとの初期設定
   const countryData = {
-    ru: { center: [60, 80], zoom: 5.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson' },
-    kr: { center: [36, 127.5], zoom: 9, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson' },
-    bd: { center: [23.7, 90.4], zoom: 8.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/bangladesh.geojson' }
+    ru: {
+      center: [60, 60],
+      zoom: 5.5,
+      geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
+      regionProperty: 'name_latin'
+    },
+    kr: {
+      center: [36, 127.5],
+      zoom: 9,
+      geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
+      regionProperty: 'name'
+    },
+    bd: {
+      center: [23.7, 90.4],
+      zoom: 8.5,
+      geoJsonUrl: '', // 後で追加
+      regionProperty: 'name'
+    }
   };
   // 地図の初期化
   const initializeMap = () => { 
@@ -54,8 +69,10 @@
   // GeoJSONデータを取得し、マップに描画する
   const updateMapLayers = async (countryCode) => {
     try {
-      const geoJsonResponse = await fetch(countryData[countryCode].geoJsonUrl);
+      const { geoJsonUrl, regionProperty } = countryData[countryCode];
+      const geoJsonResponse = await fetch(geoJsonUrl);
       const geoJsonData = await geoJsonResponse.json();
+
       geoJsonLayer = L.geoJSON(geoJsonData, {
         style: () => ({
           fillColor: '#E0E5EC',
@@ -65,16 +82,15 @@
           fillOpacity: 0.6
         }),
         onEachFeature: (feature, layer) => {
-          let name = feature.properties.name_latin || feature.properties.name || "不明";
+          const name = feature.properties[regionProperty] || "不明";
           let correctLayer = null;
-          // クリックイベントを追加
+
           layer.on('click', () => {
-            if (selectedChoice.value) return; // すでに選択済みなら無視
-            selectedChoice.value = name; // 選択された地名を保存
-            emit('answer-selected', name); // selectedChoiceが変更されたら、親コンポーネントに地名を通知
-            // 正解か不正解をチェックして色を変える
+            if (selectedChoice.value) return;
+            selectedChoice.value = name;
+            emit('answer-selected', name);
+
             if (name === props.correctAnswer) {
-              // 正解の場合、緑色に変更
               layer.setStyle({
                 fillColor: "lightgreen",
                 weight: 4,
@@ -82,17 +98,16 @@
                 fillOpacity: 0.85
               });
             } else {
-              // 不正解の場合、赤色に変更
-                layer.setStyle({
-                  fillColor: "lightcoral",
-                  weight: 4,
-                  color: '#8B0000',
-                 fillOpacity: 0.85
-                });
+              layer.setStyle({
+                fillColor: "lightcoral",
+                weight: 4,
+                color: '#8B0000',
+                fillOpacity: 0.85
+              });
+
               geoJsonLayer.eachLayer((l) => {
-                if (l.feature.properties.name_latin === props.correctAnswer || 
-                l.feature.properties.name === props.correctAnswer) {
-                  correctLayer = l; // 正解のエリアを記録
+                if (l.feature.properties[regionProperty] === props.correctAnswer) {
+                  correctLayer = l;
                   l.setStyle({
                     fillColor: "lightgreen",
                     weight: 4,
@@ -102,11 +117,9 @@
                 }
               });
             }
-            // すべてのレイヤーのクリックイベントを削除（＝全体で一回のみ回答可能にする）
             geoJsonLayer.eachLayer((l) => l.off('click'));
           });
 
-          // 地域のハイライト効果
           layer.on('mouseover', () => {
             if (!selectedChoice.value) {
               layer.setStyle({ fillColor: '#AFEEEE', weight: 4, color: '#008B8B', fillOpacity: 0.85 });
@@ -119,43 +132,37 @@
             }
           });
         }
-
       }).addTo(map);
     } catch (error) {
       console.error('Error updating map layers:', error);
     }
   };
 
+
   watch(
-  () => props.selectedChoice,
-  (newValue) => {
-    if (newValue === "TIME_UP" && geoJsonLayer) {
-      geoJsonLayer.eachLayer((layer) => {
-        // クリック無効化
-        layer.off("click");
+    () => props.selectedChoice,
+    (newValue) => {
+      if (newValue === "TIME_UP" && geoJsonLayer) {
+        const regionProperty = countryData[props.selectedCountry.code]?.regionProperty;
+        geoJsonLayer.eachLayer((layer) => {
+          layer.off("click");
+          const layerName = layer.feature.properties[regionProperty]?.toLowerCase().trim();
+          const correctName = props.correctAnswer.toLowerCase().trim();
 
-        // 正解の地域を特定
-        if (
-          layer.feature.properties.name_latin?.toLowerCase().trim() === props.correctAnswer.toLowerCase().trim() ||
-          layer.feature.properties.name?.toLowerCase().trim() === props.correctAnswer.toLowerCase().trim()
-        ) {
-          // スタイルを正解の色に固定
-          layer.setStyle({
-            fillColor: "lightgreen",
-            weight: 4,
-            color: "#008B8B",
-            fillOpacity: 0.85,
-          });
-
-          // 既存の hover イベントをすべて削除する
-          layer.off("mouseover");
-          layer.off("mouseout");
-        }
-      });
+          if (layerName === correctName) {
+            layer.setStyle({
+              fillColor: "lightgreen",
+              weight: 4,
+              color: "#008B8B",
+              fillOpacity: 0.85,
+            });
+            layer.off("mouseover");
+            layer.off("mouseout");
+          }
+        });
+      }
     }
-  }
-);
-
+  );
 
 
   // 初回マウント時に地図を初期化し、選択された国の設定に基づいて地図を描画

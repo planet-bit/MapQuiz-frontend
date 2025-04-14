@@ -1,8 +1,7 @@
 <template>
   <div class="main-container">
     <!-- 問題をランダムで出題するコンポーネント -->
-    <QuestionManager
-      ref="questionManager"
+    <QuestionManager ref="questionManager"
       :selectedCountry="selectedCountry"
       :gameType="props.gameType"
       @question-updated="updateQuestion"
@@ -15,19 +14,24 @@
         Preparing...
       </div>
 
-      <!-- 通常のモード選択 -->
+      <!-- bd以外のとき -->
       <div v-else class="mode-selection">
-        <label>
+        <label class="challenge-label">
           <input type="checkbox" v-model="localChallengeMode" />
-          Challenge Mode <br />(10s limit, No hint)
+          <span class="challenge-title">Challenge Mode</span>
         </label>
+        <ul class="challenge-info">
+          <li>Answer within 10 seconds</li>
+          <li>No hints shown</li>
+         <li>Only this mode is recorded</li>
+        </ul>
         <button @click="startGame">START</button>
       </div>
     </div>
 
     <!-- ゲーム中 -->
     <div v-else>
-      <p class="current-question">{{ currentQuestion.word }}</p>
+      <p class="current-question" v-if="currentQuestion">{{ currentQuestion.word }}</p>
 
       <div class="game-container">
         <!-- タイマー表示 -->
@@ -51,10 +55,9 @@
         />
 
         <!-- 回答フィードバック表示 -->
-        <div v-if="showAnswerFeedback">
+        <div >
           <AnswerFeedback
             class="answer-feedback"
-            v-if="selectedChoice"
             :selectedChoice="selectedChoice"
             :correctAnswer="currentQuestion.answer"
             :regionId=currentQuestion.region_id
@@ -90,13 +93,12 @@ const props = defineProps({
 const emit = defineEmits(["update:challengeMode"]);
 
 /* ------------------------- リアクティブな状態 ------------------------- */
-const currentQuestion = ref("");         // 現在の問題
+const currentQuestion = ref(null);         // 現在の問題
 const currentChoices = ref([]);         // 選択肢
 const selectedChoice = ref(null);       // ユーザーの選択
 const currentQuestionIndex = ref(1);    // 現在の問題番号
 const isAnswered = ref(false);          // 回答済みか
 const gameStarted = ref(false);         // ゲームが始まっているか
-const showAnswerFeedback = ref(false);  // フィードバックを表示するか
 const timerActive = ref(false);         // タイマーを動作させるか
 const triggerStopTimer = ref(false);    // タイマー停止トリガー
 const mapKey = ref(0);                  // 地図のkey（強制再描画用）
@@ -140,7 +142,6 @@ const StopTimer = () => {
 // 時間切れ時の処理
 const TimeUp = () => {
   checkAnswer("TIME_UP");
-  showAnswerFeedback.value = true;
 };
 
 // ゲーム状態リセット
@@ -162,16 +163,14 @@ const checkAnswer = (choice) => {
   isAnswered.value = true;
 
   StopTimer();
-
   if (props.challengeMode) {
+    sendAnswerResult();
+
     // チャレンジモードでは間違えたら終了
-    if (choice !== currentQuestion.value.answer || choice === "TIME_UP") {
-      showAnswerFeedback.value = true;
+    if (choice === "TIME_UP" || choice !== currentQuestion.value.answer) {
     } else {
       nextQuestion();
     }
-  } else {
-    showAnswerFeedback.value = true;
   }
 };
 
@@ -219,8 +218,6 @@ const sendStreakData = async () => {
     console.error("更新エラー:", error);
   }
 };
-
-// サーバーに streak を送信
 const updateStreak = async (data) => {
   try {
     const response = await fetch("http://localhost:3000/api/streaks/update", {
@@ -240,90 +237,137 @@ const updateStreak = async (data) => {
     throw error;
   }
 };
+
+const sendAnswerResult = async () => {
+  // props.userId などから正しく取得
+  if (!props.userId || selectedChoice.value === null) return;
+
+  const correctAnswer = currentQuestion.value.answer;
+  const regionId = currentQuestion.value.region_id;
+  const isCorrect = selectedChoice.value === correctAnswer && selectedChoice.value !== "TIME_UP";
+
+  const requestData = {
+    user_id: props.userId,
+    region_id: regionId,
+    is_correct: isCorrect,
+    game_type: props.gameType
+  };
+
+  try {
+    await fetch("http://localhost:3000/api/answers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
+    });
+    console.log("回答記録完了！");
+  } catch (err) {
+    console.error("回答記録エラー:", err);
+  }
+};
 </script>
 
+<style scoped>
+/* ===== コンテナ全体 ===== */
+.main-container {
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 5%;
+}
 
-  
-  <style scoped>
-    .main-container {
-      align-items: center; 
-      justify-content: center; 
-      width: 100%;
-      margin: 5%;
-    }
-    .mode-selection {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      padding: 2rem;
-      background-color: #ffffff;
-      max-width: 100%;
-      position: absolute;
-      top: 10%;
-      left: 50%;
-      transform: translate(-50%, 0);
-      text-align: left;
-    }
-    .mode-selection input[type="checkbox"] {
-      margin-right: 5rem; 
-    }
-    .mode-selection label {
-      font-size: 5rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      min-width: 60rem
-    }
-    .mode-selection button {
-      padding: 1rem 2rem;
-      font-size: 5rem;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 2rem;
-      cursor: pointer;
-      transform: translate(-50%, 0);
-      box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
-    }
-    .mode-selection button:hover {
-      background-color: #0056b3;
-    }
-    .mode-selection input[type="checkbox"] {
-      width: 5rem;
-      height: 5rem;
-      accent-color: #007bff; 
-      cursor: pointer;
-    }
-    .current-question {
-      font-size: 9rem;
-      font-weight: bold;
-      margin-top: 6rem;
-      margin-bottom: 6rem;
-    }
+.game-container {
+  position: relative;
+}
 
-    .game-container{
-      position: relative;
-    }
-    .answer-feedback {
-  position: absolute; /* 位置を指定 */
+/* ===== モード選択画面 ===== */
+.mode-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background-color: #ffffff;
+  max-width: 100%;
+  position: absolute;
+  top: 10%;
+  left: 0%;
+  text-align: left;
+}
+
+.challenge-title {
+  font-size: 6rem;
+  font-weight: bold;
+}
+
+.challenge-info {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  margin-left: 500px;
+  font-size: 5rem;
+  list-style-type: disc;
+}
+
+.mode-message {
+  font-size: 6rem;
+}
+
+/* ===== ラベル・チェックボックス ===== */
+.mode-selection label {
+  font-size: 5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 60rem;
+}
+
+.mode-selection input[type="checkbox"] {
+  margin-right: 5rem;
+  width: 5rem;
+  height: 5rem;
+  accent-color: #007bff;
+  cursor: pointer;
+}
+
+/* ===== ボタン ===== */
+.mode-selection button {
+  padding: 1rem 2rem;
+  font-size: 5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  cursor: pointer;
+  transform: translate(-50%, 0);
+  box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
+.mode-selection button:hover {
+  background-color: #0056b3;
+}
+
+/* ===== ゲーム中スタイル ===== */
+.current-question {
+  font-size: 9rem;
+  font-weight: bold;
+  margin-top: 6rem;
+  margin-bottom: 6rem;
+}
+
+.answer-feedback {
+  position: absolute;
   top: 10%;
   left: 5%;
-  z-index: 10; /* より高い値を設定して手前に表示 */
-  background-color: rgba(255, 255, 255, 0.600); /* 背景色を白に設定 */
-  border-radius: 40px; /* 角を丸くする（値は調整可能） */
-  padding: 40px; /* 内側の余白を調整 */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 影をつけて立体感を出す */
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 40px;
+  padding: 40px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .choice-regions {
-  position: relative; /* 位置を指定 */
-  z-index: 1; /* 低い値を設定して後ろに表示 */
+  position: relative;
+  z-index: 1;
 }
-
-.mode-message{
-  font-size: 6rem;
-}
-  </style>
+</style>

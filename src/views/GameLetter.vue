@@ -3,28 +3,33 @@
     <!-- 問題をランダムで出題する機能 -->
     <QuestionManager ref="questionManager"
       :selectedCountry="selectedCountry" 
-      :gameType="gameType"
+      :gameType="props.gameType"
       @question-updated="updateQuestion"
     />
 
-    <!-- ゲーム開始前のモード選択の表示 -->
+    <!-- ゲーム開始前 -->
     <div v-if="!gameStarted">
-      <!-- bd（バングラデシュ）のとき -->
+      <!-- バングラデシュのみ特殊表示 -->
       <div v-if="selectedCountry.code === 'bd'" class="mode-message">
         Preparing...
       </div>
 
       <!-- bd以外のとき -->
       <div v-else class="mode-selection">
-        <label>
-          <input type="checkbox" v-model="localChallengeMode" /> 
-          Challenge Mode <br> (10s limit, No hint)
+        <label class="challenge-label">
+          <input type="checkbox" v-model="localChallengeMode" />
+          <span class="challenge-title">Challenge Mode</span>
         </label>
-        <button @click="startGame">START</button> 
+        <ul class="challenge-info">
+          <li>Answer within 10 seconds</li>
+          <li>No hints shown</li>
+         <li>Only this mode is recorded</li>
+        </ul>
+        <button @click="startGame">START</button>
       </div>
     </div>
 
-    <!-- ゲームが開始された後の表示 -->
+    <!-- ゲーム中 -->
     <div v-else>
       <div class="question-grid">
 
@@ -50,7 +55,7 @@
 
     <!-- 解答後のフィードバック表示 -->
     <div class="feedback-grid">
-      <div v-if="showAnswerFeedback">
+      <div>
         <AnswerFeedback 
           v-if="selectedChoice"
           :selectedChoice="selectedChoice"
@@ -61,8 +66,8 @@
           :gameType="props.gameType"
           :userId="props.userId"
           @next-question="nextQuestion"
-          @retry-question="retryQuestion"
-          @select-mode="selectMode"
+          @retry-question="startGame"
+          @select-mode="GameReset"
           @streak-finalized="sendStreakData"
         />
       </div>
@@ -72,7 +77,7 @@
 
 <script setup>
 
-  import { ref, watch, onMounted } from "vue";
+  import { ref, watch } from "vue";
   import ChoiceButtons from "@/components/ChoiceButtons.vue";
   import AnswerFeedback from "@/components/AnswerFeedback.vue";
   import Timer from "@/components/Timer.vue";
@@ -93,7 +98,6 @@
   const currentQuestionIndex = ref(1); // 問題番号
   const isAnswered = ref(false); // 答えたかどうか
   const gameStarted = ref(false); // ゲーム開始の状態
-  const showAnswerFeedback = ref(false);  // フィードバック表示用
   const timerActive = ref (false);
   const triggerStopTimer = ref(false);
   const questionManager = ref(null);
@@ -143,7 +147,6 @@ const updateStreak = async (data) => {
   }
 };
 
-
   const updateQuestion = ({ question, choices }) => {
     currentQuestion.value = question;
     currentChoices.value = choices;
@@ -161,45 +164,29 @@ const updateStreak = async (data) => {
 
   const TimeUp = () => {
     checkAnswer("TIME_UP");
-    showAnswerFeedback.value = true; 
   };
-  
-  //問題番号、ユーザーの選択、解答の有無をリセット
-  const GameReset = () => {
-    currentQuestionIndex.value = 1;
-    selectedChoice.value = null;
-    isAnswered.value = false;
-  }
 
   // 国やゲームタイプが変更されたらゲーム開始画面に戻す
   watch([() => props.selectedCountry, () => props.gameType], () => {
-    gameStarted.value = false; 
     GameReset();
   });
 
-  onMounted(() => {
-    gameStarted.value = false; // 初回も選択画面にする
-  });
-
-  const selectMode = () => {
-    gameStarted.value = false;
-    GameReset();
-  }
-
+ 
   // 解答を選択したときに呼ばれる関数
   const checkAnswer = (choice) => {
     selectedChoice.value = choice ?? "TIME_UP";  // 時間切れの場合 "TIME_UP" として選択
     isAnswered.value = true;
     StopTimer();
-    // チャレンジモード時の解答チェック
-    if (props.challengeMode && (choice !== currentQuestion.value.answer || choice === "TIME_UP")) {
-      showAnswerFeedback.value = true; // フィードバック表示
-    } else if (props.challengeMode && choice === currentQuestion.value.answer) {
-      nextQuestion(); // 正解の場合次の問題に進む
+    if (props.challengeMode) {
+    sendAnswerResult();
+
+     // チャレンジモードでは間違えたら終了
+     if (choice === "TIME_UP" || choice !== currentQuestion.value.answer) {
     } else {
-      showAnswerFeedback.value = true; // 不正解の場合フィードバックを表示
+      nextQuestion();
     }
-  };
+  }
+};
 
   // 次の問題に進む関数
   const nextQuestion = () => {
@@ -215,6 +202,9 @@ const updateStreak = async (data) => {
 
   // ゲーム開始時の処理
   const startGame = () => {
+    currentQuestionIndex.value = 1;
+    selectedChoice.value = null;
+    isAnswered.value = false;
     gameStarted.value = true;
     if (props.challengeMode) StartTimer();
     if (questionManager.value) {
@@ -222,14 +212,44 @@ const updateStreak = async (data) => {
     }
   };
 
-  const retryQuestion = () => {
-    GameReset();
-    startGame();
-  };
+//問題番号、ユーザーの選択、解答の有無をリセット
+  const GameReset = () => {
+    currentQuestionIndex.value = 1;
+    selectedChoice.value = null;
+    isAnswered.value = false;
+    gameStarted.value = false;
+  }
 
   watch(localChallengeMode, (newVal) => {
-  emit("update:challengeMode", newVal);
-});
+    emit("update:challengeMode", newVal);
+  });
+
+const sendAnswerResult = async () => {
+  // props.userId などから正しく取得
+  if (!props.userId || selectedChoice.value === null) return;
+
+  const correctAnswer = currentQuestion.value.answer;
+  const regionId = currentQuestion.value.region_id;
+  const isCorrect = selectedChoice.value === correctAnswer && selectedChoice.value !== "TIME_UP";
+
+  const requestData = {
+    user_id: props.userId,
+    region_id: regionId,
+    is_correct: isCorrect,
+    game_type: props.gameType
+  };
+
+  try {
+    await fetch("http://localhost:3000/api/answers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
+    });
+    console.log("回答記録完了！");
+  } catch (err) {
+    console.error("回答記録エラー:", err);
+  }
+};
 </script>
 
 <style scoped>
@@ -252,21 +272,20 @@ const updateStreak = async (data) => {
     max-width: 100%;
     position: absolute;
     top: 10%;
-    left: 50%;
-    transform: translate(-50%, 0);
+    left: 0%;
     text-align: left;
   }
   .mode-selection input[type="checkbox"] {
     margin-right: 5rem; 
   }
   .mode-selection label {
-    font-size: 7rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 60rem
-  }
+  font-size: 5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 60rem;
+}
   .mode-selection button {
     padding: 1rem 2rem;
     font-size: 5rem;
@@ -282,11 +301,26 @@ const updateStreak = async (data) => {
     background-color: #0056b3;
   }
   .mode-selection input[type="checkbox"] {
-    width: 5rem;
-    height: 5rem;
-    accent-color: #007bff; 
-    cursor: pointer;
+  margin-right: 5rem;
+  width: 5rem;
+  height: 5rem;
+  accent-color: #007bff;
+  cursor: pointer;
   }
+
+  
+.challenge-title {
+  font-size: 6rem;
+  font-weight: bold;
+}
+
+.challenge-info {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  margin-left: 500px;
+  font-size: 5rem;
+  list-style-type: disc;
+}
   .question-grid {
     margin-left: 10%;
   }

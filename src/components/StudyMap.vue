@@ -43,11 +43,28 @@ const toggleLanguage = () => {
   updateMapLayers(props.selectedCountry.code); // 言語切り替え後、地図のラベルを更新
 };
 
-const countryData = {
-  ru: { center: [60, 60], zoom: 5.5, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson' },
-  kr: { center: [36, 127.5], zoom: 9, geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson' },
-  bd: { center: [23.7, 90.4], zoom: 8.5, geoJsonUrl: '' }
-};
+  // 国ごとの初期設定（regionPropertyを追加）
+  const countryData = {
+    ru: {
+      center: [60, 60],
+      zoom: 5.5,
+      geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
+      regionProperty: 'name_latin'
+    },
+    kr: {
+      center: [36, 127.5],
+      zoom: 9,
+      geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
+      regionProperty: 'name'
+    },
+    bd: {
+      center: [23.7, 90.4],
+      zoom: 8.5,
+      geoJsonUrl: '', // 後で追加
+      regionProperty: 'name'
+    }
+  };
+
 
 watch(() => props.selectedCountry.code, (newCountry) => {
  
@@ -137,21 +154,18 @@ const updateMapLayers = async (countryCode) => {
         let name = '';
 
         if (feature.properties) {
-          if (isEnglish.value) {
-            if (countryCode === 'kr' && feature.properties && feature.properties.name) {
-            name = feature.properties.name; 
-          } else if (countryCode === 'ru' && feature.properties && feature.properties.name_latin) {
-            name = feature.properties.name_latin; 
-          }
-        }else {
-          if (countryCode === 'kr' && feature.properties && feature.properties.CTP_KOR_NM) {
-            name = feature.properties.CTP_KOR_NM; 
-          } else if (countryCode === 'ru' && feature.properties && feature.properties.name) {
-            name = feature.properties.name; 
-          }
-        }
-
-      }
+  if (isEnglish.value) {
+    const regionProp = countryData[countryCode].regionProperty;
+    name = feature.properties[regionProp] || '';
+  } else {
+    // 各国のデフォルト表記（韓国語・ロシア語など）
+    if (countryCode === 'kr') {
+      name = feature.properties.CTP_KOR_NM || '';
+    } else if (countryCode === 'ru') {
+      name = feature.properties.name || '';
+    }
+  }
+}
 
 
         
