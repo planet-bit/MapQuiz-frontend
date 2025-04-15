@@ -15,18 +15,12 @@
       </div>
 
       <!-- bd以外のとき -->
-      <div v-else class="mode-selection">
-        <label class="challenge-label">
-          <input type="checkbox" v-model="localChallengeMode" />
-          <span class="challenge-title">Challenge Mode</span>
-        </label>
-        <ul class="challenge-info">
-          <li>Answer within 10 seconds</li>
-          <li>No hints shown</li>
-         <li>Only this mode is recorded</li>
-        </ul>
-        <button @click="startGame">START</button>
-      </div>
+      <ModeSelection
+        v-if="!gameStarted && selectedCountry.code !== 'bd'"
+        :challengeMode="challengeMode"
+        @update:challengeMode="val => challengeMode = val"
+        @start-game="startGame"
+      />
     </div>
 
     <!-- ゲーム中 -->
@@ -55,33 +49,32 @@
 
     <!-- 解答後のフィードバック表示 -->
     <div class="feedback-grid">
-      <div>
-        <AnswerFeedback 
-          v-if="selectedChoice"
-          :selectedChoice="selectedChoice"
-          :correctAnswer="currentQuestion.answer"
-          :streakCount="currentQuestionIndex - 1"
-          :regionId=currentQuestion.region_id
-          :challengeMode="props.challengeMode"
-          :gameType="props.gameType"
-          :userId="props.userId"
-          @next-question="nextQuestion"
-          @retry-question="startGame"
-          @select-mode="GameReset"
-          @streak-finalized="sendStreakData"
+      <AnswerFeedback 
+        v-if="selectedChoice"
+        :selectedChoice="selectedChoice"
+        :correctAnswer="currentQuestion.answer"
+        :streakCount="currentQuestionIndex - 1"
+        :regionId=currentQuestion.region_id
+        :challengeMode="props.challengeMode"
+        :gameType="props.gameType"
+        :userId="props.userId"
+        @next-question="nextQuestion"
+        @retry-question="startGame"
+        @select-mode="GameReset"
+        @streak-finalized="sendStreakData"
         />
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
 
-  import { ref, watch } from "vue";
+  import { ref, watch, computed } from "vue";
   import ChoiceButtons from "@/components/ChoiceButtons.vue";
   import AnswerFeedback from "@/components/AnswerFeedback.vue";
   import Timer from "@/components/Timer.vue";
   import QuestionManager from "@/components/QuestionManager.vue";
+  import ModeSelection from "@/components/ModeSelection.vue";
 
   // 親コンポーネントから渡されたプロパティ
   const props = defineProps({
@@ -101,7 +94,11 @@
   const timerActive = ref (false);
   const triggerStopTimer = ref(false);
   const questionManager = ref(null);
-  const localChallengeMode = ref(props.challengeMode);
+
+  const challengeMode = computed({
+    get: () => props.challengeMode,
+    set: (val) => emit('update:challengeMode', val)
+  });
 
 // `streak-finalized` イベントを受け取って、APIに送信
 const sendStreakData = async () => {
@@ -181,7 +178,8 @@ const updateStreak = async (data) => {
     sendAnswerResult();
 
      // チャレンジモードでは間違えたら終了
-     if (choice === "TIME_UP" || choice !== currentQuestion.value.answer) {
+    if (choice === "TIME_UP" || choice !== currentQuestion.value.answer) {
+      return;
     } else {
       nextQuestion();
     }
@@ -194,10 +192,7 @@ const updateStreak = async (data) => {
     isAnswered.value = false; // 回答済み状態をリセット
     selectedChoice.value = null; // 選択をリセット
     if (props.challengeMode) StartTimer(); // チャレンジモードならタイマーを再スタート
-    if (questionManager.value) {
-      console.log("Calling setQuestion in nextQuestion");
-      questionManager.value.setQuestion();
-    };
+    if (questionManager.value) questionManager.value.setQuestion();
   }
 
   // ゲーム開始時の処理
@@ -207,9 +202,7 @@ const updateStreak = async (data) => {
     isAnswered.value = false;
     gameStarted.value = true;
     if (props.challengeMode) StartTimer();
-    if (questionManager.value) {
-      questionManager.value.setQuestion();
-    }
+    if (questionManager.value) questionManager.value.setQuestion();
   };
 
 //問題番号、ユーザーの選択、解答の有無をリセット
@@ -219,10 +212,6 @@ const updateStreak = async (data) => {
     isAnswered.value = false;
     gameStarted.value = false;
   }
-
-  watch(localChallengeMode, (newVal) => {
-    emit("update:challengeMode", newVal);
-  });
 
 const sendAnswerResult = async () => {
   // props.userId などから正しく取得
@@ -261,66 +250,7 @@ const sendAnswerResult = async () => {
     width: 100%;
     margin: auto;
   }
-  .mode-selection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 2rem;
-    background-color: #ffffff;
-    max-width: 100%;
-    position: absolute;
-    top: 10%;
-    left: 0%;
-    text-align: left;
-  }
-  .mode-selection input[type="checkbox"] {
-    margin-right: 5rem; 
-  }
-  .mode-selection label {
-  font-size: 5rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 60rem;
-}
-  .mode-selection button {
-    padding: 1rem 2rem;
-    font-size: 5rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 2rem;
-    cursor: pointer;
-    transform: translate(-50%, 0);
-    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
-  }
-  .mode-selection button:hover {
-    background-color: #0056b3;
-  }
-  .mode-selection input[type="checkbox"] {
-  margin-right: 5rem;
-  width: 5rem;
-  height: 5rem;
-  accent-color: #007bff;
-  cursor: pointer;
-  }
-
   
-.challenge-title {
-  font-size: 6rem;
-  font-weight: bold;
-}
-
-.challenge-info {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  margin-left: 500px;
-  font-size: 5rem;
-  list-style-type: disc;
-}
   .question-grid {
     margin-left: 10%;
   }

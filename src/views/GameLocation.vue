@@ -15,18 +15,12 @@
       </div>
 
       <!-- bd以外のとき -->
-      <div v-else class="mode-selection">
-        <label class="challenge-label">
-          <input type="checkbox" v-model="localChallengeMode" />
-          <span class="challenge-title">Challenge Mode</span>
-        </label>
-        <ul class="challenge-info">
-          <li>Answer within 10 seconds</li>
-          <li>No hints shown</li>
-         <li>Only this mode is recorded</li>
-        </ul>
-        <button @click="startGame">START</button>
-      </div>
+      <ModeSelection
+        v-if="!gameStarted && selectedCountry.code !== 'bd'"
+        :challengeMode="challengeMode"
+        @update:challengeMode="val => challengeMode = val"
+        @start-game="startGame"
+      />
     </div>
 
     <!-- ゲーム中 -->
@@ -66,8 +60,8 @@
             :gameType="props.gameType"
             :userId="props.userId"
             @next-question="nextQuestion"
-            @retry-question="retryQuestion"
-            @select-mode="selectMode"
+            @retry-question="startGame"
+            @select-mode="GameReset"
             @streak-finalized="sendStreakData"
           />
         </div>
@@ -77,11 +71,12 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, computed } from "vue";
 import ChoiceRegions from "@/components/ChoiceRegions.vue";
 import AnswerFeedback from "@/components/AnswerFeedback.vue";
 import Timer from "@/components/Timer.vue";
 import QuestionManager from "@/components/QuestionManager.vue";
+import ModeSelection from "@/components/ModeSelection.vue";
 
 /* ------------------------- PropsとEmit定義 ------------------------- */
 const props = defineProps({
@@ -103,23 +98,17 @@ const timerActive = ref(false);         // タイマーを動作させるか
 const triggerStopTimer = ref(false);    // タイマー停止トリガー
 const mapKey = ref(0);                  // 地図のkey（強制再描画用）
 const questionManager = ref(null);      // QuestionManagerコンポーネントへの参照
-const localChallengeMode = ref(props.challengeMode); // ローカルでのモード管理
+const challengeMode = computed({
+    get: () => props.challengeMode,
+    set: (val) => emit('update:challengeMode', val)
+  });
 
 /* ------------------------- Watchers ------------------------- */
-// チャレンジモード切替時に親に伝える
-watch(localChallengeMode, (newVal) => {
-  emit("update:challengeMode", newVal);
-});
+
 
 // 国またはモード変更時にリセット
 watch([() => props.selectedCountry, () => props.gameType], () => {
-  gameStarted.value = false;
   GameReset();
-});
-
-/* ------------------------- 初期化 ------------------------- */
-onMounted(() => {
-  gameStarted.value = false;
 });
 
 /* ------------------------- ゲーム関連関数 ------------------------- */
@@ -149,12 +138,7 @@ const GameReset = () => {
   currentQuestionIndex.value = 1;
   selectedChoice.value = null;
   isAnswered.value = false;
-};
-
-// モード選択に戻る
-const selectMode = () => {
   gameStarted.value = false;
-  GameReset();
 };
 
 // 回答チェック
@@ -185,14 +169,11 @@ const nextQuestion = () => {
   if (questionManager.value) questionManager.value.setQuestion();
 };
 
-// 同じ問題をやり直す
-const retryQuestion = () => {
-  GameReset();
-  startGame();
-};
-
 // ゲームを開始する
 const startGame = () => {
+  currentQuestionIndex.value = 1;
+  selectedChoice.value = null;
+  isAnswered.value = false;
   gameStarted.value = true;
   if (props.challengeMode) StartTimer();
   if (questionManager.value) questionManager.value.setQuestion();
@@ -277,74 +258,6 @@ const sendAnswerResult = async () => {
 
 .game-container {
   position: relative;
-}
-
-/* ===== モード選択画面 ===== */
-.mode-selection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 2rem;
-  background-color: #ffffff;
-  max-width: 100%;
-  position: absolute;
-  top: 10%;
-  left: 0%;
-  text-align: left;
-}
-
-.challenge-title {
-  font-size: 6rem;
-  font-weight: bold;
-}
-
-.challenge-info {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  margin-left: 500px;
-  font-size: 5rem;
-  list-style-type: disc;
-}
-
-.mode-message {
-  font-size: 6rem;
-}
-
-/* ===== ラベル・チェックボックス ===== */
-.mode-selection label {
-  font-size: 5rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 60rem;
-}
-
-.mode-selection input[type="checkbox"] {
-  margin-right: 5rem;
-  width: 5rem;
-  height: 5rem;
-  accent-color: #007bff;
-  cursor: pointer;
-}
-
-/* ===== ボタン ===== */
-.mode-selection button {
-  padding: 1rem 2rem;
-  font-size: 5rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 2rem;
-  cursor: pointer;
-  transform: translate(-50%, 0);
-  box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
-}
-
-.mode-selection button:hover {
-  background-color: #0056b3;
 }
 
 /* ===== ゲーム中スタイル ===== */

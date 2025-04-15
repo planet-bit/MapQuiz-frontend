@@ -9,19 +9,21 @@
       <form @submit.prevent="login" v-if="!isRegistering">
         <div>Log in to your account</div>
         <CloseButtons class="user-deopdown-close-button" @click-action="isDropdownOpen = false" />
-        <input type="email" v-model="email" placeholder="Email" required autocomplete="username">
-        <input type="password" v-model="password" placeholder="Password" required autocomplete="current-password">
+        <input type="email" v-model="email" placeholder="Email(テスト用:test@test.com)" required autocomplete="username">
+        <input type="password" v-model="password" placeholder="Password(6文字以上、テスト用:test123)" required autocomplete="current-password">
         <button type="submit">Login</button>
         <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">create your account</a></span>
       </form>
 
       <!-- アカウント登録フォーム -->
       <form @submit.prevent="register" v-else>
+        <CloseButtons class="user-deopdown-close-button" @click-action="isDropdownOpen = false" />
         <div>Create your account</div>
         <input type="email" v-model="email" placeholder="Email" required autocomplete="username">
-        <input type="password" v-model="password" placeholder="Password" required autocomplete="new-password">
+        <input type="password" v-model="password" placeholder="Password(6文字以上)" required autocomplete="new-password">
         <div class="login-buttons">
           <button type="submit">Sign up</button>
+          <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">log in your account</a></span>
         </div>
       </form>
     </div>
@@ -88,7 +90,7 @@ const login = async () => {
   
 // 新規登録フォームを表示
 const showRegisterForm = () => {
-  isRegistering.value = true; // 新規登録フォームを表示
+  isRegistering.value = !isRegistering.value; // 新規登録フォームを表示
 };
 
 // アカウント登録処理
