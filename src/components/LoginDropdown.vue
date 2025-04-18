@@ -1,33 +1,31 @@
 <template>
   <div>
     <a href="#" @click.prevent="toggleDropdown" class="login-dropdown-link">Log in</a>
-    
-    </div>
+  </div>
 
-    <div v-if="isDropdownOpen && !token" class="dropdown-menu">
-      <!-- ログインフォーム -->
-      <form @submit.prevent="login" v-if="!isRegistering">
-        <div>Log in to your account</div>
-        <CloseButtons class="user-deopdown-close-button" @click-action="isDropdownOpen = false" />
-        <input type="email" v-model="email" placeholder="Email(テスト用:test@test.com)" required autocomplete="username">
-        <input type="password" v-model="password" placeholder="Password(6文字以上、テスト用:test123)" required autocomplete="current-password">
-        <button type="submit">Login</button>
-        <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">create your account</a></span>
-      </form>
+  <div v-if="isDropdownOpen && !token" class="dropdown-menu">
+    <!-- ログインフォーム -->
+    <form @submit.prevent="login" v-if="!isRegistering" novalidate>
+      <div>Log in to your account</div>
+      <CloseButtons class="user-deopdown-close-button" @click-action="closeDropdown" />
+      <input type="email" v-model="email" placeholder="Email(テスト用:test@test.com)" required autocomplete="username">
+      <input type="password" v-model="password" placeholder="Password(6文字以上、テスト用:test123)" required autocomplete="current-password">
+      <div class="error-message" v-if="formError">{{ formError }}</div>
+      <button>Login</button>
+      <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">create your account</a></span>
+    </form>
 
-      <!-- アカウント登録フォーム -->
-      <form @submit.prevent="register" v-else>
-        <CloseButtons class="user-deopdown-close-button" @click-action="isDropdownOpen = false" />
-        <div>Create your account</div>
-        <input type="email" v-model="email" placeholder="Email" required autocomplete="username">
-        <input type="password" v-model="password" placeholder="Password(6文字以上)" required autocomplete="new-password">
-        <div class="login-buttons">
-          <button type="submit">Sign up</button>
-          <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">log in your account</a></span>
-        </div>
-      </form>
-    </div>
-  
+    <!-- アカウント登録フォーム -->
+    <form @submit.prevent="register" v-else>
+      <div>Create your account</div>
+      <CloseButtons class="user-deopdown-close-button" @click-action="closeDropdown" />
+      <input type="email" v-model="email" placeholder="Email(テスト用:test@test.com)" required autocomplete="username">
+      <input type="password" v-model="password" placeholder="Password(6文字以上、テスト用:test123)" required autocomplete="current-password">
+      <div class="error-message" v-if="formError">{{ formError }}</div>
+      <button>Sign up</button>
+      <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">log in your account</a></span>
+    </form>
+  </div>
 </template>
 
 <script setup>
@@ -35,98 +33,127 @@ import { ref, onMounted } from 'vue';
 import CloseButtons from '@/components/CloseButtons.vue';
 
 const isDropdownOpen = ref(false);
+const isRegistering = ref(false);
 const email = ref('');
 const password = ref('');
-const isRegistering = ref(false);
 const token = ref(null);
+const formError = ref('');
 
-// クッキーからトークンを取得
+// トークン取得
 function getTokenFromCookie() {
   const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
-  console.log("クッキーから取得したトークン: ", match ? match[1] : null);  // クッキーのトークンを確認
   return match ? match[1] : null;
 }
 
+onMounted(() => {
+  const cookieToken = getTokenFromCookie();
+  if (cookieToken) {
+    token.value = cookieToken;
+  }
+});
+
+// UI制御
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
   isRegistering.value = false;
+  clearForm();
 };
 
-// コンポーネントがマウントされたときにトークンを取得
-onMounted(() => {
-  // 最初にクッキーからトークンを取得
-  const cookieToken = getTokenFromCookie();
-  if (cookieToken) {
-    token.value = cookieToken; // クッキーからトークンを取得して設定
-  } else if (token.value) {
-    // メモリにトークンがあれば、トークンをクッキーに保存する
-    document.cookie = `token=${token.value}; path=/;`;
-  }
-
-  // token.valueがクッキーから取得された場合に、コンソールに表示
-  console.log("トークン: ", token.value);  // クッキーから取得されたトークンが表示されるはず
-});
-
-// ログイン処理
-const login = async () => {
-  const res = await fetch("http://localhost:3000/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: email.value, password: password.value }),
-    credentials: "include", // Cookieを送信するために必要
-  });
-
-  const data = await res.json();
-  console.log(data);  // ここでレスポンスの内容を
-  if (data.token) {
-    // クッキーにトークンを保存（`Secure` と `HttpOnly` は開発環境では外してもよい）
-    document.cookie = `token=${data.token}; path=/;`;
-    token.value = data.token;
-    location.reload();  // ログイン後にページをリロード
-  } else {
-    alert("ログイン失敗");
-  }
+const closeDropdown = () => {
+  isDropdownOpen.value = false;
+  clearForm();
 };
-  
-// 新規登録フォームを表示
+
 const showRegisterForm = () => {
-  isRegistering.value = !isRegistering.value; // 新規登録フォームを表示
+  isRegistering.value = !isRegistering.value;
+  clearForm();
 };
 
-// アカウント登録処理
-const register = async () => {
-  if (!email.value || !password.value) {
-    alert("メールアドレスとパスワードを入力してください！");
+const clearForm = () => {
+  email.value = '';
+  password.value = '';
+  formError.value = '';
+};
+
+// バリデーション
+const isValidPassword = (pwd) => /^[a-zA-Z0-9]{6,}$/.test(pwd);
+
+// ログイン
+const login = async () => {
+  formError.value = '';
+
+  if (!email.value) {
+    formError.value = "メールアドレスを入力してください。";
+    return;
+  }
+
+  if (!isValidPassword(password.value)) {
+    formError.value = "パスワードは半角英数字6文字以上で入力してください。";
     return;
   }
 
   try {
-    const response = await fetch("http://localhost:3000/auth/register", {
+    const res = await fetch("http://localhost:3000/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email.value, password: password.value }),
       credentials: "include",
     });
 
-    const data = await response.json();
-    if (response.ok) {
-      alert("登録が完了しました！");
-      if (data.token) {
-        document.cookie = `token=${data.token}; path=/;`;
-        token.value = data.token;
-      }
-      isRegistering.value = false;
-      location.reload();  // ログイン後にページをリロード
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      document.cookie = `token=${data.token}; path=/;`;
+      token.value = data.token;
+      location.reload();
     } else {
-      alert(data.error || "登録に失敗しました。");
+      formError.value = data.error || "ログインに失敗しました。";
     }
   } catch (error) {
-    console.error("登録エラー:", error);
-    alert("サーバーエラーが発生しました。");
+    console.error("ログインエラー:", error);
+    formError.value = "サーバーエラーが発生しました。";
   }
 };
 
+// 登録
+const register = async () => {
+  formError.value = '';
+
+  if (!email.value || !password.value) {
+    formError.value = "メールアドレスとパスワードを入力してください！";
+    return;
+  }
+
+  if (!isValidPassword(password.value)) {
+    formError.value = "パスワードは半角英数字6文字以上で入力してください。";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:3000/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.value, password: password.value }),
+      credentials: "include",
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      document.cookie = `token=${data.token}; path=/;`;
+      token.value = data.token;
+      isRegistering.value = false;
+      location.reload();
+    } else {
+      formError.value = data.error || "登録に失敗しました。";
+    }
+  } catch (error) {
+    console.error("登録エラー:", error);
+    formError.value = "サーバーエラーが発生しました。";
+  }
+};
 </script>
+
 
 <style scoped>
   .login-dropdown-link {
@@ -181,7 +208,12 @@ const register = async () => {
 .user-deopdown-close-button{
   position: absolute;
   top: 5%;
-  right:0%;
+  right:0%
 }
-
+.error-message {
+  color: red;
+  font-size: 3rem;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
 </style>
