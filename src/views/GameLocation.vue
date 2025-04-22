@@ -54,11 +54,8 @@
             class="answer-feedback"
             :selectedChoice="selectedChoice"
             :correctAnswer="currentQuestion.answer"
-            :regionId=currentQuestion.region_id
             :streakCount="currentQuestionIndex - 1"
             :challengeMode="props.challengeMode"
-            :gameType="props.gameType"
-            :userId="props.userId"
             @next-question="nextQuestion"
             @retry-question="startGame"
             @select-mode="GameReset"
@@ -83,7 +80,6 @@ const props = defineProps({
   challengeMode: Boolean,
   selectedCountry: Object,
   gameType: String,
-  userId: Number,
 });
 const emit = defineEmits(["update:challengeMode"]);
 
@@ -181,14 +177,23 @@ const startGame = () => {
 };
 
 /* ------------------------- API 連携（スコア送信） ------------------------- */
+
+// トークンをクッキーから取得
+function getTokenFromCookie() {
+  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+  return match ? match[1] : null;
+}
+
+// `streak-finalized` イベントを受け取って、APIに送信
 const sendStreakData = async () => {
-  if (!props.userId) return;
+  const token = getTokenFromCookie();
+  if (!token) return;
+
   const streak = currentQuestionIndex.value - 1;
   const data = {
-    user_id: props.userId,
     game_type: props.gameType,
     country_code: props.selectedCountry.code,
-    streak,
+    streak: streak,
     correct_answers: streak,
   };
 
@@ -200,11 +205,7 @@ const sendStreakData = async () => {
   }
 };
 
-// トークンをクッキーから取得
-function getTokenFromCookie() {
-  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
-  return match ? match[1] : null;
-}
+
 
 const updateStreak = async (data) => {
   try {
@@ -237,24 +238,28 @@ const updateStreak = async (data) => {
 
 
 const sendAnswerResult = async () => {
-  // props.userId などから正しく取得
-  if (!props.userId || selectedChoice.value === null) return;
+  const token = getTokenFromCookie();
+  if (!token) return;
+
+  if (selectedChoice.value === null) return;
 
   const correctAnswer = currentQuestion.value.answer;
   const regionId = currentQuestion.value.region_id;
   const isCorrect = selectedChoice.value === correctAnswer && selectedChoice.value !== "TIME_UP";
 
   const requestData = {
-    user_id: props.userId,
     region_id: regionId,
     is_correct: isCorrect,
-    game_type: props.gameType
+    game_type: props.gameType,
   };
 
   try {
     await fetch("http://localhost:3000/api/answers", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(requestData),
     });
     console.log("回答記録完了！");

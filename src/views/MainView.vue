@@ -39,8 +39,7 @@
       <GameLetter v-if="gameType === 'letter' && isGameStarted" 
         v-model:challengeMode="challengeMode"
         :selectedCountry="selectedCountry" 
-        :gameType="gameType" 
-        :userId="userId" 
+        :gameType="gameType"
       />
     </div>
     <div class = "learn-container">
