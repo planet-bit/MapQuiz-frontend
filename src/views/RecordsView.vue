@@ -66,7 +66,6 @@ import RegionAccuracyMap from '@/components/RegionAccuracyMap.vue';
 // ルーティング関連
 const router = useRouter();
 const route = useRoute();
-const userId = ref(route.params.userId); // URLパラメータからuser_id取得
 
 // ステート（リアクティブ変数）
 const records = ref([]); // 全チャレンジ記録
@@ -97,35 +96,67 @@ const groupedRecords = computed(() => {
   return groups;
 });
 
+function getTokenFromCookie() {
+  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+  return match ? match[1] : null;
+}
+
+
+
 // 初回マウント時にデータを取得
 onMounted(async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/api/streaks/get?user_id=${userId.value}`);
+    const token = getTokenFromCookie(); // 🍪 クッキーから取得
+
+    if (!token) {
+      errorMessage.value = "ログインが必要です。";
+      return;
+    }
+
+    const response = await axios.get("http://localhost:3000/api/streaks/get", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     records.value = response.data;
   } catch (error) {
+    console.error(error);
     errorMessage.value = "記録の取得中にエラーが発生しました。";
   }
 });
 
-// カードがクリックされた時に地図とデータを取得
-const onCardClick = async (record) => {
-  clickedCountryCode.value = record.country_code;
-  clickedGameType.value = record.game_type || 'letter'; // ゲームタイプ（デフォルトは 'letter'）
 
-  try {
-    const res = await axios.get(
-      `http://localhost:3000/api/accuracy?user_id=${userId.value}&country=${clickedCountryCode.value}&game_type=${clickedGameType.value}`
-    );
-    if (res.data && Array.isArray(res.data.regions)) {
-      regionAccuracyData.value = res.data.regions;
-      showMap.value = true;
-    } else {
-      errorMessage.value = "正答率データの形式が不正です。";
-    }
-  } catch (error) {
-    errorMessage.value = "正答率データの取得に失敗しました。";
-  }
-};
+  // カードがクリックされた時に地図とデータを取得
+  const onCardClick = async (record) => {
+    clickedCountryCode.value = record.country_code;
+    clickedGameType.value = record.game_type;
+
+    try {
+      const token = getTokenFromCookie(); // 🍪 クッキーから取得
+  
+      if (!token) {
+        errorMessage.value = "ログインが必要です。";
+        return;
+      }
+      const res = await axios.get(
+        `http://localhost:3000/api/accuracy?country=${clickedCountryCode.value}&game_type=${clickedGameType.value}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+     );
+
+      if (res.data && Array.isArray(res.data.regions)) {
+        regionAccuracyData.value = res.data.regions;
+        showMap.value = true;
+      } else {
+        errorMessage.value = "正答率データの形式が不正です。";
+      }
+    } catch (error) {
+      errorMessage.value = "正答率データの取得に失敗しました。";
+   }
+  };
 
 // 地図を閉じる処理
 const closeMap = () => {

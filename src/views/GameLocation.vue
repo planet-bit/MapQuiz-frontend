@@ -199,11 +199,27 @@ const sendStreakData = async () => {
     console.error("更新エラー:", error);
   }
 };
+
+// トークンをクッキーから取得
+function getTokenFromCookie() {
+  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+  return match ? match[1] : null;
+}
+
 const updateStreak = async (data) => {
   try {
+    const token = getTokenFromCookie(); // 🍪 トークン取得
+
+    if (!token) {
+      throw new Error("トークンがありません。ログインが必要です。");
+    }
+
     const response = await fetch("http://localhost:3000/api/streaks/update", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 🔐 JWTをヘッダーに追加
+      },
       body: JSON.stringify(data),
     });
 
@@ -218,6 +234,7 @@ const updateStreak = async (data) => {
     throw error;
   }
 };
+
 
 const sendAnswerResult = async () => {
   // props.userId などから正しく取得

@@ -4,7 +4,7 @@ import RecordsView from '@/views/RecordsView.vue';
 
 const routes = [
   { path: '/', component: MainView },
-  { path: '/records/:userId', component: RecordsView }
+  { path: '/records', component: RecordsView }
 ];
 
 const router = createRouter({

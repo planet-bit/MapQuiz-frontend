@@ -3,7 +3,7 @@
         <a href="#" @click.prevent="isUserDropdownOpen = !isUserDropdownOpen" class="user-dropdown-link"> User ▼
         </a>
       <div v-if="isUserDropdownOpen" class="user-dropdown-menu">
-        <router-link :to="'/records/' + userId">Records</router-link>
+        <router-link :to="'/records' ">Records</router-link>
         <a href="#" @click.prevent="$emit('signout')">Sign out</a>
       </div>
     </div>
@@ -11,10 +11,6 @@
 
 <script setup>
   import { ref } from "vue";
-
-  const props = defineProps({
-    userId: Number,
-  });
   
   const emit = defineEmits(["signout"]); 
 

@@ -7,9 +7,9 @@
     <!-- ログインフォーム -->
     <form @submit.prevent="login" v-if="!isRegistering" novalidate>
       <div>Log in to your account</div>
-      <CloseButtons class="user-deopdown-close-button" @click-action="closeDropdown" />
-      <input type="email" v-model="email" placeholder="Email(テスト用:test@test.com)" required autocomplete="username">
-      <input type="password" v-model="password" placeholder="Password(6文字以上、テスト用:test123)" required autocomplete="current-password">
+      <CloseButtons class="user-dropdown-close-button" @click-action="closeDropdown" />
+      <input type="email" v-model="email" placeholder="Email(テスト用:test@test.com)" autocomplete="off">
+      <input type="password" v-model="password" placeholder="Password(6文字以上、テスト用:test123)" autocomplete="off">
       <div class="error-message" v-if="formError">{{ formError }}</div>
       <button>Login</button>
       <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">create your account</a></span>
@@ -18,9 +18,10 @@
     <!-- アカウント登録フォーム -->
     <form @submit.prevent="register" v-else>
       <div>Create your account</div>
-      <CloseButtons class="user-deopdown-close-button" @click-action="closeDropdown" />
-      <input type="email" v-model="email" placeholder="Email(テスト用:test@test.com)" required autocomplete="username">
-      <input type="password" v-model="password" placeholder="Password(6文字以上、テスト用:test123)" required autocomplete="current-password">
+      <CloseButtons class="user-dropdown-close-button" @click-action="closeDropdown" />
+      <input type="email" v-model="email" placeholder="Email" autocomplete="off">
+      <input type="password" v-model="password" placeholder="Password" autocomplete="off">
+      <input type="text" v-model="user_name" placeholder="Name" autocomplete="off">
       <div class="error-message" v-if="formError">{{ formError }}</div>
       <button>Sign up</button>
       <span>or <a href="#" @click.prevent="showRegisterForm" class="register-link">log in your account</a></span>
@@ -36,6 +37,7 @@ const isDropdownOpen = ref(false);
 const isRegistering = ref(false);
 const email = ref('');
 const password = ref('');
+const user_name = ref('');
 const token = ref(null);
 const formError = ref('');
 
@@ -49,6 +51,9 @@ onMounted(() => {
   const cookieToken = getTokenFromCookie();
   if (cookieToken) {
     token.value = cookieToken;
+    console.log("🍪 クッキーから取得したトークン:", cookieToken);
+  } else {
+    console.log("⚠️ クッキーにトークンが存在しません");
   }
 });
 
@@ -72,6 +77,7 @@ const showRegisterForm = () => {
 const clearForm = () => {
   email.value = '';
   password.value = '';
+  user_name.value = '';
   formError.value = '';
 };
 
@@ -88,7 +94,7 @@ const login = async () => {
   }
 
   if (!isValidPassword(password.value)) {
-    formError.value = "パスワードは半角英数字6文字以上で入力してください。";
+    formError.value = "パスワードは半角英数字6文字以上で入力してください!!";
     return;
   }
 
@@ -119,13 +125,23 @@ const login = async () => {
 const register = async () => {
   formError.value = '';
 
-  if (!email.value || !password.value) {
-    formError.value = "メールアドレスとパスワードを入力してください！";
+  if (!email.value) {
+    formError.value = "メールアドレスを入力してください。";
     return;
   }
 
+  if (!password.value) {
+    formError.value = "パスワードを入力してください！!!";
+    return;
+  }
+  
   if (!isValidPassword(password.value)) {
-    formError.value = "パスワードは半角英数字6文字以上で入力してください。";
+      formError.value = "パスワードは半角英数字6文字以上で入力してください。";
+      return;
+    }
+
+  if (!user_name.value) {
+    formError.value = "ユーザーネームを入力してください！!!";
     return;
   }
 
@@ -133,7 +149,7 @@ const register = async () => {
     const res = await fetch("http://localhost:3000/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email.value, password: password.value }),
+      body: JSON.stringify({ email: email.value, password: password.value, user_name:user_name.value  }),
       credentials: "include",
     });
 
@@ -205,7 +221,7 @@ const register = async () => {
   font-size: 4rem; /* サイズ変更したい場合 */
 }
 
-.user-deopdown-close-button{
+.user-dropdown-close-button{
   position: absolute;
   top: 5%;
   right:0%

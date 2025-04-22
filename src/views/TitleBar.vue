@@ -15,16 +15,20 @@
       </div>
       <slot></slot> 
     </div>
-
-    <div v-if = "!token" class="login-container">
-      <LoginDropdown />
-    </div>
-    <div v-else class="user-container">
-      <UserDropdown 
-      :userId="userId"
-      @signout="signout" />
-    </div>
+    <nav>
+      <div v-if = "!token" class="login-container">
+        <LoginDropdown />
+      </div>
+      <div v-else class="user-container">
+        <UserDropdown @signout="signout" />
+      </div>
     
+      <div class="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
   </div>
 </template>
 
@@ -176,4 +180,26 @@ const reloadPage = () => {
 .login-container {
   position: relative;
 }
+
+  .burger {
+    display: none;
+    cursor: pointer;
+  }
+
+  .burger div{
+  width: 4rem;
+  height: 0.5rem;
+  margin: 0.75rem;
+  background-color: #000000;
+ }
+
+  @media screen and (max-width: 768px){
+    .nav-link{
+      position: absolute;
+      right: 0;
+      height: 92vh;
+      top: 8vh;
+      background-color: aqua;
+    }
+  }
 </style>
