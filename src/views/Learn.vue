@@ -55,8 +55,8 @@
   
 <style scoped>
   .language-title {
-    padding: 10rem;
-    font-size: 6rem;
+    padding: 2rem;
+    font-size: 2rem;
     display: flex;
     font-weight: bold;
   }
@@ -66,10 +66,10 @@
   grid-auto-flow: column; /* 縦方向（列優先）に配置 */
   grid-template-rows: repeat(11, auto); /* 行数を決める（適宜調整） */
   list-style-type: none;
-  margin:5rem;
+  margin:2rem;
  }
   .language-list ul li {
-    font-size: 5rem; /* 文字サイズを調整 */
+    font-size: 2rem; /* 文字サイズを調整 */
     font-weight: bold;
     line-height: 1.5;
     padding: 1rem;
@@ -77,7 +77,7 @@
     background-color: rgb(255, 255, 255);
   }
   .learn-close-button {
-    margin-left: 150px;
+    margin-left: 50px;
   }
 </style>
   

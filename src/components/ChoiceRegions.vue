@@ -26,14 +26,14 @@
   // 国ごとの初期設定
   const countryData = {
     ru: {
-      center: [60, 60],
-      zoom: 5.5,
+      center: [65, 100],
+      zoom: 2.9,
       geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
       regionProperty: 'name_latin'
     },
     kr: {
       center: [36, 127.5],
-      zoom: 9,
+      zoom: 7,
       geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
       regionProperty: 'name'
     },
@@ -62,7 +62,6 @@
       attribution: '&copy; OpenStreetMap contributors &copy; CartoDB',
       subdomains: 'abcd',
       maxZoom: 10,
-      minZoom: 5
     }).addTo(map);
   };
 
@@ -180,7 +179,9 @@
 
 <style scoped>
   .map-container {
-    width: 90%;
-    height: 2500px;
+    width: 90vw;
+    max-width: 1000px;
+    height: 60vh;
+    max-height:600px
   }
 </style>

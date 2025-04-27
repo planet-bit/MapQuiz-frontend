@@ -16,14 +16,13 @@
 
 <style scoped>
   button {
-    padding: 1.5rem 3rem;
+    padding: 5px 10px;
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 3rem;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 5rem;
-    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
+    font-size: 1rem;
     transition: background-color 0.3s;
   }
 

@@ -1,4 +1,9 @@
 <template>
+
+<div class ="title-bar-container">
+        <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
+      <TitleBar  @user-logged-in="handleUserLogin"/>
+    </div> 
   <!-- タイトルと戻るボタン -->
   <h1 class="page-title">
     Challenge Mode Records
@@ -59,6 +64,7 @@ import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 
 // 子コンポーネント
+import TitleBar from "@/views/TitleBar.vue";
 import CountryRecordCard from '@/components/CountryRecordCard.vue';
 import CloseButtons from '@/components/CloseButtons.vue';
 import RegionAccuracyMap from '@/components/RegionAccuracyMap.vue';
@@ -168,8 +174,16 @@ const closeMap = () => {
 
 
 <style scoped>
+  .title-bar-container {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    height: 50px;
+    width: 100%; 
+  }
+
 .page-title {
-  font-size: 7rem;
+  font-size: 1.5rem;
   font-weight: bold;
   text-align: left;
   margin: 0;
@@ -185,19 +199,27 @@ const closeMap = () => {
 .records-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
   width: 80vh;
   position: absolute;
-  top: 300px;
-  left: 300px;
+  top: 150px;
+  left: 5vw;
 }
 
+.map-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+  width: 40vh;
+  position: absolute;
+  top: 150px;
+  left: 40vw;
+}
 .country-card {
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .country-name {
-  font-size: 6rem;
+  font-size: 1rem;
   font-weight: bold;
   margin-bottom: 20px;
 }
@@ -205,36 +227,31 @@ const closeMap = () => {
 .card {
   display: flex; 
   flex-wrap: wrap; 
-  gap: 100px;
+  gap: 15px;
   justify-content: flex-start; 
 }
 
 .record-card {
-  width: 40rem;
+  width: 10rem;
   background: #daf8da;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 30px;
-  font-size: 4rem;
+  padding: 15px;
+  font-size: 1rem;
 }
 
 .record-card p {
-  margin: 30px 0;
+  margin: 10px 0;
 }
 
 button {
-  margin-left: 400px;
+  margin-left: 40px;
 }
 
-.map-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; 
-  margin-top: -500px;
-}
+
 
 .map-title {
-  font-size: 5rem;
+  font-size: 1rem;
   font-weight: bold;
   text-align: center;
 }

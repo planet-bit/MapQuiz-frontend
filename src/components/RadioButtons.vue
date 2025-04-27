@@ -25,7 +25,7 @@
   
   <style scoped>
   button {
-    font-size: 4.5rem;
+    font-size: 1rem;
     font-weight: bold;
     background-color: #ffffff00;
     color: #000000;
@@ -33,12 +33,12 @@
     border-radius: 1rem;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
-    margin: 5rem;
+    margin: 1rem;
   }
   
   button:hover {
     transform: scale(1.1);
-    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
   }
   
   @keyframes fadeIn {
@@ -49,7 +49,7 @@
   button.active {
     background-color:  #3fd341;
     color: rgb(0, 0, 0);
-    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
   }
   
   button.active:hover {

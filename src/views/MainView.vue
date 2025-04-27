@@ -2,18 +2,26 @@
   
     <div class ="title-bar-container">
         <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
-      <TitleBar 
-        :isLoggedIn="isLoggedIn" 
-        @user-logged-in="handleUserLogin"
-        @country-selected="handleCountrySelected" 
-        @toggle-login="toggleLogin"
-        @logout="logout"
-      >
-        <div v-if="selectedCountry.code"  class="buttons-container">
-          <RadioButtons v-model="gameType" label="Location" value="location" />
-          <RadioButtons v-model="gameType" label="Letter" value="letter" />
+      <TitleBar  @user-logged-in="handleUserLogin"/>
+    </div> 
 
-          <div class="separator"></div>
+    <div class = "main-container">
+
+      <div  class="buttons-container">
+
+        <div class="dropdown">
+          <select v-model="selectedCountry" @change="selectCountry">
+            <option value="" disabled hidden>Country</option>
+            <option v-for="country in countries" 
+              :key="country.code" 
+              :value="country">
+              {{ country.name }}
+            </option>
+          </select>
+        </div>
+ 
+          <RadioButtons v-model="gameType" label="Location" value="location" />
+          <RadioButtons v-model="gameType" label="Letter" value="letter" />       
 
           <ToggleButtons text="Map" 
             :isActive="isViewingStudyMap" 
@@ -24,12 +32,8 @@
             @click-action="toggleButton('Learn')" 
           />
           
-          <div class="separator"></div>
         </div>
-  
-      </TitleBar>
-    </div> 
-    <div class = "game-container">
+    
       <GameLocation v-if="gameType === 'location' && isGameStarted" 
         v-model:challengeMode="challengeMode"
         :selectedCountry="selectedCountry" 
@@ -41,8 +45,6 @@
         :selectedCountry="selectedCountry" 
         :gameType="gameType"
       />
-    </div>
-    <div class = "learn-container">
       <Learn 
         :challengeMode="challengeMode"
         :selectedCountry="selectedCountry"
@@ -55,11 +57,11 @@
         :isViewingStudyMap="isViewingStudyMap"
         @close-map="handleCloseMap">
       </StudyMap> 
-    </div>
+   </div>
   </template>
   
   <script setup>
-  import { ref, computed } from "vue";
+  import { ref, computed, onMounted } from "vue";
   import TitleBar from "@/views/TitleBar.vue";
   import GameLetter from "@/views/GameLetter.vue";
   import GameLocation from "@/views/GameLocation.vue";
@@ -67,22 +69,51 @@
   import StudyMap from "@/components/StudyMap.vue";
   import ToggleButtons from "@/components/ToggleButtons.vue";
   import RadioButtons from "@/components/RadioButtons.vue";
-  
+  import axios from "axios";
   const selectedCountry = ref({ code: "", name: "" });
   const gameType = ref(null); //選択中のゲームタイプ
   const challengeMode = ref(false)
   const isGameStarted = computed(() => !!gameType.value); // gameType が選択されたら true になる
   const isLearning = ref(false); // Learnボタンの状態を管理
   const isViewingStudyMap = ref(false); // Mapボタンの状態を管理
-  const isLoggedIn = ref(false); //ログイン状態を管理
   const userId = ref(null);
   const handleUserLogin = (id) => {
     userId.value = id; // ユーザーIDを保存
   };
   
-  const handleCountrySelected = (country) => {
-      selectedCountry.value = country;
-  };
+  const countries = ref([]);
+ 
+  // fetchCountries関数を非同期で定義し、APIから国名データを取得する処理を行う
+  const fetchCountries = async () => {
+  try {
+    const response = await axios.get("http://localhost:3000/api/countries");
+    countries.value = response.data.map(item => ({
+      code: item.country_code, 
+      name: item.country_name  
+    }));
+  } catch (error) {
+    const errorMessage = error.response ? 
+      `Error: ${error.response.status} - ${error.response.data}` : 
+      `Error message: ${error.message}`;
+    console.error(errorMessage);
+  }
+};
+
+// コンポーネントがマウントされた時にデータを取得
+onMounted(() => {
+  fetchCountries();
+});
+
+
+const selectCountry = () => {
+  const selected = countries.value.find(c => c.name === selectedCountry.value);
+  if (selected) {
+    emit("country-selected", {
+      code: selected.code,  
+      name: selected.name   
+    });
+  }
+};
 
   const toggleButton = (button) => {
   if (challengeMode.value) {
@@ -114,14 +145,6 @@
     isViewingStudyMap.value = false;
   };
   
-  const toggleLogin = () => {
-    isLoggedIn.value = !isLoggedIn.value;
-  };
-  
-  const logout = () => {
-    isLoggedIn.value = false;
-  };
-  
   </script>
   
   <style scoped>
@@ -129,7 +152,7 @@
     position: absolute;
     top: 0;
     left: 0px;
-    height: 240px;
+    height: 50px;
     width: 100%; 
   }
   .buttons-container{
@@ -138,28 +161,14 @@
     align-items: center;    /* 垂直方向の中央揃え */
     overflow-x: auto;
   }
-  .separator {
-    display: inline-block;
-    width: 12px;
-    height: 110px;
-    background-color: #00000085;
-    vertical-align: middle;
-    margin: 0 160px;
-    border-radius: 6px;
-  }
-  .game-container {
+  
+  .main-container {
     position: absolute;
-    top: 240px;
+    top: 50px;
     left: 0;
-    height:calc(100% - 240px);
-    width: 50%;
+    height:calc(100% - 50px);
+    width: 100%;
     background-color: rgb(255, 255, 255);
   }
-  .learn-container {
-    position:absolute;
-    top: 240px;
-    height:calc(100% - 240px);
-    width: 50%;
-    background-color: rgb(255, 255, 255);
-  }
+
   </style>

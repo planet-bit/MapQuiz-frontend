@@ -45,10 +45,9 @@
 
 <style scoped>
 .correct-message, .streak-count {
-  font-size: 10rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #25b6af;
-  text-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
 /* ボタンを縦に並べる */
@@ -56,7 +55,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 5rem; /* ボタン同士の間隔 */
-  margin: 3rem;
+  gap: 20px; /* ボタン同士の間隔 */
+  margin: 20px; 
 }
 </style>

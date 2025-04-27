@@ -20,32 +20,30 @@
 <style scoped>
  .user-dropdown-link {
   color: rgb(0, 0, 0); 
-  font-size: 6rem; 
+  font-size: 1.5rem; 
   font-weight: bold;
   text-decoration: none; 
 }
 
   .user-dropdown-menu {
   position: absolute;
-  font-size: 4rem;
-  top: 100%;
-  right: 50px;
-  width: 30rem;
-  height: 1000px;;
+  font-size: 1rem;
+  top: 50%;
+  right: 20px;
+  width: 10rem;
+  height: 10rem;
   background: rgb(245, 245, 245);
-  border: 2px solid #bebdbd;
-  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.2);
-  padding: 0px;
+  border: 1px solid #bebdbd;
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  top: 195px;
-  border-radius: 15px;
+  top: 50px;
+  border-radius: 5px;
   }
 
   .user-dropdown-menu a {
   color: black; /* メニュー内リンクの文字色を黒に */
-  padding-left: 30px;
+  padding-left: 20px;
   }
 
   .user-dropdown-menu a:hover {

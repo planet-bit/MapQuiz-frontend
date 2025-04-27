@@ -174,61 +174,60 @@ const register = async () => {
 <style scoped>
   .login-dropdown-link {
     color: rgb(0, 0, 0); 
-    font-size: 6rem; 
+    font-size: 1.5rem; 
     font-weight: bold;
     text-decoration: none; 
   }
 
 .dropdown-menu {
   position: absolute;
-  font-size: 4rem;
+  font-size: 1rem;
   top: 100%;
   right: 0;
-  width: 2000px;
-  height: 1000px;;
+  width: 500px;
+  height: 300px;;
   background: rgb(245, 245, 245);
   border: 2px solid #bebdbd;
-  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.2);
-  padding: 70px;
+  box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  top: 195px;
-  border-radius: 15px;
+  top: 50px;
+  border-radius: 5px;
 }
 
 .dropdown-menu input {
   width: 80%; 
-  padding: 20px;
-  font-size: 4rem;  
-  margin: 20px; 
+  padding: 10px;
+  font-size: 1rem;  
+  margin: 5px; 
   border: none;
-  border-bottom: 2px solid #000000;
+  border-bottom: 1px solid #000000;
   outline: none;
 }
 
 
 .dropdown-menu button {
-  width: 20rem;
-  padding: 20px;
-  font-size: 4rem; 
+  padding: 5px;
+  font-size: 1rem;
   margin: 20px;
 }
 
 .register-link {
   color: rgb(0, 0, 0);
   text-decoration: underline;
-  font-size: 4rem; /* サイズ変更したい場合 */
+  font-size: 1rem; 
 }
 
 .user-dropdown-close-button{
   position: absolute;
-  top: 5%;
-  right:0%
+  top: 10px;
+  right: 10px;
 }
 .error-message {
   color: red;
-  font-size: 3rem;
+  font-size: 1rem;
   margin-top: 4px;
   margin-bottom: 8px;
 }

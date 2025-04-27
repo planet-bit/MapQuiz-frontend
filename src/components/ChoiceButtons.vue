@@ -30,14 +30,14 @@
 <style scoped>
   .choice-button {
     display: block;
-    margin-left: 20%;
-    padding: 0.5rem;
+    margin-left: 50px;
+    padding: 5px 10px;
     background-color: lightblue;
     border: none;
     cursor: pointer;
-    font-size: 6rem;
-    border-radius: 2rem;
-    margin-bottom: 3rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    margin-bottom: 15px;
     text-align: left;
   }
   .choice-button:hover {

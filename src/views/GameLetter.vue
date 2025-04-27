@@ -1,5 +1,5 @@
 <template>
-  <div class="main-container">
+  <div class="game-container">
     <!-- 問題をランダムで出題する機能 -->
     <QuestionManager ref="questionManager"
       :selectedCountry="selectedCountry" 
@@ -25,7 +25,7 @@
 
     <!-- ゲーム中 -->
     <div v-else>
-      <div class="question-grid">
+      <p class="current-question">{{ currentQuestion.word }}</p>
         <!-- タイマー機能の表示 -->
         <Timer
           :challengeMode="props.challengeMode" 
@@ -33,7 +33,7 @@
           :triggerStopTimer="triggerStopTimer"
           @time-up="TimeUp"
         />
-        <p class="current-question">{{ currentQuestion.word }}</p>
+        
 
         <!-- 選択肢ボタン表示 -->
         <ChoiceButtons 
@@ -47,8 +47,9 @@
     </div>
 
     <!-- 解答後のフィードバック表示 -->
-    <div class="feedback-grid">
+   
       <AnswerFeedback 
+        class="answer-feedback"
         v-if="selectedChoice"
         :selectedChoice="selectedChoice"
         :correctAnswer="currentQuestion.answer"
@@ -59,8 +60,8 @@
         @select-mode="GameReset"
         @streak-finalized="sendStreakData"
       />
-    </div>
-  </div>
+  
+ 
 </template>
 
 <script setup>
@@ -249,32 +250,25 @@ const sendAnswerResult = async () => {
 
 
 <style scoped>
-  .main-container {
-    display: grid;
-    grid-template-columns: 60% 40%;
-    align-items: center; 
-    justify-content: center; 
-    width: 100%;
-    margin: auto;
-  }
+ .game-container {
   
-  .question-grid {
-    margin-left: 10%;
-  }
-  .question-grid, .feedback-grid {
-    padding: 1.5rem;
-    background-color: #ffffff;
-    text-align: left;
-    margin-top: 10%;
+
+  
+  flex-direction: column; /* 縦並びに */
+  align-items: flex-start; /* 左寄せ */
+  justify-content: flex-start; /* 上寄せ */
+  width: 100vw;
+  margin-left: 30px;
+ 
   }
   .current-question {
-    font-size: 9rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    margin-top: 6rem;
-    margin-bottom: 6rem;
+    margin-top: 50px;
+    margin-bottom: 50px;
   }
   .mode-message{
-    margin: 8.3%;
-    font-size: 6rem;
+    margin: 50px;
+    font-size: 1.5rem;
   }
 </style>

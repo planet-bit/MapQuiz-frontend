@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isViewingStudyMap&&!challengeMode">
+  <div class="map-overlay" v-if="isViewingStudyMap&&!challengeMode">
     <h1 class="map-title">
       Map of {{ selectedCountry.name }}
       <CloseButtons class="map-close-button" @click="$emit('close-map')" />
@@ -238,23 +238,36 @@ watch(() => props.isViewingStudyMap, (newVal) => {
 
 
 <style>
+
+.map-overlay {
+  position: absolute; /* 画面全体に重ねる */
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(26, 26, 26, 0.699); /* 灰色で半透明 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; /* 他より前面に出す */
+}
   .map-title {
-    padding: 10rem;
-    font-size: 6rem;
+    padding: 1rem;
+    width: 95%;
+    font-size: 1.5rem;
     font-weight: bold;
     display: flex;
+    background-color: rgb(255, 255, 255);
   }
   .change-language-button {
     z-index: 1000;
     position: fixed; /* 画面上で固定 */
-    font-size: 5rem; 
-    padding: 30px; 
+    font-size: 1rem; 
+    padding: 0.5rem; 
     background-color: #859786; 
     color: white; 
     border: none; 
-    border-radius: 50px; 
+    border-radius: 15px; 
     cursor: pointer; 
-    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2); 
     transition: background-color 0.3s, transform 0.2s; 
   }
 
@@ -266,7 +279,7 @@ watch(() => props.isViewingStudyMap, (newVal) => {
     transform: translateY(0); /* クリック時に元に戻る */
   }
   .leaflet-container {
-    font-size: 2rem ;
+    font-size: 0.5rem ;
   }
 
   .map-container {
@@ -276,14 +289,14 @@ watch(() => props.isViewingStudyMap, (newVal) => {
   }
 
   .map-close-button {
-    margin-left: 150px;
+    margin-left: 50px;
   }
   .label {
-    font-size: 3.5rem
+    font-size: 1rem
   }
   
   .map-message {
-    font-size: 5rem
+    font-size: 1rem
   }
 </style>
   

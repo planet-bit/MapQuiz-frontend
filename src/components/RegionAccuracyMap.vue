@@ -188,8 +188,8 @@ onMounted(() => {
 }
 
 #map-record {
-  width: 4000px;
-  height: 2000px; /* ビューポートの80%にする */
+  width: 700px;
+  height: 700px; /* ビューポートの80%にする */
 }
 
 </style>

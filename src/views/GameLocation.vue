@@ -1,5 +1,5 @@
 <template>
-  <div class="main-container">
+  <div class="game-container">
     <!-- 問題をランダムで出題するコンポーネント -->
     <QuestionManager ref="questionManager"
       :selectedCountry="selectedCountry"
@@ -27,7 +27,7 @@
     <div v-else>
       <p class="current-question" v-if="currentQuestion">{{ currentQuestion.word }}</p>
 
-      <div class="game-container">
+     
         <!-- タイマー表示 -->
         <Timer
           :challengeMode="props.challengeMode"
@@ -64,7 +64,7 @@
         </div>
       </div>
     </div>
-  </div>
+  
 </template>
 
 <script setup>
@@ -271,34 +271,30 @@ const sendAnswerResult = async () => {
 
 <style scoped>
 /* ===== コンテナ全体 ===== */
-.main-container {
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin: 5%;
-}
-
 .game-container {
-  position: relative;
+  flex-direction: column; /* 縦並びに */
+  align-items: flex-start; /* 左寄せ */
+  justify-content: flex-start; /* 上寄せ */
+  width: 100vw;
+  margin-left: 30px;
 }
 
 /* ===== ゲーム中スタイル ===== */
 .current-question {
-  font-size: 9rem;
-  font-weight: bold;
-  margin-top: 6rem;
-  margin-bottom: 6rem;
-}
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
 
 .answer-feedback {
   position: absolute;
-  top: 10%;
-  left: 5%;
+  top: 20%;
+  left: 2%;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.6);
   border-radius: 40px;
   padding: 40px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .choice-regions {
