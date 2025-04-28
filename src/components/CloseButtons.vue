@@ -1,5 +1,5 @@
 <template>
-    <button @click="emit('click-action')">×</button>
+    <button type="button" @click="emit('click-action')">×</button>
 </template>
   
 <script setup>

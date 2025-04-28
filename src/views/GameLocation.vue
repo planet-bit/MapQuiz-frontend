@@ -7,24 +7,6 @@
       @question-updated="updateQuestion"
     />
 
-    <!-- ゲーム開始前 -->
-    <div v-if="!gameStarted">
-      <!-- バングラデシュのみ特殊表示 -->
-      <div v-if="selectedCountry.code === 'bd'" class="mode-message">
-        Preparing...
-      </div>
-
-      <!-- bd以外のとき -->
-      <ModeSelection
-        v-if="!gameStarted && selectedCountry.code !== 'bd'"
-        :challengeMode="challengeMode"
-        @update:challengeMode="val => challengeMode = val"
-        @start-game="startGame"
-      />
-    </div>
-
-    <!-- ゲーム中 -->
-    <div v-else>
       <p class="current-question" v-if="currentQuestion">{{ currentQuestion.word }}</p>
 
      
@@ -38,6 +20,7 @@
 
         <!-- 地図の選択肢 -->
         <ChoiceRegions
+          v-if="currentQuestion"
           class="choice-regions"
           :selectedChoice="selectedChoice"
           :correctAnswer="currentQuestion.answer"
@@ -49,7 +32,7 @@
         />
 
         <!-- 回答フィードバック表示 -->
-        <div >
+        <div v-if="currentQuestion">
           <AnswerFeedback
             class="answer-feedback"
             :selectedChoice="selectedChoice"
@@ -63,25 +46,23 @@
           />
         </div>
       </div>
-    </div>
-  
+   
 </template>
 
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch, onMounted, nextTick } from "vue";
 import ChoiceRegions from "@/components/ChoiceRegions.vue";
 import AnswerFeedback from "@/components/AnswerFeedback.vue";
 import Timer from "@/components/Timer.vue";
 import QuestionManager from "@/components/QuestionManager.vue";
-import ModeSelection from "@/components/ModeSelection.vue";
-
+import EventBus from "@/event-bus";
 /* ------------------------- PropsとEmit定義 ------------------------- */
 const props = defineProps({
   challengeMode: Boolean,
   selectedCountry: Object,
   gameType: String,
 });
-const emit = defineEmits(["update:challengeMode"]);
+const emit = defineEmits(["game-reset"]);
 
 /* ------------------------- リアクティブな状態 ------------------------- */
 const currentQuestion = ref(null);         // 現在の問題
@@ -94,10 +75,6 @@ const timerActive = ref(false);         // タイマーを動作させるか
 const triggerStopTimer = ref(false);    // タイマー停止トリガー
 const mapKey = ref(0);                  // 地図のkey（強制再描画用）
 const questionManager = ref(null);      // QuestionManagerコンポーネントへの参照
-const challengeMode = computed({
-    get: () => props.challengeMode,
-    set: (val) => emit('update:challengeMode', val)
-  });
 
 /* ------------------------- Watchers ------------------------- */
 
@@ -135,6 +112,7 @@ const GameReset = () => {
   selectedChoice.value = null;
   isAnswered.value = false;
   gameStarted.value = false;
+  emit("game-reset");
 };
 
 // 回答チェック
@@ -166,15 +144,50 @@ const nextQuestion = () => {
 };
 
 // ゲームを開始する
-const startGame = () => {
+const startGame = async () => {
   currentQuestionIndex.value = 1;
   selectedChoice.value = null;
   isAnswered.value = false;
   gameStarted.value = true;
+
+  await nextTick(); // DOMの更新を待つ
+
   if (props.challengeMode) StartTimer();
-  if (questionManager.value) questionManager.value.setQuestion();
+
+  // QuestionManagerがセットされているか確認
+  if (questionManager.value) {
+    console.log("questionManagerがセットされました");
+
+    // fetchQuestionsメソッドが存在しない場合
+    if (typeof questionManager.value.fetchQuestions === 'function') {
+      await questionManager.value.fetchQuestions(); // 問題データを取得
+    }
+
+    // 問題がロードされた後にsetQuestionを呼ぶ
+    if (questionManager.value.questions.length > 0) {
+      questionManager.value.setQuestion();
+    } else {
+    }
+  }
+
   mapKey.value++;
 };
+
+
+// 問題データが更新されるタイミングでのチェック
+watch(() => questionManager.value?.questions, (newQuestions) => {
+  if (newQuestions.length > 0 && gameStarted.value) {
+    questionManager.value.setQuestion();
+  }
+});
+
+
+
+onMounted(() => {
+  EventBus.on('start-game', () => {
+   startGame()
+  });
+});
 
 /* ------------------------- API 連携（スコア送信） ------------------------- */
 

@@ -69,7 +69,8 @@
   
   // コンポーネント外で呼び出せるように
   defineExpose({
-    setQuestion,
-  });
+  setQuestion,
+  questions,
+});
 
 </script>
