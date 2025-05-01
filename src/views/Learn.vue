@@ -1,9 +1,9 @@
 <template>
-  <div v-if="isLearning&&!challengeMode">
+  <div>
     <div class="language-list">
       <div class="language-title" >
         List of languages in {{ selectedCountry.name }}
-        <CloseButtons class="learn-close-button" @click="$emit('close-learning')" />
+        <CloseButtons class="learn-close-button" @click="$emit('game-reset')" />
       </div>
       <ul>
         <li v-for="(pronunciation, index) in languageList" :key="index">
@@ -20,13 +20,11 @@
   
   // 親コンポーネントから受け取る国
   const props = defineProps({
-    challengeMode: Boolean,
-    selectedCountry: Object,
-    isLearning: Boolean
+    selectedCountry: Object
   });
   
   // 親コンポーネントにイベントを送るための関数
-  const emit = defineEmits(['close-learning']);
+  const emit = defineEmits(['game-reset']);
   
   const languageList = ref([]);
 
@@ -69,7 +67,7 @@
   margin:2rem;
  }
   .language-list ul li {
-    font-size: 2rem; /* 文字サイズを調整 */
+    font-size: 1rem; /* 文字サイズを調整 */
     font-weight: bold;
     line-height: 1.5;
     padding: 1rem;

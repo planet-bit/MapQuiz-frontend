@@ -1,17 +1,11 @@
 <template>
-  <div class="map-overlay" v-if="isViewingStudyMap&&!challengeMode">
+  <div class="map-overlay" v-if="gameType === 'isMapViewing'&& isGameStarted">
     <h1 class="map-title">
       Map of {{ selectedCountry.name }}
-      <CloseButtons class="map-close-button" @click="$emit('close-map')" />
+      <CloseButtons class="map-close-button" @click="$emit('game-reset')" />
     </h1> 
-
-    <!-- 準備中メッセージ -->
-    <div v-if="selectedCountry.code === 'bd'" class="map-message">
-      Preparing...
-    </div>
-
     <!-- 地図表示 -->
-    <div v-else id="map-study" class="map-container">
+    <div  id="map-study" class="map-container">
       <button class="change-language-button" @click="toggleLanguage">Change Language</button>
     </div>
   </div>
@@ -24,11 +18,11 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const props = defineProps({
-  challengeMode: Boolean,
   selectedCountry: Object,
-  isViewingStudyMap: Boolean
+  isGameStarted: Boolean,
+  gameType: String,
 });
-const emit = defineEmits(['close-map']);
+const emit = defineEmits(['game-reset']);
 
 const isEnglish = ref(false);
 
@@ -44,83 +38,88 @@ const toggleLanguage = () => {
 };
 
   // 国ごとの初期設定（regionPropertyを追加）
-  const countryData = {
-    ru: {
-      center: [60, 60],
-      zoom: 5.5,
-      geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
-      regionProperty: 'name_latin'
-    },
-    kr: {
-      center: [36, 127.5],
-      zoom: 9,
-      geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
-      regionProperty: 'name'
-    },
-    bd: {
-      center: [23.7, 90.4],
-      zoom: 8.5,
-      geoJsonUrl: '', // 後で追加
-      regionProperty: 'name'
-    }
-  };
-
-
-watch(() => props.selectedCountry.code, (newCountry) => {
- 
-  isEnglish.value = false;
-
-  if (newCountry === "ru") {
-    initializeMap();
-    center.value = [60, 80]; // ロシアの中心
-    zoom.value = 5.5;
-  } else if (newCountry === "kr") {
-    initializeMap();
-    center.value = [36, 127.5]; // 韓国の中心
-    zoom.value = 9;
-  } else if (newCountry === "bd") {
-    initializeMap();
-    center.value = [23.7, 90.4]; // バングラデシュの中心
-    zoom.value = 8.5;
+// 国ごとの初期設定（regionPropertyを追加）
+const countryData = {
+  ru: {
+    center: [60, 100],
+    zoom: 4,
+    geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
+    regionProperty: 'name_latin'
+  },
+  kr: {
+    center: [35.5, 127.5],
+    zoom: 7,
+    geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
+    regionProperty: 'name'
+  },
+  bd: {
+    center: [23.7, 90.4],
+    zoom: 8.5,
+    geoJsonUrl: '', // 後で追加
+    regionProperty: 'name'
   }
+};
 
-  if (map) {
-    // 地図の中心とズームを更新
-    map.setView(center.value, zoom.value);
-    updateMapLayers(newCountry);
-  }
-});
-
+// 地図の初期化
 const initializeMap = () => {
+  const selectedCountryCode = props.selectedCountry.code;
 
-  if (props.selectedCountry.code === 'bd') return; // バングラデシュなら何もしない
+  // バングラデシュの場合はgeoJsonUrlが後で追加されるまで地図を初期化しない
+  if (selectedCountryCode === 'bd') return;
 
   nextTick(() => {
     const mapElement = document.getElementById('map-study');
     if (!mapElement) return;
 
+    // 既存のマップがあれば削除
     if (map) {
       map.remove();
     }
 
+    // countryData から設定を取得
+    const countryConfig = countryData[selectedCountryCode];
+    if (!countryConfig) return;
+
+    // 地図を初期化
     map = L.map('map-study', {
-      center: center.value,
-      zoom: zoom.value,
+      center: countryConfig.center,
+      zoom: countryConfig.zoom,
       zoomDelta: 0.10,
       zoomSnap: 0,
       wheelPxPerZoomLevel: 200
     });
 
+    // タイルレイヤーの追加
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors &copy; CartoDB',
       subdomains: 'abcd',
-      maxZoom: 10,
-      minZoom: 5
+      maxZoom: 20,
+      minZoom: 1
     }).addTo(map);
 
-    updateMapLayers(props.selectedCountry.code);
+    // 地図レイヤーの更新
+    updateMapLayers(selectedCountryCode);
   });
 };
+
+// countryData に基づいて地図の設定を変更
+watch(() => props.selectedCountry.code, (newCountry) => {
+  isEnglish.value = false;
+
+  // 地図の初期化
+  initializeMap();
+
+  // 新しい国の設定に基づいて地図の中心とズームを更新
+  const countryConfig = countryData[newCountry];
+  if (countryConfig && map) {
+    center.value = countryConfig.center;
+    zoom.value = countryConfig.zoom;
+
+    // 地図の中心とズームを更新
+    map.setView(center.value, zoom.value);
+    updateMapLayers(newCountry);
+  }
+});
 
 const updateMapLayers = async (countryCode) => {
   try {
@@ -222,20 +221,16 @@ const updateMapLayers = async (countryCode) => {
   }
 };
 
-
-
 onMounted(() => {
   initializeMap();
 });
 
-watch(() => props.isViewingStudyMap, (newVal) => {
+watch(() => props.isGameStarted, (newVal) => {
   if (newVal) {
     initializeMap();
   }
 });
 </script>
-
-
 
 <style>
 
@@ -284,7 +279,7 @@ watch(() => props.isViewingStudyMap, (newVal) => {
 
   .map-container {
     width: 95%;
-    height: 70vh;
+    height: 80vh;
     z-index: 0;
   }
 

@@ -1,49 +1,53 @@
 <template>
-    <div class="game-mode-selector">
-      <!-- 国選択セクション -->
-      <div class="section">
-        <h2>学びたい国を選ぼう</h2>
-        <select v-model="selectedCountryLocal" @change="onCountryChange">
-          <option value="" disabled hidden>Country</option>
-          <option v-for="country in countries" :key="country.code" :value="country">
-            {{ country.name }}
-          </option>
-        </select>
-      </div>
-  
-      <!-- ゲームタイプ選択 -->
-      <div class="game-type">
-        <RadioButtons
-          :modelValue="gameType"
-          @update:modelValue="updateGameType"
-          label="Location"
-          value="location"
-        />
-        <RadioButtons
-          :modelValue="gameType"
-          @update:modelValue="updateGameType"
-          label="Letter"
-          value="letter"
-        />
-      </div>
-  
-      <!-- モード選択 (地図または学習) -->
-      <div class="mode-toggle">
-        <ToggleButtons 
-          text="Map" 
-          :isActive="isViewingStudyMap" 
-          :disabled="challengeMode" 
-          @click-action="handleToggle('Map')" 
-        />
-        <ToggleButtons 
-          text="Learn" 
-          :isActive="isLearning" 
-          :disabled="challengeMode" 
-          @click-action="handleToggle('Learn')" 
-        />
-      </div>
-  
-      <!-- チャレンジモードの選択 -->
+  <div class="game-mode-selector">
+    <!-- 国選択 -->
+    <div class="section">
+      <h2>学びたい国を選ぼう</h2>
+      <select v-model="selectedCountryLocal" @change="onCountryChange" class="country-select">
+        <option value="" disabled hidden>選択してください</option>
+        <option v-for="country in countries" :key="country.code" :value="country">
+          {{ country.name }}
+        </option>
+      </select>
+    </div>
+   
+    <!-- モード選択 -->
+    <div class="mode-buttons">
+  <h2>モードを選ぼう</h2>
+  <div class="radio-group">
+    <RadioButtons
+      :modelValue="selectedMode"
+      @update:modelValue="selectMode"
+      label="クイズで遊ぶ"
+      value="quiz"
+    />
+    <RadioButtons
+      :modelValue="selectedMode"
+      @update:modelValue="selectMode"
+      label="学習する"
+      value="learn"
+    />
+  </div>
+</div>
+<div class="wrapper">
+    <!-- クイズ設定 -->
+    <div v-if="selectedMode === 'quiz'" class="game-type">
+      <h2>クイズの種類を選択</h2>
+      <div class="radio-group">
+      <RadioButtons
+        :modelValue="gameType"
+        @update:modelValue="updateGameType"
+        label="地域当てクイズ"
+        value="location"
+      />
+      <RadioButtons
+        :modelValue="gameType"
+        @update:modelValue="updateGameType"
+        label="読み当てクイズ"
+        value="letter"
+      />
+    </div>
+ 
       <div class="mode-selection">
         <label>
           <input type="checkbox" v-model="internalChallengeMode" />
@@ -51,35 +55,57 @@
         </label>
         <ul class="challenge-info">
           <li>制限時間10秒</li>
-          <li>ヒント無し（地図と言語の表の表示不可）</li>
-          <li>ログインユーザーはこのモードのみレコードに記録されます</li>
+          <li>ログインユーザーは成績を記録されます</li>
         </ul>
-        
-        <NavigationButtons class="start-button" text="START" @click="$emit('start-game')" />
       </div>
     </div>
-  </template>
+
+    <!-- 学習設定 -->
+    <div v-if="selectedMode === 'learn'" class="mode-toggle">
+      <h2>学習表示形式を選択</h2>
+      <div class="radio-group">
+      <RadioButtons
+        :modelValue="gameType"
+        @update:modelValue="updateGameType"
+        label="地図"
+        value="isMapViewing"
+      />
+      <RadioButtons
+        :modelValue="gameType"
+        @update:modelValue="updateGameType"
+        label="言語の読み方表"
+        value="isLearning"
+      />
+    </div>
+    </div>
+</div>
+    <!-- スタートボタン -->
+    <NavigationButtons
+      text="START"
+      :disabled="!selectedCountryLocal || !gameType
+      
+      "
+      @click="$emit('start-game')"
+    />
+  </div> 
+</template>
+
   
   <script setup>
   import { ref, computed, onMounted } from "vue";
   import axios from "axios";
   import RadioButtons from "@/components/RadioButtons.vue";
-  import ToggleButtons from "@/components/ToggleButtons.vue";
   import NavigationButtons from "@/components/NavigationButtons.vue";
   
   // プロパティの受け取り
   const props = defineProps({
     gameType: String,
-    isLearning: Boolean,
-    isViewingStudyMap: Boolean,
-    challengeMode: Boolean
+
   });
   
   // イベントの発行
   const emit = defineEmits([
     "update:gameType",
-    "update:isLearning",
-    "update:isViewingStudyMap",
     "update:challengeMode",
     "country-selected",
     "start-game"
@@ -88,7 +114,8 @@
   // 国データの管理
   const countries = ref([]);
   const selectedCountryLocal = ref('');
-  
+  const selectedMode = ref('quiz')
+
   // APIから国リストを取得
   const fetchCountries = async () => {
     try {
@@ -116,143 +143,103 @@
   const updateGameType = (value) => {
     emit("update:gameType", value);
   };
-  
-  // モード（地図、学習）の切り替え処理
-  const handleToggle = (button) => {
-    if (props.challengeMode) return;
-  
-    if (button === "Learn") {
-      emit("update:isLearning", !props.isLearning);
-      emit("update:isViewingStudyMap", false);
-    } else if (button === "Map") {
-      emit("update:isViewingStudyMap", !props.isViewingStudyMap);
-      emit("update:isLearning", false);
-    }
-  };
+  const selectMode =(mode) => {
+  selectedMode.value = mode
+}
   
   // チャレンジモードのチェックボックスの双方向バインディング
   const internalChallengeMode = computed({
     get: () => props.challengeMode,
     set: (val) => emit('update:challengeMode', val)
   });
-  </script>
+</script>
   
-  
-  <style scoped>
- /* 全体コンテナ */
+<style scoped>
+/* 全体コンテナ */
 .game-mode-selector {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  max-width: 500px;
+  width: 500px;
+  max-width: 100vw;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
 }
 
-/* 各セクションのスタイル */
-.game-mode-selector > div {
+.mode-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  text-align: center;
+  background-color: rgb(184, 223, 210);
+  border-radius: 4px;
+  width: 500px;
+  max-width: 100vw;
+  padding: 10px;
 }
 
-/* ドロップダウン（国選択） */
-.dropdown {
+
+.section {
   width: 100%;
   text-align: center;
-}
-
-.dropdown select {
-  width: 80%;
+  background-color: rgb(184, 223, 210);
+  border-radius: 4px;
+  width: 500px;
+  max-width: 100vw;
   padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-top: 10px;
 }
 
-/* ゲームタイプ選択 */
-.game-type {
-  display: flex;
-  justify-content: space-around;
+.country-select{
+  font-size: 1.25rem;
+}
+
+.wrapper {
   width: 100%;
-  margin-top: 20px;
+  text-align: center;
+  background-color: rgb(184, 223, 210);
+  border-radius: 4px;
+  width: 500px;
+  max-width: 100vw;
+  height:15rem;
+  padding: 10px;
 }
 
-.game-type label {
-  font-size: 18px;
-}
-
-/* ラジオボタン */
-.radio-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.radio-buttons input {
-  margin-right: 5px;
-}
-
-/* モード選択 */
+.game-type,
 .mode-toggle {
   display: flex;
-  justify-content: space-around;
-  width: 100%;
-  margin-top: 20px;
+  flex-direction: column; 
+  align-items: center;
+ 
 }
 
-.mode-toggle button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
+.radio-group {
+  display: flex;
+  gap: 1rem; /* ボタンの間に余白を作る */
+}
+.mode-selection {
+  display: flex;
+  flex-direction: column; 
+  align-items:baseline
 }
 
-.mode-toggle button:hover {
-  background-color: #45a049;
+.challenge-info {
+  display: flex;
+  flex-direction: column; 
+  align-items:baseline
 }
 
-/* スタートボタン */
-button.start-game {
-  background-color: #FF5733;
-  color: white;
-  padding: 15px 30px;
-  font-size: 18px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 30px;
-  transition: background-color 0.3s;
-}
-
-button.start-game:hover {
-  background-color: #e84a2d;
-}
-
-/* レスポンシブデザイン */
+/* レスポンシブ対応 */
 @media (max-width: 600px) {
-  .game-mode-selector {
-    padding: 15px;
+  .button-wrapper {
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .game-type,
   .mode-toggle {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .dropdown select {
-    width: 90%;
-  }
-
-  button.start-game {
     width: 100%;
   }
 }

@@ -22,7 +22,7 @@
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.5rem;
     transition: background-color 0.3s;
   }
 

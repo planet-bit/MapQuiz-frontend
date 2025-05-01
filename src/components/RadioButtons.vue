@@ -27,16 +27,19 @@
   button {
     font-size: 1rem;
     font-weight: bold;
-    background-color: #ffffff00;
+    background-color: #acacac;
     color: #000000;
     border: none;
-    border-radius: 1rem;
+    border-radius: 2px;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
-    margin: 1rem;
+    padding: 8px;
+    margin: 10px;
+    width: 10rem;
   }
   
   button:hover {
+    background-color:  #69c06b;
     transform: scale(1.1);
     box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
   }
@@ -47,7 +50,7 @@
   }
   
   button.active {
-    background-color:  #3fd341;
+    background-color:  #64e466;
     color: rgb(0, 0, 0);
     box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
   }

@@ -1,9 +1,8 @@
 <template>
 
-<div class ="title-bar-container">
-        <!-- TitleBarからのボタンの情報を受け取り、関数実行 -->
-      <TitleBar  @user-logged-in="handleUserLogin"/>
-    </div> 
+  <div class ="title-bar-container">   
+    <TitleBar/>
+  </div> 
   <!-- タイトルと戻るボタン -->
   <h1 class="page-title">
     Challenge Mode Records
@@ -60,7 +59,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 // 子コンポーネント
@@ -71,7 +70,6 @@ import RegionAccuracyMap from '@/components/RegionAccuracyMap.vue';
 
 // ルーティング関連
 const router = useRouter();
-const route = useRoute();
 
 // ステート（リアクティブ変数）
 const records = ref([]); // 全チャレンジ記録

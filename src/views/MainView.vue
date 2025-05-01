@@ -7,7 +7,7 @@
   <div class="main-container">
     <div class="buttons-container">
       <GameMenu
-        v-if="!isGameStarted"
+        v-show="!isGameStarted"
         :countries="countries"
         :gameType="gameType"
         :isLearning="isLearning"
@@ -40,17 +40,16 @@
     />
 
     <Learn
-      :challengeMode="challengeMode"
+      v-if="gameType === 'isLearning'&& isGameStarted"
       :selectedCountry="selectedCountry"
-      :isLearning="isLearning"
-      @close-learning="handleCloseLearning"
+      @game-reset="handleGameReset"
     />
 
     <StudyMap
-      :challengeMode="challengeMode"
+      :isGameStarted="isGameStarted"
       :selectedCountry="selectedCountry"
-      :isViewingStudyMap="isViewingStudyMap"
-      @close-map="handleCloseMap"
+      :gameType="gameType"
+      @game-reset="handleGameReset"
     />
   </div>
 </template>
@@ -104,11 +103,6 @@ const fetchCountries = async () => {
   }
 };
 
-// Learnコンポーネントを閉じる処理
-const handleCloseLearning = () => {
-  isLearning.value = false;
-};
-
 // StudyMapコンポーネントを閉じる処理
 const handleCloseMap = () => {
   isViewingStudyMap.value = false;
@@ -129,10 +123,6 @@ const initializeGame = () => {
 
   // Event Busを使ってstart-gameイベントを発火
   EventBus.emit('start-game');
-
-  console.log(gameType.value);
-  console.log(isGameStarted.value);
-  console.log(challengeMode.value);
 };
 
 
@@ -153,7 +143,7 @@ const handleGameReset = () => {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-width: 400px;
+  max-width: 100vw;
   width: 100%;
 }
 
@@ -201,18 +191,6 @@ const handleGameReset = () => {
   background-color: #e0e0e0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
   .title-bar-container {
     position: absolute;
     top: 0;
@@ -226,7 +204,7 @@ const handleGameReset = () => {
     left: 0;
     height:calc(100% - 50px);
     width: 100%;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(240, 240, 240);
   }
 
 </style>

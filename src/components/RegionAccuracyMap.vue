@@ -21,14 +21,14 @@ const zoom = ref(5.5);
 
 const countryData = {
   ru: {
-    center: [65, 100],
-    zoom: 4.5,
+    center: [55, 100],
+    zoom: 3,
     geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
     regionProperty: 'name_latin'
   },
   kr: {
     center: [36, 127.5],
-    zoom: 8.7,
+    zoom: 7,
     geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
     regionProperty: 'name'
   },
@@ -70,8 +70,8 @@ const initializeMap = () => {
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors &copy; CartoDB',
       subdomains: 'abcd',
-      maxZoom: 10,
-      minZoom: 5
+      maxZoom: 20,
+      minZoom: 1
     }).addTo(map);
 
     updateMapLayers(props.countryCode);
@@ -183,13 +183,13 @@ onMounted(() => {
 
 <style scoped>
 .map-wrapper {
-  height: 60vh; /* または vh, %, remなど */
+  height: 60vh; 
   width: 50vw;
 }
 
 #map-record {
-  width: 700px;
-  height: 700px; /* ビューポートの80%にする */
+  width: 1000px;
+  height: 700px; 
 }
 
 </style>
