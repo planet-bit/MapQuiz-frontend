@@ -103,11 +103,6 @@ const fetchCountries = async () => {
   }
 };
 
-// StudyMapコンポーネントを閉じる処理
-const handleCloseMap = () => {
-  isViewingStudyMap.value = false;
-};
-
 // マウント時に国リストを取得
 onMounted(() => {
   fetchCountries();
