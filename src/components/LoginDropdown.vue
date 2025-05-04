@@ -144,6 +144,11 @@ const register = async () => {
     formError.value = "ユーザーネームを入力してください！!!";
     return;
   }
+  
+  if (user_name.value.length > 20) {
+    formError.value = "名前は20文字以下で入力してください。";
+    return;
+  }
 
   try {
     const res = await fetch("http://localhost:3000/auth/register", {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a href="#" @click.prevent="isUserDropdownOpen = !isUserDropdownOpen" class="user-dropdown-link"> User ▼
+        <a href="#" @click.prevent="isUserDropdownOpen = !isUserDropdownOpen" class="user-dropdown-link">  {{ userName }}
         </a>
       <div v-if="isUserDropdownOpen" class="user-dropdown-menu">
         <router-link :to="'/records' ">Records</router-link>
@@ -11,18 +11,24 @@
 
 <script setup>
   import { ref } from "vue";
-  
+
+  const props = defineProps({
+    userName: String
+  });
   const emit = defineEmits(["signout"]); 
 
   const isUserDropdownOpen = ref(false);
 </script>
 
 <style scoped>
- .user-dropdown-link {
+.user-dropdown-link {
   color: rgb(0, 0, 0); 
-    font-size: 1.1rem; 
-    font-weight: bold;
-    text-decoration: none; 
+  font-size: 1.1rem; 
+  font-weight: bold;
+  text-decoration: none; 
+  border: 1px solid rgba(0, 0, 0, 0.2); 
+  padding: 4px 8px;                   
+  border-radius: 8px;                
 }
 
   .user-dropdown-menu {

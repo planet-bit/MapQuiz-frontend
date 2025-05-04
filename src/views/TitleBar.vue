@@ -7,7 +7,10 @@
     </div>
 
     <div v-else class="user-container">
-      <UserDropdown @signout="signout" />
+      <UserDropdown 
+      :userName="userName" 
+      @signout="signout" 
+      />
     </div>
   </div>
 </template>
@@ -22,7 +25,7 @@ const router = useRouter();
 const emit = defineEmits(["user-logged-in"]);
 const token = ref(null);
 const userId = ref(null);
-
+const userName = ref("User");
 // クッキーからトークンを取得
 const getTokenFromCookie = () => {
   const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
@@ -38,6 +41,7 @@ const fetchUserInfo = async () => {
         headers: { Authorization: `Bearer ${token.value}` }
       });
       userId.value = response.data.user.id;
+      userName.value = response.data.user.user_name;
       emit("user-logged-in", userId.value);
     } catch (error) {
       console.error("ユーザー情報の取得に失敗しました", error);
