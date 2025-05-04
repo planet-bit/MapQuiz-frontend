@@ -35,13 +35,12 @@
     transition: transform 0.3s, box-shadow 0.3s;
     padding: 8px;
     margin: 10px;
-    width: 10rem;
+    width: 8rem;
   }
   
   button:hover {
     background-color:  #69c06b;
     transform: scale(1.1);
-    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
   }
   
   @keyframes fadeIn {
@@ -52,12 +51,10 @@
   button.active {
     background-color:  #64e466;
     color: rgb(0, 0, 0);
-    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
   }
   
   button.active:hover {
-    transform: none;
-    box-shadow: none;
+    transform: scale(1.1);
   }
   </style>
   

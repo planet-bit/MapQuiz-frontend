@@ -69,18 +69,32 @@ const reloadMainPage = async () => {
   background: #a8faa8;
   color: #000000;
   width: 100%;
-  height: 50px;
+  height: 40px;
   padding: 0 10px;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  text-shadow: 8px 8px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }
 
 .login-container {
   position: relative;
 }
+
+@media (max-width: 600px) {
+  .title-bar {
+    height: 30px;
+  }
+
+  .title {
+    font-size: 1rem; 
+  }
+
+  .login-container {
+    font-size: 0.9rem; 
+  }
+}
+
 </style>

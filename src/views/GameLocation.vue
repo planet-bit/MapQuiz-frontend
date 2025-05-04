@@ -289,15 +289,14 @@ const sendAnswerResult = async () => {
   align-items: flex-start; /* 左寄せ */
   justify-content: flex-start; /* 上寄せ */
   width: 100vw;
-  margin-left: 30px;
 }
 
 /* ===== ゲーム中スタイル ===== */
 .current-question {
     font-size: 1.5rem;
     font-weight: bold;
-    margin-top: 50px;
-    margin-bottom: 50px;
+    margin: 50px 20px;
+    
   }
 
 .answer-feedback {

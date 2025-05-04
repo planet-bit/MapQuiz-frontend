@@ -2,7 +2,7 @@
   <div class="game-mode-selector">
     <!-- 国選択 -->
     <div class="section">
-      <h2>学びたい国を選ぼう</h2>
+      <h3>①学びたい国を選ぼう</h3>
       <select v-model="selectedCountryLocal" @change="onCountryChange" class="country-select">
         <option value="" disabled hidden>選択してください</option>
         <option v-for="country in countries" :key="country.code" :value="country">
@@ -13,7 +13,7 @@
    
     <!-- モード選択 -->
     <div class="mode-buttons">
-  <h2>モードを選ぼう</h2>
+  <h3>②モードを選ぼう</h3>
   <div class="radio-group">
     <RadioButtons
       :modelValue="selectedMode"
@@ -32,7 +32,7 @@
 <div class="wrapper">
     <!-- クイズ設定 -->
     <div v-if="selectedMode === 'quiz'" class="game-type">
-      <h2>クイズの種類を選択</h2>
+      <h3>③クイズの種類を選択</h3>
       <div class="radio-group">
       <RadioButtons
         :modelValue="gameType"
@@ -62,7 +62,7 @@
 
     <!-- 学習設定 -->
     <div v-if="selectedMode === 'learn'" class="mode-toggle">
-      <h2>学習表示形式を選択</h2>
+      <h3>学習表示形式を選択</h3>
       <div class="radio-group">
       <RadioButtons
         :modelValue="gameType"
@@ -162,10 +162,9 @@
   align-items: center;
   gap: 20px;
   width: 500px;
-  max-width: 100vw;
+  max-width: 98vw;
   margin: 0 auto;
   padding: 20px;
-  font-family: Arial, sans-serif;
 }
 
 .mode-buttons {
@@ -177,7 +176,7 @@
   background-color: rgb(184, 223, 210);
   border-radius: 4px;
   width: 500px;
-  max-width: 100vw;
+  max-width: 98vw;
   padding: 10px;
 }
 
@@ -188,12 +187,12 @@
   background-color: rgb(184, 223, 210);
   border-radius: 4px;
   width: 500px;
-  max-width: 100vw;
+  max-width: 98vw;
   padding: 10px;
 }
 
 .country-select{
-  font-size: 1.25rem;
+  font-size: 1rem;
 }
 
 .wrapper {
@@ -202,8 +201,8 @@
   background-color: rgb(184, 223, 210);
   border-radius: 4px;
   width: 500px;
-  max-width: 100vw;
-  height:15rem;
+  max-width: 98vw;
+  height:13rem;
   padding: 10px;
 }
 
@@ -231,17 +230,6 @@
   align-items:baseline
 }
 
-/* レスポンシブ対応 */
-@media (max-width: 600px) {
-  .button-wrapper {
-    flex-direction: column;
-    gap: 1rem;
-  }
 
-  .game-type,
-  .mode-toggle {
-    width: 100%;
-  }
-}
 
-  </style>
+</style>

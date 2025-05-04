@@ -42,13 +42,13 @@ const toggleLanguage = () => {
 const countryData = {
   ru: {
     center: [60, 100],
-    zoom: 4,
+    zoom:2.5,
     geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
     regionProperty: 'name_latin'
   },
   kr: {
     center: [35.5, 127.5],
-    zoom: 7,
+    zoom: 6.5,
     geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
     regionProperty: 'name'
   },

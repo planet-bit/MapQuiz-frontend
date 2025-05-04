@@ -147,64 +147,30 @@ const handleGameReset = () => {
   width: 100%;
 }
 
-.dropdown {
-  margin-bottom: 10px;
-}
-
-.dropdown select {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.game-type p,
-.view-options p {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.game-type,
-.view-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.game-type .RadioButtons,
-.view-options .ToggleButtons {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.view-options .ToggleButtons {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-}
-
-.view-options .ToggleButtons:hover {
-  cursor: pointer;
-  background-color: #e0e0e0;
-}
-
   .title-bar-container {
     position: absolute;
     top: 0;
     left: 0px;
-    height: 50px;
+    height: 40px;
     width: 100%; 
   }
   .main-container {
     position: absolute;
-    top: 50px;
+    top: 40px;
     left: 0;
-    height:calc(100% - 50px);
+    height:calc(100% - 40px);
     width: 100%;
-    background-color: rgb(240, 240, 240);
+    background-color: rgb(255, 255, 255);
+  }
+  
+  @media (max-width: 600px) {
+  .title-bar-container {
+    height: 30px;
   }
 
+  .main-container {
+    top: 30px;
+    height: calc(100% - 30px);
+  }
+  }
 </style>

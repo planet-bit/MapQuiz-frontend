@@ -27,13 +27,13 @@
   const countryData = {
     ru: {
       center: [65, 100],
-      zoom: 2.9,
+      zoom: 2.5,
       geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
       regionProperty: 'name_latin'
     },
     kr: {
-      center: [36, 127.5],
-      zoom: 7,
+      center: [35.5, 127.5],
+      zoom: 6.5,
       geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
       regionProperty: 'name'
     },
@@ -182,6 +182,14 @@
     width: 90vw;
     max-width: 1000px;
     height: 60vh;
-    max-height:600px
+    max-height:600px;
+    margin-left: 20px;
   }
+
+  @media(max-width:600px) {
+    .map-container {
+      margin:0 auto;
+    }
+  }
+
 </style>

@@ -20,9 +20,9 @@
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 1rem;
     transition: background-color 0.3s;
   }
 

@@ -53,24 +53,29 @@
   
 <style scoped>
   .language-title {
-    padding: 2rem;
-    font-size: 2rem;
+    padding: 20px;
+    font-size: 1rem;
     display: flex;
     font-weight: bold;
   }
+
+  .language-list{
+    width: 800px;
+    max-width: 95vw;
+  }
   .language-list ul {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); /* 列幅の自動調整 */
+  grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr)); /* 列幅の自動調整 */
   grid-auto-flow: column; /* 縦方向（列優先）に配置 */
   grid-template-rows: repeat(11, auto); /* 行数を決める（適宜調整） */
   list-style-type: none;
-  margin:2rem;
+  margin:5px;
  }
   .language-list ul li {
     font-size: 1rem; /* 文字サイズを調整 */
     font-weight: bold;
     line-height: 1.5;
-    padding: 1rem;
+    padding: 10px;
     text-align: center;
     background-color: rgb(255, 255, 255);
   }

@@ -1,6 +1,5 @@
 <template>
   <div class="map-wrapper">
-  <!-- v-showを使ってmap-recordを常に表示しておく -->
   <div v-if="visible" id="map-record"></div>
   </div>
 </template>
@@ -21,14 +20,14 @@ const zoom = ref(5.5);
 
 const countryData = {
   ru: {
-    center: [55, 100],
-    zoom: 3,
+    center: [55, 85],
+    zoom: 2.5,
     geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/russia.geojson',
     regionProperty: 'name_latin'
   },
   kr: {
     center: [36, 127.5],
-    zoom: 7,
+    zoom: 6.5,
     geoJsonUrl: 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/korea.geojson',
     regionProperty: 'name'
   },
@@ -184,12 +183,14 @@ onMounted(() => {
 <style scoped>
 .map-wrapper {
   height: 60vh; 
-  width: 50vw;
+  width: 1000px;
+  max-width: 90vw;
 }
 
 #map-record {
   width: 1000px;
-  height: 700px; 
+  height: 500px;
+  max-width: 90vw;
 }
 
 </style>

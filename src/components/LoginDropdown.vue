@@ -174,7 +174,7 @@ const register = async () => {
 <style scoped>
   .login-dropdown-link {
     color: rgb(0, 0, 0); 
-    font-size: 1.5rem; 
+    font-size: 1.1rem; 
     font-weight: bold;
     text-decoration: none; 
   }
@@ -185,6 +185,7 @@ const register = async () => {
   top: 100%;
   right: 0;
   width: 500px;
+  max-width: 95vw;
   height: 300px;;
   background: rgb(245, 245, 245);
   border: 2px solid #bebdbd;
@@ -200,7 +201,7 @@ const register = async () => {
 .dropdown-menu input {
   width: 80%; 
   padding: 10px;
-  font-size: 1rem;  
+  font-size: clamp(0.75rem, 0.75rem, 1rem); 
   margin: 5px; 
   border: none;
   border-bottom: 1px solid #000000;
@@ -210,19 +211,19 @@ const register = async () => {
 
 .dropdown-menu button {
   padding: 5px;
-  font-size: 1rem;
+  font-size: clamp(0.75rem, 0.75rem, 1rem);
   margin: 20px;
 }
 
 .register-link {
   color: rgb(0, 0, 0);
   text-decoration: underline;
-  font-size: 1rem; 
+  font-size: clamp(0.75rem, 0.75rem, 1rem); 
 }
 
 .user-dropdown-close-button{
   position: absolute;
-  top: 10px;
+  top: 5px;
   right: 10px;
 }
 .error-message {
@@ -230,5 +231,11 @@ const register = async () => {
   font-size: 1rem;
   margin-top: 4px;
   margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+  .login-dropdown-link { 
+    font-size: 0.9rem; 
+  }
 }
 </style>
