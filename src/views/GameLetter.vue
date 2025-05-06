@@ -1,39 +1,39 @@
 <template>
   <div class="game-container">
-    <!-- 問題をランダムで出題する機能 -->
-    <QuestionManager ref="questionManager"
+    <!-- 問題出題 -->
+    <QuestionManager
+      ref="questionManager"
       :selectedCountry="selectedCountry" 
       :gameType="props.gameType"
       @question-updated="updateQuestion"
     />
 
-    <!-- ゲーム中 -->
-   
-      <p class="current-question">{{ currentQuestion.word }}</p>
-        <!-- タイマー機能の表示 -->
-        <Timer
-          :challengeMode="props.challengeMode" 
-          :timerActive="timerActive"
-          :triggerStopTimer="triggerStopTimer"
-          @time-up="TimeUp"
-        />
-        
-        <!-- 選択肢ボタン表示 -->
-        <ChoiceButtons 
-          :choices="currentChoices" 
-          :selectedChoice="selectedChoice" 
-          :correctAnswer="currentQuestion.answer"
-          :isAnswered="isAnswered"
-          @answer-selected="checkAnswer"
-        />
-      </div>
-  
+    <!-- 問題文表示 -->
+    <p class="current-question">{{ currentQuestion.word }}</p>
 
-    <!-- 解答後のフィードバック表示 -->
-   
+    <!-- タイマー表示 -->
+    <Timer
+      :challengeMode="props.challengeMode" 
+      :timerActive="timerActive"
+      :triggerStopTimer="triggerStopTimer"
+      @time-up="TimeUp"
+    />
+
+    <!-- 選択肢とフィードバックを横並びに配置 -->
+    <div class="answer-section">
+      <!-- 選択肢ボタン -->
+      <ChoiceButtons 
+        :choices="currentChoices" 
+        :selectedChoice="selectedChoice" 
+        :correctAnswer="currentQuestion.answer"
+        :isAnswered="isAnswered"
+        @answer-selected="checkAnswer"
+      />
+
+      <!-- 解答後のフィードバック -->
       <AnswerFeedback 
-        class="answer-feedback"
         v-if="selectedChoice"
+        class="answer-feedback"
         :selectedChoice="selectedChoice"
         :correctAnswer="currentQuestion.answer"
         :streakCount="currentQuestionIndex - 1"
@@ -43,9 +43,10 @@
         @select-mode="GameReset"
         @streak-finalized="sendStreakData"
       />
-  
- 
+    </div>
+  </div>
 </template>
+
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from "vue";
@@ -262,24 +263,37 @@ const sendAnswerResult = async () => {
 
 <style scoped>
  .game-container {
-  
-
-  
-  flex-direction: column; /* 縦並びに */
+  flex-direction: column; 
   align-items: flex-start; /* 左寄せ */
   justify-content: flex-start; /* 上寄せ */
   width: 100vw;
-  margin-left: 30px;
- 
   }
+
   .current-question {
     font-size: 1.5rem;
     font-weight: bold;
-    margin-top: 50px;
-    margin-bottom: 50px;
+    margin: 50px 20px;
   }
-  .mode-message{
-    margin: 50px;
-    font-size: 1.5rem;
+  
+  .answer-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px; 
+    margin-top: 20px;
   }
+
+  .choice-buttons {
+  flex: 1;
+}
+
+.answer-feedback {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .current-question {
+    margin-top: 20px;
+  }
+}
 </style>

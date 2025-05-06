@@ -58,4 +58,10 @@
   gap: 20px; /* ボタン同士の間隔 */
   margin: 20px; 
 }
+
+@media (max-width: 600px) {
+  .correct-message, .streak-count {
+  font-size: 1.5rem;
+}
+}
 </style>

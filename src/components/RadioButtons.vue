@@ -56,5 +56,13 @@
   button.active:hover {
     transform: scale(1.1);
   }
+
+  @media (max-width: 600px) {
+    button {
+      font-size: 0.75rem;
+      padding: 3px 7px;
+      width: 7rem;
+    }
+  }
   </style>
   

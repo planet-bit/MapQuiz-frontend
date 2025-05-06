@@ -285,11 +285,12 @@ const sendAnswerResult = async () => {
 <style scoped>
 /* ===== コンテナ全体 ===== */
 .game-container {
-  flex-direction: column; /* 縦並びに */
+  flex-direction: column; 
   align-items: flex-start; /* 左寄せ */
   justify-content: flex-start; /* 上寄せ */
   width: 100vw;
-}
+ 
+  }
 
 /* ===== ゲーム中スタイル ===== */
 .current-question {
@@ -301,16 +302,28 @@ const sendAnswerResult = async () => {
 
 .answer-feedback {
   position: absolute;
-  top: 20%;
-  left: 2%;
+  top: 200px;
+  left: 40px;
   z-index: 10;
-  background-color: rgba(255, 255, 255, 0.6);
-  border-radius: 40px;
-  padding: 40px;
+  background-color: hsla(0, 0%, 100%, 0.8);
+  border-radius: 20px;
+  padding: 20px;
 }
 
 .choice-regions {
   position: relative;
   z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .current-question {
+    margin: 30px 10px;
+    
+  }
+  .answer-feedback {
+    top: 150px;
+    left: 15px;
+    padding: 10px;
+}
 }
 </style>

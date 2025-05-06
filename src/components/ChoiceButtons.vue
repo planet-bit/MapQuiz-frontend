@@ -63,4 +63,11 @@
   .choice-button:disabled:hover {
     background-color: lightblue; /* もともとの選択肢の色を保持 */
   }
+
+  @media (max-width: 600px) {
+    .choice-button {
+      font-size:0.75rem;
+      margin-left: 30px;
+    }
+  }
 </style>

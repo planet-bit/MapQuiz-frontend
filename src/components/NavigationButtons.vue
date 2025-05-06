@@ -34,5 +34,12 @@
     from {opacity: 0;}
     to {opacity: 1;}
   }
+
+  @media (max-width: 600px) {
+    button {
+      font-size: 0.75rem;
+      padding: 3px 7px;
+    }
+  }
   </style>
   
