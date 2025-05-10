@@ -47,7 +47,7 @@ const fetchUserInfo = async () => {
       console.error("ユーザー情報の取得に失敗しました", error);
     }
   } else {
-    console.log("トークンがありません");
+    return;
   }
 };
 
