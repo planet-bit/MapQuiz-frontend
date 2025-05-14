@@ -37,7 +37,7 @@ const fetchUserInfo = async () => {
   if (cookieToken) {
     token.value = cookieToken;
     try {
-      const response = await axios.get("http://localhost:3000/auth/me", {
+      const response = await axios.get("/server/auth/me", {
         headers: { Authorization: `Bearer ${token.value}` }
       });
       userId.value = response.data.user.id;

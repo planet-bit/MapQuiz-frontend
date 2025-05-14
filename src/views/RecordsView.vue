@@ -122,7 +122,7 @@ onMounted(async () => {
       return;
     }
 
-    const response = await axios.get("http://localhost:3000/api/streaks/get", {
+    const response = await axios.get("/server/api/streaks/get", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -149,7 +149,7 @@ onMounted(async () => {
         return;
       }
       const res = await axios.get(
-        `http://localhost:3000/api/accuracy?country=${clickedCountryCode.value}&game_type=${clickedGameType.value}`,{
+        `/server/api/accuracy?country=${clickedCountryCode.value}&game_type=${clickedGameType.value}`,{
           headers: {
             Authorization: `Bearer ${token}`,
           }
