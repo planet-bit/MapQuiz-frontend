@@ -19,7 +19,7 @@
     if (!props.selectedCountry.code) return;
     try {
       // APIにリクエストを送信。`encodeURIComponent`で選択された国をURLエンコード
-      const response = await fetch(`http://localhost:3000/api/questions?countryCode=${encodeURIComponent(props.selectedCountry.code)}`);
+      const response = await fetch(`/server/api/questions?countryCode=${encodeURIComponent(props.selectedCountry.code)}`);
 
       // responseをJSON形式に変換し、questionsに格納
       const data = await response.json();

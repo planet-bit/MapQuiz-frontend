@@ -267,7 +267,7 @@ const sendAnswerResult = async () => {
   };
 
   try {
-    await fetch("http://localhost:3000/api/answers", {
+    await fetch("/server/api/answers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -34,7 +34,7 @@
     if (!props.selectedCountry.code) return;
     try {
       // country_code を使ってAPIからデータを取得
-      const response = await fetch(`http://localhost:3000/api/letters/${props.selectedCountry.code}`);
+      const response = await fetch(`/server/api/letters/${props.selectedCountry.code}`);
       if (!response.ok) throw new Error('データ取得に失敗しました');
     
       // responseをJSON形式に変換し、languageListに格納
