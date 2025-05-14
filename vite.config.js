@@ -23,7 +23,7 @@ export default defineConfig({
     },
     proxy: {
       '/server': {
-        target: 'http://mapquiz-app-container:3000', // docker-compose上のバックエンド名とポート
+        target: 'http://localhost:3000', 
         changeOrigin: true,
         rewrite: path => path.replace(/^\/server/, '')
       }
