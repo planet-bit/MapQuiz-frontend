@@ -90,7 +90,7 @@ const handleCountrySelected = (country) => {
 // 国リスト取得
 const fetchCountries = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/api/countries");
+    const response = await axios.get("/server/api/countries");
     countries.value = response.data.map(item => ({
       code: item.country_code,
       name: item.country_name

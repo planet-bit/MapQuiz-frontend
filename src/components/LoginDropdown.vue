@@ -126,7 +126,7 @@ const login = async () => {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/auth/login", {
+    const res = await fetch("/server/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_name:user_name.value, password: password.value }),
@@ -173,7 +173,7 @@ const register = async () => {
     }
   
   try {
-    const res = await fetch("http://localhost:3000/auth/register", {
+    const res = await fetch("/server/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_name:user_name.value, password: password.value }),

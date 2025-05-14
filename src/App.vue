@@ -1,3 +1,8 @@
 <template>
-  <router-view></router-view>
+  <router-view class="main"></router-view>
 </template>
+<style coped>
+  .main {
+    color: black;
+  }
+</style>
