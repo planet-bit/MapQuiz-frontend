@@ -14,17 +14,18 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0',  // 全てのIPアドレスからアクセス可能に設定
+    host: '0.0.0.0',
     port: 5173,
     watch: {
-      usePolling: true,  // ファイル監視のためにPollingを使う
+      usePolling: true,
     },
     proxy: {
       '/server': {
-        target: 'http://localhost:3000', 
+        target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/server/, '')
       }
-    }
+    },
+    allowedHosts: ['geo-language.com', 'www.geo-language.com'],  // ここを追加
   }
 })
