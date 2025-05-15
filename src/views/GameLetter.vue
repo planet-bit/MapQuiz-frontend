@@ -186,7 +186,7 @@ const updateStreak = async (data) => {
     const token = getTokenFromCookie();
     if (!token) return;
 
-    const response = await fetch("http://localhost:3000/api/streaks/update", {
+    const response = await fetch("/server/api/streaks/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
